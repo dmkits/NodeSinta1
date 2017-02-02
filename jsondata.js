@@ -1,12 +1,17 @@
 
 var fs = require('fs');
 var sql = require('mssql');
-var dbConfig = {
-    host: 'localhost\\SQLEXPRESS',
-    user: "sa",
-    password: "LVCCbu7575",
-    database: 'GMSData38_20161212'
-};
+
+var app = require('./app');
+
+try {
+    var dbConfig = require('./' + app.startupMode() + '.cfg.json');
+}
+catch(err){
+    console.log("Wrong mode");
+}
+
+
 module.exports.getUnits= function(errAction, successAction) {
     var conn = new sql.Connection(dbConfig);
     var reqSql = new sql.Request(conn);

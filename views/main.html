@@ -7,21 +7,18 @@
     <meta name="viewport"
           content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no"/>
     <!--<meta name="apple-mobile-web-app-capable" content="yes"/>-->
-
     <link href="/jslib/dojox/mobile/themes/iphone/iphone.css" rel="stylesheet"/>
     <link rel="stylesheet" href="/jslib/dojox/widget/Calendar/Calendar.css">
     <link rel="stylesheet" href="/jslib/dojox/calendar/themes/claro/Calendar.css">
     <link href="/jslib/dijit/themes/claro/claro.css" rel="stylesheet" type="text/css">
     <!--<script type="text/javascript" src="/jslib/dojox/mobile/deviceTheme.js"></script>-->
-    <script src="/jslib/myutils.js"></script>
+    <!--<script src="/jslib/myutils.js"></script>-->
     <script src="/jslib/mainutils.js"></script>
-    <script src="/jslib/handsontable/moment/moment-with-locales.js"></script>
-    <script src="/jslib/handsontable/numeral/numeral.js"></script>
-    <script src="/jslib/handsontable/numeral/languages/ru-UA.js"></script>
+    <script src="/jslib/moment/moment-with-locales.js"></script>
+    <script src="/jslib/numeral/numeral.js"></script>
+    <script src="/jslib/numeral/languages/ru-UA.js"></script>
     <script type="text/javascript" src="/jslib/dojo/dojo.js"
             data-dojo-config="async: true, parseOnLoad: false"></script>
-    <!--<script src="/jslib/dijit/dijit.js"></script>-->
-
     <title></title>
     <style>
         .claro table.dijitCalendarContainer {
@@ -285,7 +282,7 @@
                 view_main.setBottomButtonsFor(view_main);
                 view_main.inner_scroll.startup();
                 view_main.startup();
-                if (maindata.mode.indexOf("test") !== -1) {
+                if (maindata.mode && maindata.mode.toString().toLowerCase().indexOf("test") !== -1) {
                     var test_btn = new ToolBarButton({
                         icon: "/icons/exclamation-mark29x29.ico",
                         iconPos: "0,0,29,29",

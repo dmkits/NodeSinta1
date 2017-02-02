@@ -6,16 +6,9 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
-    "body-parser": "~1.15.2",
-    "cookie-parser": "~1.4.3",
-    "debug": "~2.2.0",
-    "ejs": "~2.5.2",
     "express": "~4.14.0",
-    "morgan": "~1.7.0",
-    "serve-favicon": "~2.3.0",
-    "mysql":"~4.0.5",
-    "mssql":"~4.0.5",
-    "path":"~4.0.5",
-    "fs":"~4.0.5"
+    "mssql":"~3.3.0",
+    "path":"~0.12.7",
+    "fs":"~0.0.1"
   }
 }

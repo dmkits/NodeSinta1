@@ -1,13 +1,20 @@
+function startupMode(){
+    var app_params = process.argv.slice(2);
+    if(app_params.length===0) return 'production';
+    return app_params[0];
+};
+module.exports.startupMode = startupMode;
+
 var express = require('express');
 var app = express();
 var port=8181;
 var path=require ('path');
+
 var database=require('./jsondata');
 
-app.use('/',express.static('web_sinta'));
+app.use('/',express.static('public'));
 app.get('/', function(req, res){
     res.sendFile(path.join(__dirname, '/views', 'main.html'));
-    // res.sendFile('main.html', { root: path.join(__dirname, '/web_sinta') });
 });
 app.get("/mobile", function(req, res){
     var bdate;
@@ -22,7 +29,10 @@ app.get("/mobile", function(req, res){
             }, function (recordset) {
                                                                                                                         console.log("getUnits result:", recordset);
                 var outData= {};
-                outData.mode="test";
+                var app_params = process.argv.slice(2);
+                if(app_params.length===0) outData.mode='production';
+                else outData.mode=app_params[0];
+
                 outData.head="Магазины";
                 outData.units = recordset;
                 res.send(outData);
@@ -73,14 +83,30 @@ app.get("/mobile", function(req, res){
     }
     function getUnitlist(req){
         sUnitlist="";
-        if(req.query.unit_0_id) sUnitlist=" "+sUnitlist+" "+req.query.unit_0_id+" ";
-        if(req.query.unit_1_id) sUnitlist=" "+sUnitlist+" "+req.query.unit_1_id+" ";
-        if(req.query.unit_2_id) sUnitlist=" "+sUnitlist+" "+req.query.unit_2_id+" ";
-        if(req.query.unit_id) sUnitlist=" "+ req.query.unit_id+" ";
+        for(var itemName in req.query){
+            if (itemName.indexOf("unit_")>=0){
+                sUnitlist=" "+sUnitlist+" "+req.query[itemName]+" ";
+            }
+        }
+        // if(req.query.unit_0_id) sUnitlist=" "+sUnitlist+" "+req.query.unit_0_id+" ";
+        // if(req.query.unit_1_id) sUnitlist=" "+sUnitlist+" "+req.query.unit_1_id+" ";
+        // if(req.query.unit_2_id) sUnitlist=" "+sUnitlist+" "+req.query.unit_2_id+" ";
+        // if(req.query.unit_id) sUnitlist=" "+ req.query.unit_id+" ";
         return sUnitlist;
     }
 });
+app.get("/sysadmin", function(req, res){
 
+    res.sendFile(path.join(__dirname, '/views', 'sysadmin.html'));
+});
+app.get("/sysadmin/app_state", function(req, res){
+    var outData= {};
+    outData.mode= startupMode();
+    res.send(outData);
+});
+app.get("/sysadmin/startup_parameters", function(req, res){
+    res.sendFile(path.join(__dirname, '/views/sysadmin', 'startup_parameters.html'));
+});
 app.listen(port, function (err) {                                                                                       console.log('running server on port ' + port);
 });
 
