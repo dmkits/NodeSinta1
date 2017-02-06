@@ -3,14 +3,12 @@ var fs = require('fs');
 var sql = require('mssql');
 
 var app = require('./app');
+var dbConfig;
 
-try {
-    var dbConfig = require('./' + app.startupMode() + '.cfg.json');
-}
-catch(err){
-    console.log("Wrong mode");
-}
-
+module.exports.init=function(){
+    var stringConfig = fs.readFileSync('./' + app.startupMode() + '.cfg');
+    dbConfig = JSON.parse(stringConfig);
+};
 
 module.exports.getUnits= function(errAction, successAction) {
     var conn = new sql.Connection(dbConfig);
@@ -35,7 +33,7 @@ module.exports.getUnits= function(errAction, successAction) {
         )
     });
 };
-module.exports.getMainView= function(bdate, edate, unit_condition,errAction, successAction) {
+module.exports.getViewMainData= function(bdate, edate, unit_condition,errAction, successAction) {
     var conn = new sql.Connection(dbConfig);
     var reqSql = new sql.Request(conn);
     conn.connect(function (err) {
@@ -62,7 +60,7 @@ module.exports.getMainView= function(bdate, edate, unit_condition,errAction, suc
     });
 };
 
-module.exports.getDetailMainView= function(bdate, edate, unit_condition,errAction, successAction) {
+module.exports.getViewMainDetailData= function(bdate, edate, unit_condition,errAction, successAction) {
     var conn = new sql.Connection(dbConfig);
     var reqSql = new sql.Request(conn);
     conn.connect(function (err) {

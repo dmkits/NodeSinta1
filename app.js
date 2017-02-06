@@ -2,7 +2,8 @@ function startupMode(){
     var app_params = process.argv.slice(2);
     if(app_params.length===0) return 'production';
     return app_params[0];
-};
+}
+
 module.exports.startupMode = startupMode;
 
 var express = require('express');
@@ -10,24 +11,33 @@ var app = express();
 var port=8181;
 var path=require ('path');
 
-var database=require('./jsondata');
-
 app.use('/',express.static('public'));
-app.get('/', function(req, res){
-    res.sendFile(path.join(__dirname, '/views', 'main.html'));
+
+var database = require('./dataBase');
+
+var DBError;
+try {
+    database.init();
+    DBError=null;
+} catch (e) {
+    DBError=e;
+}
+app.get('/', function (req, res) {
+   if(DBError!=null) res.sendFile(path.join(__dirname, '/views', 'err_dbconfig.html'));
+    else res.sendFile(path.join(__dirname, '/views', 'main.html'));
 });
+
 app.get("/mobile", function(req, res){
     var bdate;
     var edate;
     var sUnitlist;
 
-    var pAction= req.query.action;                                                                                      console.log('get  /mobile ?action=',pAction);
+    var pAction= req.query.action;
     if(pAction=='get_units'){
         database.getUnits(
             function (error) {
-                                                                                                                        console.log("getUnits error:", error);
+                res.send({error:""});
             }, function (recordset) {
-                                                                                                                        console.log("getUnits result:", recordset);
                 var outData= {};
                 var app_params = process.argv.slice(2);
                 if(app_params.length===0) outData.mode='production';
@@ -45,22 +55,20 @@ app.get("/mobile", function(req, res){
 
         if(req.query.detail!==undefined){
 
-            database.getDetailMainView(bdate,edate,sUnitlist,
+            database.getViewMainDetailData(bdate,edate,sUnitlist,
                 function (error) {
-                                                                                                                        console.log("getDetailMainView error:", error);
+                    res.send({error:""});
                 }, function (recordset) {
-                                                                                                                        console.log("getDetailMainView result:", recordset);
                     var outData= {};
                     outData.items = recordset;
                     res.send(outData);
                 });
         }
         else {
-            database.getMainView(bdate,edate,sUnitlist,
+            database.getViewMainData(bdate,edate,sUnitlist,
                 function (error) {
-                                                                                                                        console.log("getMainView error:", error);
+                    res.send({error:""});
                 }, function (recordset) {
-                                                                                                                        console.log("getMainView result:", recordset);
                     var outData= {};
                     outData.items = recordset;
                     res.send(outData);
@@ -74,8 +82,8 @@ app.get("/mobile", function(req, res){
         edate = req.query.edate;
         database.getDetailViewData(detail_id,bdate,edate,sUnitlist,
             function (error) {
-                                                                                                                        console.log("getDetailViewData error:", error);
-            }, function (recordset) {                                                                                   console.log("getDetailViewData result:", recordset);
+                res.send({error:""});
+            }, function (recordset) {
                 var outData= {};
                 outData.items = recordset;
                 res.send(outData);
@@ -88,10 +96,6 @@ app.get("/mobile", function(req, res){
                 sUnitlist=" "+sUnitlist+" "+req.query[itemName]+" ";
             }
         }
-        // if(req.query.unit_0_id) sUnitlist=" "+sUnitlist+" "+req.query.unit_0_id+" ";
-        // if(req.query.unit_1_id) sUnitlist=" "+sUnitlist+" "+req.query.unit_1_id+" ";
-        // if(req.query.unit_2_id) sUnitlist=" "+sUnitlist+" "+req.query.unit_2_id+" ";
-        // if(req.query.unit_id) sUnitlist=" "+ req.query.unit_id+" ";
         return sUnitlist;
     }
 });
@@ -107,6 +111,8 @@ app.get("/sysadmin/app_state", function(req, res){
 app.get("/sysadmin/startup_parameters", function(req, res){
     res.sendFile(path.join(__dirname, '/views/sysadmin', 'startup_parameters.html'));
 });
-app.listen(port, function (err) {                                                                                       console.log('running server on port ' + port);
+app.listen(port, function (err) {
 });
+
+
 
