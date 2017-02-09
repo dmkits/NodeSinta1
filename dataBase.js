@@ -10,6 +10,10 @@ module.exports.init=function(){
     dbConfig = JSON.parse(stringConfig);
 };
 
+module.exports.getDBConfig=function(){
+    return dbConfig;
+};
+
 module.exports.getUnits= function(errAction, successAction) {
     var conn = new sql.Connection(dbConfig);
     var reqSql = new sql.Request(conn);

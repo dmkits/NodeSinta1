@@ -13,7 +13,7 @@
     <link href="/jslib/dijit/themes/claro/claro.css" rel="stylesheet" type="text/css">
     <!--<script type="text/javascript" src="/jslib/dojox/mobile/deviceTheme.js"></script>-->
     <!--<script src="/jslib/myutils.js"></script>-->
-    <script src="/jslib/mainutils.js"></script>
+    <!--<script src="/jslib/mainutils.js"></script>-->
     <script src="/jslib/moment/moment-with-locales.js"></script>
     <script src="/jslib/numeral/numeral.js"></script>
     <script src="/jslib/numeral/languages/ru-UA.js"></script>
@@ -74,10 +74,10 @@
             "dojox/mobile/ListItem", "dojo/parser", "dojo/ready", "dojox/mobile/ToolBarButton",
             "dijit/registry", "dojox/mobile/Tooltip", "dijit/CalendarLite", "dojox/mobile/IconItem", "dojox/mobile/IconContainer",
             "dojox/mobile/ToggleButton", "dojox/mobile/ScrollableView", "dojox/mobile/ProgressIndicator", "dojox/mobile/SimpleDialog", "dojox/mobile/Button",
-            "calendarView", "pickUnitView", "detailView"],
+            "calendarView", "pickUnitView", "detailView", "JSON"],
         function ( domConstruct, xhr, mobile, mparser, View, Heading, roundRectList, ListItem, parser, ready, ToolBarButton, registry,
                    Tooltip, CalendarLite, IconItem, IconContainer, ToggleButton, ScrollableView, ProgressIndicator, SimpleDialog, Button,
-                   CalendarView, PickUnitView, DetailView) {
+                   CalendarView, PickUnitView, DetailView, JSON) {
             moment.locale("uk");
             numeral.language('ru-UA');
 
@@ -199,42 +199,55 @@
                     tbody.appendChild(tr);
                     tr.appendChild(td);
                 }
-                var today_current_time = moment();
+
+                function getCurrentTime() {
+                        return moment();
+                }
                 if (!view.todayBtn) {
-                    var today_beginning = moment().startOf('day');
-                    view.todayBtn =  setBottomButtons(tr,view,"Сегодня",today_beginning,today_current_time );
+                    function getTodayBeginning() {
+                        return getCurrentTime().startOf('day');
+                    }
+                    view.todayBtn =  setBottomButtons(tr,view,"Сегодня", getTodayBeginning, getCurrentTime);
                 }
                 if (!view.yesterdayBtn) {
-                    var yesterday_beginning = moment().startOf('day').subtract(1, 'days');
-                    var yesterday_end = moment().endOf('day').subtract(1, 'days');
-                    view.yesterdayBtn = setBottomButtons(tr,view,"Вчера",yesterday_beginning,yesterday_end );
+                    function getYesterdayBeginning() {
+                        return getCurrentTime().startOf('day').subtract(1, 'days');
+                    }
+                    function getYesterdayEnd() {
+                        return getCurrentTime().endOf('day').subtract(1, 'days');
+                    }
+                    view.yesterdayBtn = setBottomButtons(tr,view,"Вчера", getYesterdayBeginning, getYesterdayEnd );
                 }
                 if (!view.weekBtn) {
-                    var week_beginning = moment().startOf('week');
-                    view.weekBtn = setBottomButtons(tr,view,"Неделя",week_beginning,today_current_time );
+                    function getWeekBeginning(){
+                        return  getCurrentTime().startOf('week');
+                    }
+                    view.weekBtn = setBottomButtons(tr,view,"Неделя", getWeekBeginning, getCurrentTime );
                 }
                 if (!view.monthBtn) {
-                    var month_beginning = moment().startOf('month');
-                    view.monthBtn = setBottomButtons(tr,view,"Месяц",month_beginning,today_current_time );
+                    function getMonthBeginning() {
+                       return  getCurrentTime().startOf('month');
+                    }
+                    view.monthBtn = setBottomButtons(tr,view,"Месяц", getMonthBeginning, getCurrentTime );
 
                 } else {
                     view.btnBeginDate.set("label", view_main.btnBeginDate.label);
                     view.btnEndDate.set("label", view_main.btnEndDate.label);
                 }
             };
-            var setBottomButtons= function(tr,view,label,first_date,last_date){
+            var setBottomButtons= function(tr, view, label, get_first_date, get_last_date){
                 var btn= new ToolBarButton({
-                    first_date:first_date,
-                    last_date:last_date,
+                    get_first_date:get_first_date,
+                    get_last_date:get_last_date,
                     style: "padding-left:4px;padding-right:4px; ",
                     label: label,
                     clickable: "true"
                 });
                 btn.onClick = function () {
-                    view.btnBeginDate.dateValue=this.first_date;
-                    view.btnEndDate.dateValue=this.last_date;
-                    view.btnBeginDate.set("label", this.first_date.format("DD.MM.YYYY"));
-                    view.btnEndDate.set("label", this.last_date.format("DD.MM.YYYY"));
+                    view.btnBeginDate.dateValue=this.get_first_date();                                                  console.log("this.get_first_date()=", this.get_first_date());
+                    view.btnEndDate.dateValue=this.get_last_date();                                                     console.log("this.get_last_date()=", this.get_last_date());
+                    view.btnBeginDate.set("label", this.get_first_date().format("DD.MM.YYYY"));
+                    view.btnEndDate.set("label", this.get_last_date().format("DD.MM.YYYY"));
                     view.loadDetailContent(view_main);
                 };
                 tr.appendChild(btn.domNode);
@@ -248,7 +261,9 @@
              ,{ "id": "Bata2", "short_name": "Bata2", "name": "Магазин БАТА2" } ]
              }*/
             view_main.loadMainContent = function () {
-                getJSONData({url: "/mobile", condition: "action=get_units", consoleLog: true},
+
+                JSON.getJSONData({url: "/mobile", condition: "action=get_units", consoleLog: true},
+               // getJSONData({url: "/mobile", condition: "action=get_units", consoleLog: true},
                     function (success, result) {
                         if (success) {                                                                                  console.log("result =", result);
                             if (result.error) {
@@ -312,7 +327,8 @@
                     var unit_condition = "unit_" + i + "_id=" + units_list[i].id;
                     unit_params = (unit_params === null) ? unit_condition : unit_params + "&" + unit_condition;         console.log("unit_params=",unit_params);
                 }
-                getJSONData({
+                //getJSONData({
+                JSON.getJSONData({
                         url: "/mobile",
                         condition: "action=get_main_data&bdate=" + bdate + "&edate=" + edate + "&" + unit_params + detail,
                         consoleLog: true

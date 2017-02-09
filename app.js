@@ -10,6 +10,9 @@ var express = require('express');
 var app = express();
 var port=8181;
 var path=require ('path');
+var bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 app.use('/',express.static('public'));
 
@@ -22,6 +25,7 @@ try {
 } catch (e) {
     DBError=e;
 }
+
 app.get('/', function (req, res) {
    if(DBError!=null) res.sendFile(path.join(__dirname, '/views', 'err_dbconfig.html'));
     else res.sendFile(path.join(__dirname, '/views', 'main.html'));
@@ -108,8 +112,18 @@ app.get("/sysadmin/app_state", function(req, res){
     outData.mode= startupMode();
     res.send(outData);
 });
-app.get("/sysadmin/startup_parameters", function(req, res){
+app.get("/sysadmin/startup_parameters", function (req, res) {
     res.sendFile(path.join(__dirname, '/views/sysadmin', 'startup_parameters.html'));
+});
+app.get("/sysadmin/startup_parameters/store_app_local_config", function (req, res) {
+
+   var outData = {};
+    outData=database.getDBConfig();
+    res.send(outData);
+});
+app.post("/sysadmin/startup_parameters/save_app_local_config_and_reconnect", function (req, res) {                      console.log("req.body=", req.body);
+
+    res.send("ok");
 });
 app.listen(port, function (err) {
 });
