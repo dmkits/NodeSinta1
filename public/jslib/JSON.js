@@ -4,10 +4,10 @@ define(["dojo/request/xhr", "dojo/domReady!"],
 
             jsonHeader: {"X-Requested-With": "application/json; charset=utf-8"},
 
-            getJSONData: function (data, callback) {
-                if (!data) return;
+            getJSONData: function (params, callback) {
+                if (!params) return;
 
-                var url = data["url"], condition = data["condition"], consoleLog = data["consoleLog"];
+                var url = params["url"], condition = params["condition"], consoleLog = params["consoleLog"];
                 if (condition) url = url + "?" + condition;
                 xhr.get(url, {headers: this.jsonHeader, handleAs: "json"}).then(
                     function (data) {
@@ -19,11 +19,11 @@ define(["dojo/request/xhr", "dojo/domReady!"],
                     });
             },
 
-            postJSONData: function (data, callback) {
-                if (!data) return;
-                var url = data["url"], condition = data["condition"], consoleLog = data["consoleLog"];
+            postJSONData: function (params, callback) {
+                if (!params) return;
+                var url = params["url"], condition = params["condition"], consoleLog = params["consoleLog"];
                 if (condition) url = url + "?" + condition;
-                xhr.post(url, {headers: this.jsonHeader, handleAs: "json", data: data["data"]}).then(
+                xhr.post(url, {headers: this.jsonHeader, handleAs: "json", data: params["data"]}).then(
                     function (data) {
                         if (callback)callback(true, data);
                     }, function (error) {

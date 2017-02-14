@@ -6,6 +6,7 @@ function startupMode(){
 
 module.exports.startupMode = startupMode;
 
+var fs = require('fs');
 var express = require('express');
 var app = express();
 var port=8181;
@@ -18,24 +19,38 @@ app.use('/',express.static('public'));
 
 var database = require('./dataBase');
 
-var DBError;
-try {
-    database.init();
-    DBError=null;
-} catch (e) {
-    DBError=e;
+var ConfigurationError, DBConnectError;
+
+tryLoadConfiguration();
+function tryLoadConfiguration(){
+    try {
+        database.loadConfig();
+        ConfigurationError=null;
+    } catch (e) {
+        ConfigurationError= "Failed to load configuration! Reason:"+e;
+    }
 }
-
+ if (!ConfigurationError) tryDBConnect();
+function tryDBConnect(postaction){
+    database.checkDBConnection(function(err){
+        DBConnectError=null;
+        if (err){
+            DBConnectError= "Failed to connect to database! Reason:"+err;
+        }
+        if(postaction)postaction(err);
+    });
+}
 app.get('/', function (req, res) {
-   if(DBError!=null) res.sendFile(path.join(__dirname, '/views', 'err_dbconfig.html'));
-    else res.sendFile(path.join(__dirname, '/views', 'main.html'));
+   if(ConfigurationError||DBConnectError) {
+       res.sendFile(path.join(__dirname, '/views', 'err_dbconfig.html'));
+       return;
+   }
+    res.sendFile(path.join(__dirname, '/views', 'main.html'));
 });
-
 app.get("/mobile", function(req, res){
     var bdate;
     var edate;
     var sUnitlist;
-
     var pAction= req.query.action;
     if(pAction=='get_units'){
         database.getUnits(
@@ -104,26 +119,57 @@ app.get("/mobile", function(req, res){
     }
 });
 app.get("/sysadmin", function(req, res){
-
     res.sendFile(path.join(__dirname, '/views', 'sysadmin.html'));
 });
+
 app.get("/sysadmin/app_state", function(req, res){
     var outData= {};
     outData.mode= startupMode();
-    res.send(outData);
+
+    if (ConfigurationError) {
+        outData.error= ConfigurationError;
+        res.send(outData);
+        return;
+    }
+    outData.configuration= database.getDBConfig();
+    tryDBConnect(/*postaction*/function (err) {
+        if (DBConnectError) outData.dbConnection='Connection failed! Reason:'+ DBConnectError;
+        else outData.dbConnection='Connected';
+        res.send(outData);
+    });
 });
 app.get("/sysadmin/startup_parameters", function (req, res) {
     res.sendFile(path.join(__dirname, '/views/sysadmin', 'startup_parameters.html'));
 });
-app.get("/sysadmin/startup_parameters/store_app_local_config", function (req, res) {
-
-   var outData = {};
-    outData=database.getDBConfig();
-    res.send(outData);
+app.get("/sysadmin/startup_parameters/get_app_config", function (req, res) {
+    if (ConfigurationError) {
+        res.send({error:ConfigurationError});
+        return;
+    }
+    res.send(database.getDBConfig());
 });
-app.post("/sysadmin/startup_parameters/save_app_local_config_and_reconnect", function (req, res) {                      console.log("req.body=", req.body);
+app.get("/sysadmin/startup_parameters/load_app_config", function (req, res) {
+    tryLoadConfiguration();
+    if (ConfigurationError) {
+        res.send({error:ConfigurationError});
+        return;
+    }
+    res.send(database.getDBConfig());
+});
+app.post("/sysadmin/startup_parameters/store_app_config_and_reconnect", function (req, res) {
+        var newDBConfigString = req.body;
+        database.setDBConfig(newDBConfigString);
+    database.saveConfig(
+        function (err) {
+            var outData = {};
+            if (err) outData.error = err;
 
-    res.send("ok");
+            tryDBConnect(/*postaction*/function (err) {
+                if (DBConnectError) outData.DBConnectError = DBConnectError;
+                res.send(outData);
+            });
+        }
+    );
 });
 app.listen(port, function (err) {
 });

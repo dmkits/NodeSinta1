@@ -1,19 +1,40 @@
-
 var fs = require('fs');
 var sql = require('mssql');
 
 var app = require('./app');
 var dbConfig;
+var dbConfigFilePath;
 
-module.exports.init=function(){
-    var stringConfig = fs.readFileSync('./' + app.startupMode() + '.cfg');
+
+module.exports.loadConfig=function(){
+    dbConfigFilePath='./' + app.startupMode() + '.cfg';
+    var stringConfig = fs.readFileSync(dbConfigFilePath);
     dbConfig = JSON.parse(stringConfig);
 };
-
-module.exports.getDBConfig=function(){
+var count=0;
+var count2=0;
+module.exports.getDBConfig=function(){                                                                                  console.log(count++, "dbConfig=",dbConfig );
     return dbConfig;
 };
-
+module.exports.setDBConfig=function(newDBConfig){                                                                       console.log(count2++, "module.exports.setDBConfig=");
+    dbConfig= newDBConfig;
+};
+module.exports.saveConfig=function(callback) {
+    fs.writeFile(dbConfigFilePath, JSON.stringify(dbConfig), function (err, sucsess) {
+        callback(err,sucsess);
+    })
+};
+module.exports.checkDBConnection=function(callback){
+    var conn = new sql.Connection(dbConfig);
+    conn.connect(function (err) {
+        if (err) {
+            callback(err.message);
+            return;
+        }
+        callback(null,"connected");
+        conn.close();
+    });
+};
 module.exports.getUnits= function(errAction, successAction) {
     var conn = new sql.Connection(dbConfig);
     var reqSql = new sql.Request(conn);

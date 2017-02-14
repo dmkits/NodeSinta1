@@ -58,115 +58,91 @@
 </body>
 <script type="text/javascript">
     require(["dijit/registry", "dijit/layout/BorderContainer", "dijit/layout/LayoutContainer", "dijit/layout/ContentPane", "dojo/data/ItemFileReadStore",
-                "dijit/form/TextBox", "dijit/form/DateTextBox", "dijit/form/Button"],
-            function (registry, BorderContainer, LayoutContainer, ContentPane, ItemFileReadStore, TextBox, DateTextBox, Button) {
+                "dijit/form/TextBox", "dijit/form/DateTextBox", "dijit/form/Button","JSON"],
+            function (registry, BorderContainer, LayoutContainer, ContentPane, ItemFileReadStore, TextBox, DateTextBox, Button, JSON) {
                 var sa_startup_params_PageContent = initElem(registry, "sa_startup_params_PageContent", "sa_startup_params_PageContent", ContentPane, {});
 
-//                var sa_startup_params_ContentController =
-//                        new ContentController({dataIDName:"db.engine", getURL:"/sysadmin/startup_parameters",postURL: "/sysadmin/startup_parameters", stateElementID:null});
-//
-//                sa_startup_params_ContentController.addElement("host", initElem(registry, "host", "host", TextBox, {style:"width:150px", readOnly:"false", disabled:"false"}));
-//                sa_startup_params_ContentController.addElement("database", initElem(registry, "database", "database", TextBox, {style:"width:150px"}));
-//                sa_startup_params_ContentController.addElement("user", initElem(registry, "user", "user", TextBox, {style:"width:100px"}));
-//                sa_startup_params_ContentController.addElement("password", initElem(registry, "password", "password", TextBox, {style:"width:100px"}));
-//
-//                var SA_startup_params_BtnAppLocalConfigLoad=
-//                        initElem(registry, "SA_startup_params_BtnAppLocalConfigLoad", "SA_startup_params_BtnAppLocalConfigLoad", Button, {style:"width:150px"});
-//                var SA_startup_params_BtnAppLocalConfigSaveAndReconnect=
-//                        initElem(registry, "SA_startup_params_BtnAppLocalConfigSaveAndReconnect", "SA_startup_params_BtnAppLocalConfigSaveAndReconnect",
-//                            Button, {style:"width:150px"});
-//                /*---actions---*/
+                var hostInput=new TextBox({id:"host"},"host");
+                var databaseInput=new TextBox({id:"database"},"database");
+                var userInput=new TextBox({id:"user"},"user");
+                var passwordInput=new TextBox({id:"password"},"password");
+                var sa_startup_params_appLocalConfig = document.getElementById("sa_startup_params_appLocalConfig");
+                var reloadBtn = new Button({id: "SA_startup_params_BtnAppLocalConfigLoad"}, "SA_startup_params_BtnAppLocalConfigLoad");
+                var saveAndReconnectBtn = new Button({id: "SA_startup_params_BtnAppLocalConfigSaveAndReconnect"}, "SA_startup_params_BtnAppLocalConfigSaveAndReconnect");
 
-                loadContent();
-                function loadContent() {
-                    console.log("loadContent");
-
-                    var sa_startup_params_appLocalConfig = document.getElementById("sa_startup_params_appLocalConfig");
-                    sa_startup_params_appLocalConfig.innerHTML = "<div><b>Loading configuration parameters...</b></div>";
-
-                    getJSONData({url: "/sysadmin/startup_parameters/store_app_local_config", consoleLog: true},
+                sa_startup_params_PageContent.getAppConfiguration = function(){
+                    JSON.getJSONData({url: "/sysadmin/startup_parameters/get_app_config", consoleLog: true},
                             function (success, result) {
-                                if (success) {
-                                    if (result.error) {
-                                        sa_startup_params_appLocalConfig.innerHTML = "<div><b style='color:red'>Cannot " + +"load configuration parameters! No connection to the server!</b></div>";
-                                    } else setDBConfigContent(result);
-                                } else {//error!!!
-                                    sa_startup_params_appLocalConfig.innerHTML = "<div><b style='color:red'>Cannot " + +"load configuration parameters! No connection to the server!</b></div>";
+                                if (!success) {
+                                    sa_startup_params_appLocalConfig.innerHTML = "<div><b style='color:red'>No connection to the server!</b></div>";
+                                    return;
                                 }
+                                if (result.error) {
+                                    sa_startup_params_appLocalConfig.innerHTML = "<div><b style='color:red'>Cannot get configuration parameters!</b> Reason:"+result.error+"</div>";
+                                    return;
+                                }
+                                sa_startup_params_appLocalConfig.innerHTML = "<div><b>Configuration loaded.</b></div>";
+                                setDBConfigContent(result);
+                            })
+                };
+                
+                reloadBtn.onClick= function() {                                                                                    console.log("reloadBtn.onClick");
+                    sa_startup_params_appLocalConfig.innerHTML = "<div><b>Loading configuration parameters...</b></div>";
+                    JSON.getJSONData({url: "/sysadmin/startup_parameters/load_app_config", consoleLog: true},
+                            function (success, result) {
+                                if (!success) {
+                                    sa_startup_params_appLocalConfig.innerHTML = "<div><b style='color:red'>No connection to the server!</b></div>";
+                                    return;
+                                }
+                                if (result.error) {
+                                    sa_startup_params_appLocalConfig.innerHTML = "<div><b style='color:red'>Cannot load configuration parameters!</b> Reason:"+result.error+"</div>";
+                                    return;
+                                }
+                                sa_startup_params_appLocalConfig.innerHTML = "<div><b>Configuration reloaded.</b></div>";
+                                setDBConfigContent(result);
+                                if (sa_startup_params_PageContent.getParent().updateDBState)  sa_startup_params_PageContent.getParent().updateDBState();
                             }
                     );
-                }
-
+                };
                 function setDBConfigContent(DBConfigData) {
-                    var hostInput=new TextBox({id:"host", value:DBConfigData.host},"host");
-                    var databaseInput=new TextBox({id:"database", value:DBConfigData.database},"database");
-                    var userInput=new TextBox({id:"user", value:DBConfigData.user},"user");
-                    var passwordInput=new TextBox({id:"password", value:DBConfigData.password},"password");
-
-//                    document.getElementById("host").setAttribute("value", DBConfigData.host);
-//                    document.getElementById("database").setAttribute("value", DBConfigData.database);
-//                    document.getElementById("user").setAttribute("value", DBConfigData.user);
-//                    document.getElementById("password").setAttribute("value", DBConfigData.password);
+                    hostInput.set("value",DBConfigData.host );
+                    databaseInput.set("value",DBConfigData.database );
+                    userInput.set("value",DBConfigData.user );
+                    passwordInput.set("value",DBConfigData.password );
                 }
-                var reloadBtn = new Button({
-                    id: "SA_startup_params_BtnAppLocalConfigLoad",
-                    onClick: loadContent
-                }, "SA_startup_params_BtnAppLocalConfigLoad");
 
-                var saveAndReconnectBtn = new Button({
-                    id: "SA_startup_params_BtnAppLocalConfigSaveAndReconnect",
-                    onClick: loadContent
-                }, "SA_startup_params_BtnAppLocalConfigSaveAndReconnect");
-
-                saveAndReconnectBtn.onClick = function () {
+                saveAndReconnectBtn.onClick = function () {                                                             console.log("saveAndReconnectBtn.onClick");
                     var sa_startup_params_appLocalConfig = document.getElementById("sa_startup_params_appLocalConfig");
                     sa_startup_params_appLocalConfig.innerHTML = "<div><b>Configuration saving and reconnected to database...</b></div>";
-
                     var newDBConfig={
-                        host: registry.byId("host").get('value'),
-                        database: registry.byId("database").get('value'),
-                        user: registry.byId("user").get('value'),
-                        password: registry.byId("password").get('value')
-                    };                                                                                                  console.log("newDBConfig=",newDBConfig);
-                    postJSONData({url:  "/sysadmin/startup_parameters/save_app_local_config_and_reconnect", data: newDBConfig, consoleLog: true},
+                        host: hostInput.get('value'),
+                        database: databaseInput.get('value'),
+                        user: userInput.get('value'),
+                        password: passwordInput.get('value')
+                    };
+                    JSON.postJSONData({url:  "/sysadmin/startup_parameters/store_app_config_and_reconnect", data: newDBConfig, consoleLog: true},
                             function (success, data) {
-                                if (success) {
-                                    if (data.error) {
-                                        sa_startup_params_appLocalConfig.innerHTML = "<div><b style='color:red'>" + data["error"] + "</b></div>";
-                                    } else; //setDBConfigContent(data);!!!!!!!
-                                } else {//error!!!
-                                    sa_startup_params_appLocalConfig.innerHTML = "<div><b style='color:red'>Cannot save and reconnect to database! No connection to the server!</b></div>";
+                                if (!success) {
+                                    sa_startup_params_appLocalConfig.innerHTML = "<div><b style='color:red'>No connection!</b></div>";
+                                    return;
                                 }
+                                if (data.error) {
+                                    sa_startup_params_appLocalConfig.innerHTML = "<div><b style='color:red'>Failed store configuration! Reason:" + data["error"] + "</b></div>";
+                                } else {
+                                    sa_startup_params_appLocalConfig.innerHTML = "<div><b>Configuration saved.</b></div>";
+                                }
+                                if (data.dbConnectError) {
+                                    sa_startup_params_appLocalConfig.innerHTML=
+                                        sa_startup_params_appLocalConfig.innerHTML+ "<br><div><b style='color:red'>Failed connect to database ! Reason:" + data["dbConnectError"] + "</b></div>";
+                                } else {
+                                    sa_startup_params_appLocalConfig.innerHTML =
+                                            sa_startup_params_appLocalConfig.innerHTML+ "<br><div><b>Reconnected to database.</b></div>";
+                                }
+                               if (sa_startup_params_PageContent.getParent().updateDBState)  sa_startup_params_PageContent.getParent().updateDBState();
                             });
                 };
-
-//                    sa_startup_params_ContentController.postDataToUrl("action=save_app_local_config_and_reconnect",
-//                            /*postaction*/function (success, data, updateCount, resultItemData) {
-//                                if (success) {
-//                                    if (data["error"]) {
-//                                        sa_startup_params_appLocalConfig.innerHTML = "<div><b style='color:red'>" + data["error"] + "</b></div>";
-//                                    } else {
-//                                        sa_startup_params_appLocalConfig.innerHTML = "<div><b>Default configuration saved.</b></div>";
-//                                        var reconnect_result_msg = "";
-//                                        if (data.reconnect_result) {
-//                                            reconnect_result_msg = "<div>Reconnected to: <span  style='text-decoration:underline'>" + data.reconnect_URL + "</span></div>";
-//                                        } else {
-//                                            if (data.reconnect_error) {
-//                                                reconnect_result_msg = "<div><b style='color:red'>" + data.reconnect_error + "</b></div>";
-//                                            } else {
-//                                                reconnect_result_msg = "<div><b style='color:red'>Cannot reconnected to: </b></div>";
-//                                            }
-//                                        }
-//                                        sa_startup_params_appLocalConfig.innerHTML = sa_startup_params_appLocalConfig.innerHTML + " " + reconnect_result_msg;
-//                                    }
-//                                    if (sa_startup_params_PageContent.getParent().updateStateInfo) sa_startup_params_PageContent.getParent().updateStateInfo();
-//                                } else {
-//                                    sa_startup_params_appLocalConfig.innerHTML = "<div><b style='color:red'>Cannot save and reconnect to database! No connection to the server!</b></div>";
-//                                }
-//                            });
-              //  };
                 /*---initing on load---*/
-                // loadContent();
+                sa_startup_params_PageContent.getAppConfiguration();
             });
 </script>
 </html>
