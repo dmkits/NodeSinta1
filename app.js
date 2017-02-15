@@ -14,6 +14,7 @@ var path=require ('path');
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(bodyParser.text());
 
 app.use('/',express.static('public'));
 
@@ -31,112 +32,103 @@ function tryLoadConfiguration(){
     }
 }
  if (!ConfigurationError) tryDBConnect();
-function tryDBConnect(postaction){
-    database.checkDBConnection(function(err){
-        DBConnectError=null;
-        if (err){
-            DBConnectError= "Failed to connect to database! Reason:"+err;
+function tryDBConnect(postaction) {
+    database.databaseConnection(function (err) {
+        DBConnectError = null;
+        if (err) {
+            DBConnectError = "Failed to connect to database! Reason:" + err;
         }
-        if(postaction)postaction(err);
+        if (postaction)postaction(err);
     });
 }
+
+function getUnitlist(req){
+    var sUnitlist="";
+    for(var itemName in req.query){
+        if (itemName.indexOf("unit_")>=0){
+            sUnitlist=" "+sUnitlist+" "+req.query[itemName]+" ";
+        }
+    }
+    return sUnitlist;
+}
 app.get('/', function (req, res) {
-   if(ConfigurationError||DBConnectError) {
-       res.sendFile(path.join(__dirname, '/views', 'err_dbconfig.html'));
-       return;
-   }
+    if(ConfigurationError||DBConnectError) {
+        res.sendFile(path.join(__dirname, '/views', 'err_dbconfig.html'));
+        return;
+    }
     res.sendFile(path.join(__dirname, '/views', 'main.html'));
 });
-app.get("/mobile", function(req, res){
-    var bdate;
-    var edate;
-    var sUnitlist;
-    var pAction= req.query.action;
-    if(pAction=='get_units'){
-        database.getUnits(
-            function (error) {
+app.get("/mobile/get_units", function(req, res){
+    database.getUnits(
+        function (error,recordset) {
+            if (error){
                 res.send({error:""});
+                return;
+            }
+            var outData= {};
+            var app_params = process.argv.slice(2);
+            if(app_params.length===0) outData.mode='production';
+            else outData.mode=app_params[0];
+            outData.head="Магазины";
+            outData.units = recordset;
+            res.send(outData);
+        });
+});
+app.get("/mobile/get_main_data", function (req, res) {
+    var sUnitlist = getUnitlist(req);
+    var bdate = req.query.bdate;
+    var edate = req.query.edate;
+    if (req.query.detail !== undefined) {
+        database.getViewMainDetailData(bdate, edate, sUnitlist,
+            function (error) {
+                res.send({error: ""});
             }, function (recordset) {
-                var outData= {};
-                var app_params = process.argv.slice(2);
-                if(app_params.length===0) outData.mode='production';
-                else outData.mode=app_params[0];
-
-                outData.head="Магазины";
-                outData.units = recordset;
+                var outData = {};
+                outData.items = recordset;
                 res.send(outData);
             });
-    }
-    if(pAction=='get_main_data'){
-        sUnitlist=getUnitlist(req);
-        bdate = req.query.bdate;
-        edate = req.query.edate;
-
-        if(req.query.detail!==undefined){
-
-            database.getViewMainDetailData(bdate,edate,sUnitlist,
-                function (error) {
-                    res.send({error:""});
-                }, function (recordset) {
-                    var outData= {};
-                    outData.items = recordset;
-                    res.send(outData);
-                });
-        }
-        else {
-            database.getViewMainData(bdate,edate,sUnitlist,
-                function (error) {
-                    res.send({error:""});
-                }, function (recordset) {
-                    var outData= {};
-                    outData.items = recordset;
-                    res.send(outData);
-                });
-        }
-    }
-    if(pAction=='get_detail_view_data'){
-        var detail_id=req.query.detail_id;
-        sUnitlist=getUnitlist(req);
-        bdate = req.query.bdate;
-        edate = req.query.edate;
-        database.getDetailViewData(detail_id,bdate,edate,sUnitlist,
+    } else {
+        database.getViewMainData(bdate, edate, sUnitlist,
             function (error) {
-                res.send({error:""});
+                res.send({error: ""});
             }, function (recordset) {
-                var outData= {};
+                var outData = {};
                 outData.items = recordset;
                 res.send(outData);
             });
     }
-    function getUnitlist(req){
-        sUnitlist="";
-        for(var itemName in req.query){
-            if (itemName.indexOf("unit_")>=0){
-                sUnitlist=" "+sUnitlist+" "+req.query[itemName]+" ";
-            }
-        }
-        return sUnitlist;
-    }
+});
+app.get("/mobile/get_detail_view_data", function (req, res) {
+    var detail_id = req.query.detail_id;
+    var sUnitlist = getUnitlist(req);
+    var bdate = req.query.bdate;
+    var edate = req.query.edate;
+    database.getDetailViewData(detail_id, bdate, edate, sUnitlist,
+        function (error) {
+            res.send({error: ""});
+        }, function (recordset) {
+            var outData = {};
+            outData.items = recordset;
+            res.send(outData);
+        });
 });
 app.get("/sysadmin", function(req, res){
     res.sendFile(path.join(__dirname, '/views', 'sysadmin.html'));
 });
-
-app.get("/sysadmin/app_state", function(req, res){
+app.get("/sysadmin/app_state", function(req, res){                                                                      console.log("/sysadmin/app_state");
     var outData= {};
     outData.mode= startupMode();
-
     if (ConfigurationError) {
         outData.error= ConfigurationError;
         res.send(outData);
         return;
     }
     outData.configuration= database.getDBConfig();
-    tryDBConnect(/*postaction*/function (err) {
-        if (DBConnectError) outData.dbConnection='Connection failed! Reason:'+ DBConnectError;
-        else outData.dbConnection='Connected';
-        res.send(outData);
-    });
+    if (DBConnectError)
+        outData.dbConnection= DBConnectError;
+    else
+        outData.dbConnection='Connected';
+    res.send(outData);
 });
 app.get("/sysadmin/startup_parameters", function (req, res) {
     res.sendFile(path.join(__dirname, '/views/sysadmin', 'startup_parameters.html'));
@@ -157,13 +149,12 @@ app.get("/sysadmin/startup_parameters/load_app_config", function (req, res) {
     res.send(database.getDBConfig());
 });
 app.post("/sysadmin/startup_parameters/store_app_config_and_reconnect", function (req, res) {
-        var newDBConfigString = req.body;
-        database.setDBConfig(newDBConfigString);
+    var newDBConfigString = req.body;
+    database.setDBConfig(newDBConfigString);
     database.saveConfig(
         function (err) {
             var outData = {};
             if (err) outData.error = err;
-
             tryDBConnect(/*postaction*/function (err) {
                 if (DBConnectError) outData.DBConnectError = DBConnectError;
                 res.send(outData);
@@ -171,7 +162,29 @@ app.post("/sysadmin/startup_parameters/store_app_config_and_reconnect", function
         }
     );
 });
+app.get("/sysadmin/sql_queries", function (req, res) {
+    res.sendFile(path.join(__dirname, '/views/sysadmin', 'sql_queries.html'));
+});
+app.get("/sysadmin/sql_queries/mobile_units", function (req, res) {
+    res.send(fs.readFileSync('./scripts/mobile_units.sql', 'utf8'));
+});
+app.post("/sysadmin/sql_queries/get_result_to_request", function (req, res) {
+
+    var newQuery = req.body;                                                                                            console.log("newQuery", newQuery);
+   // var outData= {};
+    database.getResultToNewQuery(newQuery,
+        function (err) {
+           var outData = {};
+            if (err) outData.error = err;
+        },  function (result) {
+           var outData= {};
+            outData = result;                                                                                           console.log("database.getResultToNewQuery outData= ", outData);
+            res.send(outData);
+        }
+    );
+});
 app.listen(port, function (err) {
+
 });
 
 

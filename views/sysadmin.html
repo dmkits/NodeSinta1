@@ -7,44 +7,64 @@
     <![endif]-->
     <link rel="icon" type="image/gif" href="/icons/icon1.ico"/>
     <link rel="stylesheet" href="/jslib/dijit/themes/claro/claro.css" media="screen">
-    <script type="text/javascript" src="/jslib/dojo/dojo.js" data-dojo-config="async:true,parseOnLoad:true"></script>
+    <script type="text/javascript" src="/jslib/dojo/dojo.js" data-dojo-config="async:true,parseOnLoad:false"></script>
     <link rel="stylesheet" type="text/css" href="/css/sysadmin.css" media="screen">
-    <script type="text/javascript" src="/jslib/mainutils.js"></script>
+
     <title>SINTA MOBILE (SYSADMIN)</title>
 </head>
 <body class="claro">
-    <div id="sysadmin_MainContainer">
-        <div id="sysadmin_TopContainer">
-            <div id="sysadmin_TopImg"></div>
-            <div id="sysadmin_TopStateInfo">
-                <div id="sysadmin_app_mode" style="display:inline;"></div>
-                <div id="sysadmin_dbName" style="display:inline;;margin-left:20px;"></div>
-                <div id="sysadmin_connectToDBState" style="display:inline;margin-left:20px;"></div>
-                <div id="sysadmin_dbValidateState" style="display:inline;margin-left:20px;"></div>
-            </div>
-            <div id="sysadmin_TopActions"></div>
+<div id="sysadmin_MainContainer">
+    <div id="sysadmin_TopContainer">
+        <div id="sysadmin_TopImg"></div>
+        <div id="sysadmin_TopStateInfo">
+            <div id="sysadmin_app_mode" style="display:inline;"></div>
+            <div id="sysadmin_dbName" style="display:inline;;margin-left:20px;"></div>
+            <div id="sysadmin_connectToDBState" style="display:inline;margin-left:20px;"></div>
+            <div id="sysadmin_dbValidateState" style="display:inline;margin-left:20px;"></div>
         </div>
-        <div id="sysadmin_ContentContainer"></div>
+        <div id="sysadmin_TopActions">
+            <button id="display_startup_params">Startup params</button>
+            <button id="display_SQL_queries">SQL queries</button>
+        </div>
     </div>
+    <div id="sysadmin_ContentContainer"></div>
+</div>
 </body>
 <script type="text/javascript">
-    require(["dijit/registry", "dijit/layout/BorderContainer", "dijit/layout/StackContainer", "dijit/layout/ContentPane",
-                "dijit/form/ToggleButton", "dojox/layout/ContentPane", "dojo/domReady!"],
-            function (registry, BorderContainer, StackContainer, ContentPane, ToggleButton, XContentPane) {
-                                                                                                                        console.log("STARTING SYSADMIN PAGE...");//!!!IT'S FOR TESTING!!!
-                var sysadmin_MainContainer = initElem(null, "sysadmin_MainContainer", "sysadmin_MainContainer", BorderContainer, {design: "headline"});
-                var sysadmin_TopContainer = initElem(null, "sysadmin_TopContainer", "sysadmin_TopContainer",
-                        BorderContainer, {region: "top", design: "sidebar", class: "sysadmin_TopContent", gutters: true});
-                var sysadmin_TopImg = initElem(null, "sysadmin_TopImg", "sysadmin_TopImg", ContentPane, {region: "left", class: "sysadmin_TopContent"});
+    require(["app", "dijit/layout/BorderContainer", "dijit/layout/StackContainer", "dijit/layout/ContentPane",
+                "dijit/form/ToggleButton", "dojox/layout/ContentPane", "dijit/form/Button",  "request", "dojo/domReady!"],
+            function (APP, BorderContainer, StackContainer, ContentPane, ToggleButton, XContentPane, Button, Request) {                    console.log("STARTING SYSADMIN PAGE...");//!!!IT'S FOR TESTING!!!
+                var sysadmin_MainContainer = APP.initElem("sysadmin_MainContainer", BorderContainer, {design: "headline"});
+                var sysadmin_TopContainer = APP.initElem("sysadmin_TopContainer",
+                        BorderContainer, {
+                            region: "top",
+                            design: "sidebar",
+                            class: "sysadmin_TopContent",
+                            gutters: true
+                        });
+                var sysadmin_TopImg = APP.initElem("sysadmin_TopImg", ContentPane, {
+                    region: "left",
+                    class: "sysadmin_TopContent"
+                });
                 //sysadmin_TopImg.set("content", "<image src=\"imgs/bata_small.jpg\" style=\"position:absolute; top:5px\">");
-                var sysadmin_TopStateInfo = initElem(null, "sysadmin_TopStateInfo", "sysadmin_TopStateInfo", ContentPane, {region:"top", class: "sysadmin_TopContent"});
-                var sysadmin_TopActions = initElem(null, "sysadmin_TopActions", "sysadmin_TopActions", ContentPane, {region: "bottom", class: "sysadmin_TopContent"});
-                var sysadmin_ContentContainer = initElem(null, "sysadmin_ContentContainer", "sysadmin_ContentContainer",
+                var sysadmin_TopStateInfo = APP.initElem("sysadmin_TopStateInfo", ContentPane, {
+                    region: "top",
+                    class: "sysadmin_TopContent"
+                });
+                var sysadmin_TopActions = APP.initElem("sysadmin_TopActions", ContentPane, {
+                    region: "bottom",
+                    class: "sysadmin_TopContent"
+                });
+
+                var startupBtn = new Button({id:"display_startup_params"},"display_startup_params");
+                var sqlBtn = new Button({id:"display_SQL_queries"},"display_SQL_queries");
+
+                var sysadmin_ContentContainer = APP.initElem("sysadmin_ContentContainer",
                         StackContainer, {region: "center", tabPosition: "top", class: "sysadmin_Content"});
                 sysadmin_MainContainer.startup();
 
                 sysadmin_MainContainer.getAppState = function () {   //getting main json data from server and run action parameter function
-                    getJSONData({url: "/sysadmin/app_state", consoleLog: true},
+                    Request.getJSONData({url: "/sysadmin/app_state", consoleLog: true},
                             function (success, result) {
                                 if (success) {
                                     if (result === undefined || result == null) result = [];
@@ -79,30 +99,29 @@
                             }
                     )
                 };
-                    sysadmin_MainContainer.runSysadminContentPage = function (id, title, closable, contentURL) {
-                        console.log("sysadmin_MainContainer.runSysadminContentPage: ", contentURL);//!!!IT'S FOR TESTING!!!
-                        var pageContentPane =
-                                initChild(registry, "PageContentPane_" + id, sysadmin_ContentContainer,
-                                        XContentPane, {
-                                            title: title,
-                                            closable: closable,
-                                            parseOnLoad: false,
-                                            style: "margin:0;padding:0;"
-                                        });
-                        sysadmin_ContentContainer.selectChild(pageContentPane);
-                        pageContentPane.set("content", "");
-                        pageContentPane.set("href", contentURL);
-                        var count =0;
-                        pageContentPane.updateDBState = function () {
-                                                                                                                      console.log("pageContentPane.updateDBStat", count++);
-                            document.getElementById("sysadmin_app_mode").innerHTML = "";
-                            document.getElementById("sysadmin_dbName").innerHTML = "";
-                            document.getElementById("sysadmin_connectToDBState").innerHTML = "";
-                            sysadmin_MainContainer.getAppState();
-                        };
+                sysadmin_MainContainer.runSysadminContentPage = function (id, title, closable, contentURL) {
+                    console.log("sysadmin_MainContainer.runSysadminContentPage: ", contentURL);//!!!IT'S FOR TESTING!!!
+                    var pageContentPane =
+                            APP.initChildTo(sysadmin_ContentContainer, "PageContentPane_" + id,
+                                    XContentPane, {title: title, closable: closable,parseOnLoad: false,style: "margin:0;padding:0;"});
+                    sysadmin_ContentContainer.selectChild(pageContentPane);
+                    pageContentPane.set("content", "");
+                    pageContentPane.set("href", contentURL);
+                    pageContentPane.updateDBState = function () {
+                        document.getElementById("sysadmin_app_mode").innerHTML = "";
+                        document.getElementById("sysadmin_dbName").innerHTML = "";
+                        document.getElementById("sysadmin_connectToDBState").innerHTML = "";
+                        sysadmin_MainContainer.getAppState();
                     };
-                    sysadmin_MainContainer.getAppState();
-                    sysadmin_MainContainer.runSysadminContentPage("startup_parameters", "Startup parameters", false, "/sysadmin/startup_parameters");
+                };
+
+                startupBtn.onClick=function() {
+                   sysadmin_MainContainer.runSysadminContentPage("startup_parameters", "Startup parameters", false, "/sysadmin/startup_parameters");
+                };
+                sqlBtn.onClick=function(){
+                    sysadmin_MainContainer.runSysadminContentPage("sql_queries", "SQL queries", false, "/sysadmin/sql_queries");
+                };
+                sysadmin_MainContainer.getAppState();
             });
 </script>
 </html>

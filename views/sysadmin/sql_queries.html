@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body id="body">
+<div id="sql_queries_PageContent" style="width:100%;height:100%; margin:0;padding:0;">
+    <div id="sql_queries_TopContent" style="width:100%;height:50px; margin:0;padding:0; border: solid 1px;">
+        <button id="sql_runBtn">Run</button>
+    </div>
+    <div id="sql_queries_LeftContent" style="width:100px;height:100%; margin:0;padding:0; border: solid 1px;">
+        <button id="unitsBtn">Get Units</button>
+    </div>
+    <div id="sql_queries_DetailContent" style="border: solid 1px;">
+            <textarea id="sql_display_content"></textarea>
+            <textarea id="sql_display_result"></textarea>
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+    require(["app", "dijit/layout/BorderContainer", "dijit/layout/LayoutContainer", "dijit/layout/ContentPane", "dojo/data/ItemFileReadStore",
+                "dijit/form/TextBox", "dijit/form/DateTextBox", "dijit/form/Button",
+                "request", "dijit/form/SimpleTextarea", "dijit/form/Textarea"],
+            function (APP, BorderContainer, LayoutContainer, ContentPane, ItemFileReadStore, TextBox, DateTextBox, Button,
+                      Request,SimpleTextarea,Textarea) {
+                var borderContainer= APP.initElem("sql_queries_PageContent", BorderContainer, {});
+                borderContainer.startup();
+                var sql_queries_TopContent= APP.initElem("sql_queries_TopContent", ContentPane, {region:"top"});
+                var sql_queries_LeftContent= APP.initElem("sql_queries_LeftContent", ContentPane, {region:"left"});
+                var sql_queries_DetailContent= APP.initElem("sql_queries_DetailContent", ContentPane, {region:"center"});
+                var unitsBtn= APP.initElem("unitsBtn", Button, {});
+                var sql_display_content= APP.initElem("sql_display_content", SimpleTextarea, {rows:20, style: "width:400px"});
+                var sql_display_result= APP.initElem("sql_display_result", SimpleTextarea, {rows:20, style: "width:400px"});
+                var sql_runBtn = APP.initElem("sql_runBtn", Button,{});
+                unitsBtn.onClick=function(){                                                                            console.log('unitsBtn.onclick');
+                    Request.getTextData({url:  "/sysadmin/sql_queries/mobile_units", consoleLog: true},
+                            function (success, data) {                                                                   console.log('data', data);
+                                if (!success) {
+                                    sql_display_content.innerHTML = "<div><b style='color:red'>No connection!</b></div>";
+                                    return;
+                                }
+                                sql_display_content.set("value",data);
+                            });
+                };
+                unitsBtn.onClick=function(){                                                                            console.log('unitsBtn.onclick');
+                   // var filename=this.filename;
+                    Request.getTextData({url: "/sysadmin/sql_queries/mobile_units",/* condition:"filename="+filename,*/ consoleLog: true},
+                            function (success, data) {                                                                  console.log('data', data);
+                                if (!success) {
+                                    sql_display_content.innerHTML = "<div><b style='color:red'>No connection!</b></div>";
+                                    return;
+                                }
+                                sql_display_content.set("value",data);
+                            });
+                };
+                sql_runBtn.onClick=function(){
+                    var newQueryText=sql_display_content.value;                                                         console.log("newQueryText=", newQueryText);
+                    Request.postTextData({url:  "/sysadmin/sql_queries/get_result_to_request", data:{text:newQueryText}, consoleLog: true},
+                            function (success, data) {
+                                if (!success) {
+                                    sql_display_result.innerHTML = "<div><b style='color:red'>Error in request</b></div>";
+                                    return;
+                                }
+                                sql_display_result.set("value",JSON.stringify(data));
+                            });
+                };
+            });
+</script>
+</html>

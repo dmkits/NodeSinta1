@@ -51,16 +51,17 @@
             </td>
         </tr>
         <tr>
-            <td></td>
+            <td >
+            </td>
         </tr>
     </table>
 </div>
 </body>
 <script type="text/javascript">
-    require(["dijit/registry", "dijit/layout/BorderContainer", "dijit/layout/LayoutContainer", "dijit/layout/ContentPane", "dojo/data/ItemFileReadStore",
-                "dijit/form/TextBox", "dijit/form/DateTextBox", "dijit/form/Button","JSON"],
-            function (registry, BorderContainer, LayoutContainer, ContentPane, ItemFileReadStore, TextBox, DateTextBox, Button, JSON) {
-                var sa_startup_params_PageContent = initElem(registry, "sa_startup_params_PageContent", "sa_startup_params_PageContent", ContentPane, {});
+    require(["app", "dijit/layout/BorderContainer", "dijit/layout/LayoutContainer", "dijit/layout/ContentPane", "dojo/data/ItemFileReadStore",
+                "dijit/form/TextBox", "dijit/form/DateTextBox", "dijit/form/Button","request"],
+            function (APP, BorderContainer, LayoutContainer, ContentPane, ItemFileReadStore, TextBox, DateTextBox, Button, Request) {
+                var sa_startup_params_PageContent = APP.initElem("sa_startup_params_PageContent", ContentPane, {});
 
                 var hostInput=new TextBox({id:"host"},"host");
                 var databaseInput=new TextBox({id:"database"},"database");
@@ -69,9 +70,8 @@
                 var sa_startup_params_appLocalConfig = document.getElementById("sa_startup_params_appLocalConfig");
                 var reloadBtn = new Button({id: "SA_startup_params_BtnAppLocalConfigLoad"}, "SA_startup_params_BtnAppLocalConfigLoad");
                 var saveAndReconnectBtn = new Button({id: "SA_startup_params_BtnAppLocalConfigSaveAndReconnect"}, "SA_startup_params_BtnAppLocalConfigSaveAndReconnect");
-
                 sa_startup_params_PageContent.getAppConfiguration = function(){
-                    JSON.getJSONData({url: "/sysadmin/startup_parameters/get_app_config", consoleLog: true},
+                    Request.getJSONData({url: "/sysadmin/startup_parameters/get_app_config", consoleLog: true},
                             function (success, result) {
                                 if (!success) {
                                     sa_startup_params_appLocalConfig.innerHTML = "<div><b style='color:red'>No connection to the server!</b></div>";
@@ -86,9 +86,9 @@
                             })
                 };
                 
-                reloadBtn.onClick= function() {                                                                                    console.log("reloadBtn.onClick");
+                reloadBtn.onClick= function() {
                     sa_startup_params_appLocalConfig.innerHTML = "<div><b>Loading configuration parameters...</b></div>";
-                    JSON.getJSONData({url: "/sysadmin/startup_parameters/load_app_config", consoleLog: true},
+                    Request.getJSONData({url: "/sysadmin/startup_parameters/load_app_config", consoleLog: true},
                             function (success, result) {
                                 if (!success) {
                                     sa_startup_params_appLocalConfig.innerHTML = "<div><b style='color:red'>No connection to the server!</b></div>";
@@ -120,7 +120,7 @@
                         user: userInput.get('value'),
                         password: passwordInput.get('value')
                     };
-                    JSON.postJSONData({url:  "/sysadmin/startup_parameters/store_app_config_and_reconnect", data: newDBConfig, consoleLog: true},
+                    Request.postJSONData({url:  "/sysadmin/startup_parameters/store_app_config_and_reconnect", data: newDBConfig, consoleLog: true},
                             function (success, data) {
                                 if (!success) {
                                     sa_startup_params_appLocalConfig.innerHTML = "<div><b style='color:red'>No connection!</b></div>";
@@ -131,9 +131,9 @@
                                 } else {
                                     sa_startup_params_appLocalConfig.innerHTML = "<div><b>Configuration saved.</b></div>";
                                 }
-                                if (data.dbConnectError) {
+                                if (data.DBConnectError) {
                                     sa_startup_params_appLocalConfig.innerHTML=
-                                        sa_startup_params_appLocalConfig.innerHTML+ "<br><div><b style='color:red'>Failed connect to database ! Reason:" + data["dbConnectError"] + "</b></div>";
+                                        sa_startup_params_appLocalConfig.innerHTML+ "<br><div><b style='color:red'>Failed connect to database ! Reason:" + data["DBConnectError"] + "</b></div>";
                                 } else {
                                     sa_startup_params_appLocalConfig.innerHTML =
                                             sa_startup_params_appLocalConfig.innerHTML+ "<br><div><b>Reconnected to database.</b></div>";

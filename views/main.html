@@ -12,8 +12,7 @@
     <link rel="stylesheet" href="/jslib/dojox/calendar/themes/claro/Calendar.css">
     <link href="/jslib/dijit/themes/claro/claro.css" rel="stylesheet" type="text/css">
     <!--<script type="text/javascript" src="/jslib/dojox/mobile/deviceTheme.js"></script>-->
-    <!--<script src="/jslib/myutils.js"></script>-->
-    <!--<script src="/jslib/mainutils.js"></script>-->
+
     <script src="/jslib/moment/moment-with-locales.js"></script>
     <script src="/jslib/numeral/numeral.js"></script>
     <script src="/jslib/numeral/languages/ru-UA.js"></script>
@@ -74,10 +73,10 @@
             "dojox/mobile/ListItem", "dojo/parser", "dojo/ready", "dojox/mobile/ToolBarButton",
             "dijit/registry", "dojox/mobile/Tooltip", "dijit/CalendarLite", "dojox/mobile/IconItem", "dojox/mobile/IconContainer",
             "dojox/mobile/ToggleButton", "dojox/mobile/ScrollableView", "dojox/mobile/ProgressIndicator", "dojox/mobile/SimpleDialog", "dojox/mobile/Button",
-            "calendarView", "pickUnitView", "detailView", "JSON"],
+            "calendarView", "pickUnitView", "detailView", "request"],
         function ( domConstruct, xhr, mobile, mparser, View, Heading, roundRectList, ListItem, parser, ready, ToolBarButton, registry,
                    Tooltip, CalendarLite, IconItem, IconContainer, ToggleButton, ScrollableView, ProgressIndicator, SimpleDialog, Button,
-                   CalendarView, PickUnitView, DetailView, JSON) {
+                   CalendarView, PickUnitView, DetailView, Request) {
             moment.locale("uk");
             numeral.language('ru-UA');
 
@@ -135,7 +134,6 @@
                 view_main.pickUnitBtn.set("style", "width:" + v + "px; font-size:14px; align: center");
             };
             pickUnitBtnHeading.addChild(view_main.pickUnitBtn);
-
 
             view_main.setTopButtonsFor = function (view) {
                 if (!view.dateBtnHeading) {
@@ -261,8 +259,7 @@
              ,{ "id": "Bata2", "short_name": "Bata2", "name": "Магазин БАТА2" } ]
              }*/
             view_main.loadMainContent = function () {
-
-                JSON.getJSONData({url: "/mobile", condition: "action=get_units", consoleLog: true},
+                Request.getJSONData({url: "/mobile/get_units", consoleLog: true},
                // getJSONData({url: "/mobile", condition: "action=get_units", consoleLog: true},
                     function (success, result) {
                         if (success) {                                                                                  console.log("result =", result);
@@ -275,8 +272,7 @@
                             view_main.dialogWin.show();
                         }
                         if(view_main.prog) view_main.prog.stop();
-                    }
-                );
+                    });
             };
 
             view_main.setMainContent = function (maindata) {
@@ -328,9 +324,10 @@
                     unit_params = (unit_params === null) ? unit_condition : unit_params + "&" + unit_condition;         console.log("unit_params=",unit_params);
                 }
                 //getJSONData({
-                JSON.getJSONData({
-                        url: "/mobile",
-                        condition: "action=get_main_data&bdate=" + bdate + "&edate=" + edate + "&" + unit_params + detail,
+                Request.getJSONData({
+                        url: "/mobile/get_main_data",
+                        condition: "bdate=" + bdate + "&edate=" + edate + "&" + unit_params + detail,
+                        //    condition: "action=get_main_data&bdate=" + bdate + "&edate=" + edate + "&" + unit_params + detail,
                         consoleLog: true
                     }
                     , function (success, result) {
