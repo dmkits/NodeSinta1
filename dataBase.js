@@ -98,9 +98,9 @@ module.exports.getDetailViewData= function(detail_id, bdate, edate, unit_conditi
 module.exports.getResultToNewQuery=function(newQuery,errAction, successAction ){
     var reqSql = new sql.Request(conn);
 
-        //reqSql.input('BDATE',sql.Date,bdate);
-        //reqSql.input('EDATE',sql.Date,edate);
-        //reqSql.input('StocksList',sql.NVarChar,unit_condition );
+        reqSql.input('BDATE',sql.Date,bdate);
+        reqSql.input('EDATE',sql.Date,edate);
+        reqSql.input('StocksList',sql.NVarChar,unit_condition );
 
         //var temp=JSON.stringify(newQuery);                                                                              console.log("newQuery=", newQuery);
         //var newQueryString=temp.substring(1,temp.length-4).replace("\\n","");                                           console.log("newQueryString=", newQueryString);

@@ -165,11 +165,13 @@ app.post("/sysadmin/startup_parameters/store_app_config_and_reconnect", function
 app.get("/sysadmin/sql_queries", function (req, res) {
     res.sendFile(path.join(__dirname, '/views/sysadmin', 'sql_queries.html'));
 });
-app.get("/sysadmin/sql_queries/mobile_units", function (req, res) {
-    res.send(fs.readFileSync('./scripts/mobile_units.sql', 'utf8'));
+//app.get("/sysadmin/sql_queries/mobile_units", function (req, res) {
+//    res.send(fs.readFileSync('./scripts/mobile_units.sql', 'utf8'));
+//});
+app.get("/sysadmin/sql_queries/get_script", function (req, res) {                                                       console.log("req.query.filename=", req.query.filename);
+  res.send(fs.readFileSync('./scripts/'+req.query.filename, 'utf8'));
 });
 app.post("/sysadmin/sql_queries/get_result_to_request", function (req, res) {
-
     var newQuery = req.body;                                                                                            console.log("newQuery", newQuery);
    // var outData= {};
     database.getResultToNewQuery(newQuery,

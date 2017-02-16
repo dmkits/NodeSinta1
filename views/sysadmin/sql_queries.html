@@ -6,56 +6,151 @@
 </head>
 <body id="body">
 <div id="sql_queries_PageContent" style="width:100%;height:100%; margin:0;padding:0;">
-    <div id="sql_queries_TopContent" style="width:100%;height:50px; margin:0;padding:0; border: solid 1px;">
+    <div id="sql_queries_TopContent" style="width:100%;height:50px; margin:0;padding:0; ">
         <button id="sql_runBtn">Run</button>
+        <table id="sql_params_table">
+           <!--// <tr id="sql_params"></tr>-->
+        </table>
+        <!--<span id="sql_params"></span>-->
     </div>
-    <div id="sql_queries_LeftContent" style="width:100px;height:100%; margin:0;padding:0; border: solid 1px;">
-        <button id="unitsBtn">Get Units</button>
+    <div id="sql_queries_LeftContent" style="width:150px;height:100%; margin:0;padding:0; ">
+        <button id="detail_view_card">detail_view_card</button><br>
+        <button id="detail_view_cash">detail_view_cash</button><br>
+        <button id="detail_view_other">detail_view_other</button><br>
+        <button id="detail_view_returns">detail_view_returns</button><br>
+        <button id="detail_view_sales">detail_view_sales</button><br>
+        <button id="main_view">main_view</button><br>
+        <button id="main_view_d">main_view_d</button><br>
+        <button id="units">units</button><br>
     </div>
-    <div id="sql_queries_DetailContent" style="border: solid 1px;">
+    <div id="sql_queries_DetailContent" style="width:100%;height:100%; margin:0;padding:0;" >
             <textarea id="sql_display_content"></textarea>
-            <textarea id="sql_display_result"></textarea>
+    </div>
+    <div id="sql_queries_RightContent" style="width:400px;height:100%; margin:0;padding:0;">
+           <textarea id="sql_display_result"></textarea>
     </div>
 </div>
 </body>
 <script type="text/javascript">
     require(["app", "dijit/layout/BorderContainer", "dijit/layout/LayoutContainer", "dijit/layout/ContentPane", "dojo/data/ItemFileReadStore",
                 "dijit/form/TextBox", "dijit/form/DateTextBox", "dijit/form/Button",
-                "request", "dijit/form/SimpleTextarea", "dijit/form/Textarea"],
+                "request", "dijit/form/SimpleTextarea"],
             function (APP, BorderContainer, LayoutContainer, ContentPane, ItemFileReadStore, TextBox, DateTextBox, Button,
-                      Request,SimpleTextarea,Textarea) {
+                      Request,SimpleTextarea) {
                 var borderContainer= APP.initElem("sql_queries_PageContent", BorderContainer, {});
                 borderContainer.startup();
                 var sql_queries_TopContent= APP.initElem("sql_queries_TopContent", ContentPane, {region:"top"});
                 var sql_queries_LeftContent= APP.initElem("sql_queries_LeftContent", ContentPane, {region:"left"});
                 var sql_queries_DetailContent= APP.initElem("sql_queries_DetailContent", ContentPane, {region:"center"});
-                var unitsBtn= APP.initElem("unitsBtn", Button, {});
-                var sql_display_content= APP.initElem("sql_display_content", SimpleTextarea, {rows:20, style: "width:400px"});
-                var sql_display_result= APP.initElem("sql_display_result", SimpleTextarea, {rows:20, style: "width:400px"});
+                var sql_queries_RightContent= APP.initElem("sql_queries_RightContent", ContentPane, {region:"right"});
+
+                var detail_view_card= APP.initElem("detail_view_card", Button, {onClick: function(){showRequestSqlText(this)}, filename: "mobile_detail_view_card.sql"});
+                var detail_view_cash= APP.initElem("detail_view_cash", Button, {onClick: function(){showRequestSqlText(this)},filename: "mobile_detail_view_cash.sql"});
+                var detail_view_other= APP.initElem("detail_view_other", Button, {onClick: function(){showRequestSqlText(this)},filename: "mobile_detail_view_other.sql"});
+                var detail_view_returns= APP.initElem("detail_view_returns", Button, {onClick: function(){showRequestSqlText(this)},filename: "mobile_detail_view_returns.sql"});
+                var detail_view_sales= APP.initElem("detail_view_sales", Button, {onClick: function(){showRequestSqlText(this)},filename: "mobile_detail_view_sales.sql"});
+                var main_view= APP.initElem("main_view", Button, {onClick: function(){showRequestSqlText(this)},filename: "mobile_main_view.sql"});
+                var main_view_d= APP.initElem("main_view_d", Button, {onClick: function(){showRequestSqlText(this)},filename: "mobile_main_view_d.sql"});
+                var units= APP.initElem("units", Button, {onClick: function(){showRequestSqlText(this)},filename: "mobile_units.sql"});
+
+
+                var sql_display_content= APP.initElem("sql_display_content", SimpleTextarea, {rows:20, style: "width:100%"});
+                var sql_display_result= APP.initElem("sql_display_result", SimpleTextarea, {rows:20, style: "width:100%"});
                 var sql_runBtn = APP.initElem("sql_runBtn", Button,{});
-                unitsBtn.onClick=function(){                                                                            console.log('unitsBtn.onclick');
-                    Request.getTextData({url:  "/sysadmin/sql_queries/mobile_units", consoleLog: true},
+
+                var sql_params= document.getElementById("sql_params");
+
+                function showRequestSqlText(sqlButton){
+                    var filename=sqlButton.filename;
+                    Request.getTextData({url:  "/sysadmin/sql_queries/get_script", condition:"filename="+filename, consoleLog: true},
                             function (success, data) {                                                                   console.log('data', data);
                                 if (!success) {
                                     sql_display_content.innerHTML = "<div><b style='color:red'>No connection!</b></div>";
                                     return;
                                 }
                                 sql_display_content.set("value",data);
+                                sql_display_result.set("value","");
+
+                                var tr=document.getElementById("sql_params_tr");
+                                if(tr)  tr.parentNode.removeChild(tr);
+
+                                showParamsInput(data);
                             });
-                };
-                unitsBtn.onClick=function(){                                                                            console.log('unitsBtn.onclick');
-                   // var filename=this.filename;
-                    Request.getTextData({url: "/sysadmin/sql_queries/mobile_units",/* condition:"filename="+filename,*/ consoleLog: true},
-                            function (success, data) {                                                                  console.log('data', data);
-                                if (!success) {
-                                    sql_display_content.innerHTML = "<div><b style='color:red'>No connection!</b></div>";
-                                    return;
-                                }
-                                sql_display_content.set("value",data);
-                            });
-                };
+                }
+
+                function showParamsInput(queryString){
+                    var paramMap=defineParamName(queryString);                                                      console.log("paramMap=", paramMap);
+                    if(paramMap.length>0){
+                        createParamsInput(paramMap);
+                    }
+                }
+                function defineParamName(text){
+                    var paramNameMap=[]; var paramName; var target="@"; var pos=0;
+                    while(true){
+                        var foundPos=text.indexOf(target,pos);
+                        if(foundPos<0)break;
+                        paramName=text.substring(foundPos, text.indexOf(" " ,foundPos));
+                        if(paramName.indexOf("\n")>-1){
+                            paramName=paramName.substring(0, paramName.indexOf("\n"));
+                            paramName=paramName.trim();
+                        }
+                        if(paramNameMap.length==0){
+                            paramNameMap.push(paramName);
+                        }
+                        else if(paramNameMap.indexOf(paramName)<0){
+                            paramNameMap.push(paramName);
+                        }
+                       pos=foundPos + 1;
+                    }
+                    return paramNameMap;
+                }
+
+                function createParamsInput(paramNamesMap) {
+                    var tr; var td;
+                    tr = document.createElement('tr');
+                    tr.setAttribute("id", "sql_params_tr");
+
+                    document.getElementById("sql_params_table").appendChild(tr);
+                    for (var i = 0; i < paramNamesMap.length; i++) {
+                        td= document.createElement('td');
+                        tr.appendChild(td);
+                        var id = paramNamesMap[i].substring(1);                                                         console.log("paramNamesMap[i]=", paramNamesMap[i]);
+                        var label = document.createElement("label");
+                        label.htmlFor = id;
+                        label.innerText = "" + paramNamesMap[i];
+                        label.setAttribute("id", "ladel" + id);
+
+                        var textBox = new TextBox( {name: id});
+                        td.appendChild(textBox.domNode);
+                        td.insertBefore(label, textBox.domNode);
+
+                        //textBox.startup();
+                    }
+                }
+
+//                function showParamsInput(){
+//                    if(!sql_bdate_input) {
+//                        var sql_bdate_input = APP.initElem("sql_bdate", DateTextBox, {});
+//                    }
+//                    if(!sql_edate_input) {
+//                        var sql_edate_input = APP.initElem("sql_edate", DateTextBox, {});
+//                    }
+//                 //   var sql_stock_units_input = APP.initElem("sql_stock_units", Button,{});
+//                }
+//                units.onClick=function(){
+//                   // var filename=this.filename;
+//                    Request.getTextData({url: "/sysadmin/sql_queries/mobile_units",/* condition:"filename="+filename,*/ consoleLog: true},
+//                            function (success, data) {                                                                  console.log('data', data);
+//                                if (!success) {
+//                                    sql_display_content.innerHTML = "<div><b style='color:red'>No connection!</b></div>";
+//                                    return;
+//                                }
+//                                sql_display_content.set("value",data);
+//                            });
+ //               };
                 sql_runBtn.onClick=function(){
                     var newQueryText=sql_display_content.value;                                                         console.log("newQueryText=", newQueryText);
+
                     Request.postTextData({url:  "/sysadmin/sql_queries/get_result_to_request", data:{text:newQueryText}, consoleLog: true},
                             function (success, data) {
                                 if (!success) {

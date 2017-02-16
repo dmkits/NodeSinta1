@@ -13,4 +13,3 @@ INNER JOIN t_CRRet returns ON returns.ChID=pays.ChID
 WHERE pays.PayformCode=2
 AND returns.DocDate BETWEEN  @BDATE  AND @EDATE
 AND @StocksList like '% '+CAST(returns.StockID as varchar(200))+' %'
-
