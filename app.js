@@ -46,11 +46,13 @@ function getUnitlist(req){
     var sUnitlist="";
     for(var itemName in req.query){
         if (itemName.indexOf("unit_")>=0){
-            sUnitlist=" "+sUnitlist+" "+req.query[itemName]+" ";
+            sUnitlist=sUnitlist+","+req.query[itemName]+",";
         }
     }
     return sUnitlist;
 }
+
+
 app.get('/', function (req, res) {
     if(ConfigurationError||DBConnectError) {
         res.sendFile(path.join(__dirname, '/views', 'err_dbconfig.html'));
@@ -115,7 +117,7 @@ app.get("/mobile/get_detail_view_data", function (req, res) {
 app.get("/sysadmin", function(req, res){
     res.sendFile(path.join(__dirname, '/views', 'sysadmin.html'));
 });
-app.get("/sysadmin/app_state", function(req, res){                                                                      console.log("/sysadmin/app_state");
+app.get("/sysadmin/app_state", function(req, res){
     var outData= {};
     outData.mode= startupMode();
     if (ConfigurationError) {
@@ -165,28 +167,35 @@ app.post("/sysadmin/startup_parameters/store_app_config_and_reconnect", function
 app.get("/sysadmin/sql_queries", function (req, res) {
     res.sendFile(path.join(__dirname, '/views/sysadmin', 'sql_queries.html'));
 });
-//app.get("/sysadmin/sql_queries/mobile_units", function (req, res) {
-//    res.send(fs.readFileSync('./scripts/mobile_units.sql', 'utf8'));
-//});
-app.get("/sysadmin/sql_queries/get_script", function (req, res) {                                                       console.log("req.query.filename=", req.query.filename);
+app.get("/sysadmin/sql_queries/get_script", function (req, res) {
   res.send(fs.readFileSync('./scripts/'+req.query.filename, 'utf8'));
 });
 app.post("/sysadmin/sql_queries/get_result_to_request", function (req, res) {
-    var newQuery = req.body;                                                                                            console.log("newQuery", newQuery);
-   // var outData= {};
-    database.getResultToNewQuery(newQuery,
-        function (err) {
+   var newQuery = req.body;
+    var sUnitlist = req.query.stocksList;
+    var bdate = req.query.bdate;
+    var edate = req.query.edate;
+    database.getResultToNewQuery(newQuery, bdate, edate, sUnitlist,
+        function (err,result) {
            var outData = {};
-            if (err) outData.error = err;
-        },  function (result) {
-           var outData= {};
-            outData = result;                                                                                           console.log("database.getResultToNewQuery outData= ", outData);
+            if (err) outData.error = err.message;
+            outData.result = result;
             res.send(outData);
+        },  function (result) {
         }
     );
 });
+app.post("/sysadmin/sql_queries/save_sql_file", function (req, res) {
+    var newQuery = req.body;
+    var filename= req.query.filename;
+    fs.writeFile("./scripts/"+filename, newQuery.text, function (err) {
+        var outData = {};
+        if(err)outData.error=err.message;
+        outData.success="Файл сохранен!";
+        res.send(outData);
+    });
+});
 app.listen(port, function (err) {
-
 });
 
 

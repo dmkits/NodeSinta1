@@ -70,7 +70,7 @@ input {
 }
 #sysadmin_TopContainer{
     margin: 0; padding: 0;
-    height: 62px;
+    height: 63px;
 }
 #sysadmin_TopImg{
     width: 50px;
@@ -89,7 +89,7 @@ input {
 #sysadmin_TopActions {
     margin:0;
     margin-left: -5px;
-    height: 28px;
+    height: 30px;
     background: none;
     border-left: none;
     padding:3px;

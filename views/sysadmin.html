@@ -5,6 +5,7 @@
     <!--[if IE]>
     <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
     <![endif]-->
+    <script src="/jslib/moment/moment-with-locales.js"></script>
     <link rel="icon" type="image/gif" href="/icons/icon1.ico"/>
     <link rel="stylesheet" href="/jslib/dijit/themes/claro/claro.css" media="screen">
     <script type="text/javascript" src="/jslib/dojo/dojo.js" data-dojo-config="async:true,parseOnLoad:false"></script>
@@ -34,6 +35,7 @@
     require(["app", "dijit/layout/BorderContainer", "dijit/layout/StackContainer", "dijit/layout/ContentPane",
                 "dijit/form/ToggleButton", "dojox/layout/ContentPane", "dijit/form/Button",  "request", "dojo/domReady!"],
             function (APP, BorderContainer, StackContainer, ContentPane, ToggleButton, XContentPane, Button, Request) {                    console.log("STARTING SYSADMIN PAGE...");//!!!IT'S FOR TESTING!!!
+               moment.locale("uk");
                 var sysadmin_MainContainer = APP.initElem("sysadmin_MainContainer", BorderContainer, {design: "headline"});
                 var sysadmin_TopContainer = APP.initElem("sysadmin_TopContainer",
                         BorderContainer, {

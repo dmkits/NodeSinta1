@@ -37,7 +37,7 @@ module.exports.databaseConnection=function(callback){
 
 module.exports.getUnits = function (callback) {
     var reqSql = new sql.Request(conn);
-    var query_str = fs.readFileSync('./scripts/mobile_units.sql', 'utf8');                                              console.log("query_str=",query_str);
+    var query_str = fs.readFileSync('./scripts/mobile_units.sql', 'utf8');
     reqSql.query(query_str,
         function (err, recordset) {
             if (err)
@@ -95,23 +95,25 @@ module.exports.getDetailViewData= function(detail_id, bdate, edate, unit_conditi
         )
 };
 
-module.exports.getResultToNewQuery=function(newQuery,errAction, successAction ){
+module.exports.getResultToNewQuery=function(newQuery,bdate, edate, unit_condition, callback ){
     var reqSql = new sql.Request(conn);
-
-        reqSql.input('BDATE',sql.Date,bdate);
-        reqSql.input('EDATE',sql.Date,edate);
-        reqSql.input('StocksList',sql.NVarChar,unit_condition );
-
-        //var temp=JSON.stringify(newQuery);                                                                              console.log("newQuery=", newQuery);
-        //var newQueryString=temp.substring(1,temp.length-4).replace("\\n","");                                           console.log("newQueryString=", newQueryString);
-        //
-        var newQueryString=newQuery.text;                                                                                console.log("newQueryString=", newQueryString);
+    var newQueryString=newQuery.text;
+    reqSql.input('BDATE',sql.Date,bdate);
+    reqSql.input('EDATE',sql.Date,edate);
+    if(unit_condition){unit_condition=deleteSpaces(unit_condition)}
+    reqSql.input('StocksList',sql.NVarChar,unit_condition);
         reqSql.query(newQueryString,
             function (err, result) {
-                if (err) {                                                                                              console.log("err 108=", err);
-                    errAction(err);
-                } else {                                                                                                console.log("result=", result);
-                    successAction(result);
+                if (err) {
+                    callback(err);
+                } else {
+                    callback(null,result);
                 }
             })
 };
+function deleteSpaces(text){
+    if(text.indexOf(" ")!=-1){
+        text = text.replace(/ /g,"");
+    }
+    return text;
+}
