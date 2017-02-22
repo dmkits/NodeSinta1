@@ -1,10 +1,8 @@
 var fs = require('fs');
 var sql = require('mssql');
-
 var app = require('./app');
 var dbConfig;
 var dbConfigFilePath;
-
 var conn=null;
 
 module.exports.getDBConfig=function(){
@@ -34,7 +32,6 @@ module.exports.databaseConnection=function(callback){
         callback(null,"connected");
     });
 };
-
 module.exports.getUnits = function (callback) {
     var reqSql = new sql.Request(conn);
     var query_str = fs.readFileSync('./scripts/mobile_units.sql', 'utf8');
@@ -61,7 +58,6 @@ module.exports.getViewMainData = function (bdate, edate, unit_condition, errActi
             }
         })
 };
-
 module.exports.getViewMainDetailData = function (bdate, edate, unit_condition, errAction, successAction) {
     var reqSql = new sql.Request(conn);
     var query_str = fs.readFileSync('./scripts/mobile_main_view_d.sql', 'utf8');
@@ -77,7 +73,6 @@ module.exports.getViewMainDetailData = function (bdate, edate, unit_condition, e
             }
         })
 };
-
 module.exports.getDetailViewData= function(detail_id, bdate, edate, unit_condition,errAction, successAction) {
     var reqSql = new sql.Request(conn);
         var query_str=fs.readFileSync('./scripts/mobile_detail_view_'+detail_id+'.sql', 'utf8');
@@ -94,7 +89,6 @@ module.exports.getDetailViewData= function(detail_id, bdate, edate, unit_conditi
             }
         )
 };
-
 module.exports.getResultToNewQuery=function(newQuery,bdate, edate, unit_condition, callback ){
     var reqSql = new sql.Request(conn);
     var newQueryString=newQuery.text;

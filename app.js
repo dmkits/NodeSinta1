@@ -15,11 +15,8 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(bodyParser.text());
-
 app.use('/',express.static('public'));
-
 var database = require('./dataBase');
-
 var ConfigurationError, DBConnectError;
 
 tryLoadConfiguration();
@@ -41,7 +38,6 @@ function tryDBConnect(postaction) {
         if (postaction)postaction(err);
     });
 }
-
 function getUnitlist(req){
     var sUnitlist="";
     for(var itemName in req.query){
@@ -51,8 +47,6 @@ function getUnitlist(req){
     }
     return sUnitlist;
 }
-
-
 app.get('/', function (req, res) {
     if(ConfigurationError||DBConnectError) {
         res.sendFile(path.join(__dirname, '/views', 'err_dbconfig.html'));
