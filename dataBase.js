@@ -17,8 +17,8 @@ module.exports.loadConfig=function(){
     dbConfig = JSON.parse(stringConfig);
 };
 module.exports.saveConfig=function(callback) {
-    fs.writeFile(dbConfigFilePath, JSON.stringify(dbConfig), function (err, sucsess) {
-        callback(err,sucsess);
+    fs.writeFile(dbConfigFilePath, JSON.stringify(dbConfig), function (err, success) {
+        callback(err,success);
     })
 };
 module.exports.databaseConnection=function(callback){
