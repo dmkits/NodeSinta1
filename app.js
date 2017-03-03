@@ -187,6 +187,9 @@ app.post("/sysadmin/sql_queries/save_sql_file", function (req, res) {
         res.send(outData);
     });
 });
+app.get("/password", function(req, res){
+    res.sendFile(path.join(__dirname, '/views', 'password.html'));
+});
 app.listen(port, function (err) {
 });
 

@@ -39,6 +39,14 @@
                         <td><label for="password">db.password </label></td>
                         <td><input id="password" type="text" aria-disabled="false"/></td>
                     </tr>
+                    <tr>
+                        <td><label for="control">control.url </label></td>
+                        <td><input id="control" type="text" aria-disabled="false"/></td>
+                    </tr>
+                    <tr>
+                        <td><label for="order">order.url</label></td>
+                        <td><input id="order" type="text" aria-disabled="false"/></td>
+                    </tr>
                 </table>
             </td>
         </tr>
@@ -67,6 +75,8 @@
                 var databaseInput=new TextBox({id:"database"},"database");
                 var userInput=new TextBox({id:"user"},"user");
                 var passwordInput=new TextBox({id:"password"},"password");
+                var controlUrlInput=new TextBox({id:"control"},"control");
+                var orderUrlInput=new TextBox({id:"order"},"order");
                 var sa_startup_params_appLocalConfig = document.getElementById("sa_startup_params_appLocalConfig");
                 var reloadBtn = new Button({id: "SA_startup_params_BtnAppLocalConfigLoad"}, "SA_startup_params_BtnAppLocalConfigLoad");
                 var saveAndReconnectBtn = new Button({id: "SA_startup_params_BtnAppLocalConfigSaveAndReconnect"}, "SA_startup_params_BtnAppLocalConfigSaveAndReconnect");
@@ -89,7 +99,7 @@
                 reloadBtn.onClick= function() {
                     sa_startup_params_appLocalConfig.innerHTML = "<div><b>Loading configuration parameters...</b></div>";
                     Request.getJSONData({url: "/sysadmin/startup_parameters/load_app_config", consoleLog: true},
-                            function (success, result) {
+                            function (success, result) {                                console.log("result", result);
                                 if (!success) {
                                     sa_startup_params_appLocalConfig.innerHTML = "<div><b style='color:red'>No connection to the server!</b></div>";
                                     return;
@@ -109,6 +119,10 @@
                     databaseInput.set("value",DBConfigData.database );
                     userInput.set("value",DBConfigData.user );
                     passwordInput.set("value",DBConfigData.password );
+                    if(DBConfigData.control_url) controlUrlInput.set("value", DBConfigData.control_url);
+                    else controlUrlInput.set("value","/control");
+                    if(DBConfigData.order_url) orderUrlInput.set("value", DBConfigData.order_url);
+                    else orderUrlInput.set("value","/");
                 }
 
                 saveAndReconnectBtn.onClick = function () {                                                             console.log("saveAndReconnectBtn.onClick");
@@ -118,7 +132,9 @@
                         host: hostInput.get('value'),
                         database: databaseInput.get('value'),
                         user: userInput.get('value'),
-                        password: passwordInput.get('value')
+                        password: passwordInput.get('value'),
+                        control_url: controlUrlInput.get('value'),
+                        order_url: orderUrlInput.get('value')
                     };
                     Request.postJSONData({url:  "/sysadmin/startup_parameters/store_app_config_and_reconnect", data: newDBConfig, consoleLog: true},
                             function (success, data) {
