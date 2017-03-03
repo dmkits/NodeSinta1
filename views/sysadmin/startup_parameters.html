@@ -24,8 +24,12 @@
             <td height="1px">
                 <table width="500px">
                     <tr>
-                        <td><label for="host">db.Host </label></td>
-                        <td><input id="host" type="text" aria-disabled="false"/></td>
+                        <td><label for="server">db.Server </label></td>
+                        <td><input id="server" type="text" aria-disabled="false"/></td>
+                    </tr>
+                    <tr>
+                        <td><label for="port">db.Port </label></td>
+                        <td><input id="port" type="text" aria-disabled="false"/></td>
                     </tr>
                     <tr>
                         <td><label for="database">db.Name </label></td>
@@ -71,7 +75,8 @@
             function (APP, BorderContainer, LayoutContainer, ContentPane, ItemFileReadStore, TextBox, DateTextBox, Button, Request) {
                 var sa_startup_params_PageContent = APP.initElem("sa_startup_params_PageContent", ContentPane, {});
 
-                var hostInput=new TextBox({id:"host"},"host");
+                var serverInput=new TextBox({id:"server"},"server");
+                var portInput=new TextBox({id:"port"},"port");
                 var databaseInput=new TextBox({id:"database"},"database");
                 var userInput=new TextBox({id:"user"},"user");
                 var passwordInput=new TextBox({id:"password"},"password");
@@ -115,7 +120,9 @@
                     );
                 };
                 function setDBConfigContent(DBConfigData) {
-                    hostInput.set("value",DBConfigData.host );
+                    serverInput.set("value",DBConfigData.server );
+                    if(DBConfigData.port) portInput.set("value",DBConfigData.port);
+                    else portInput.set("value","1433");
                     databaseInput.set("value",DBConfigData.database );
                     userInput.set("value",DBConfigData.user );
                     passwordInput.set("value",DBConfigData.password );
@@ -129,7 +136,8 @@
                     var sa_startup_params_appLocalConfig = document.getElementById("sa_startup_params_appLocalConfig");
                     sa_startup_params_appLocalConfig.innerHTML = "<div><b>Configuration saving and reconnected to database...</b></div>";
                     var newDBConfig={
-                        host: hostInput.get('value'),
+                        server: serverInput.get('value'),
+                        port: portInput.get('value'),
                         database: databaseInput.get('value'),
                         user: userInput.get('value'),
                         password: passwordInput.get('value'),
