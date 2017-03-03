@@ -23,7 +23,7 @@ module.exports.saveConfig=function(callback) {
 };
 module.exports.databaseConnection=function(callback){
     if(conn) conn.close();
-    conn = new sql.Connection(dbConfig);
+    conn = new sql.Connection(dbConfig);                                console.log("databaseConnection ",dbConfig);
     conn.connect(function (err) {
         if (err) {
             callback(err.message);

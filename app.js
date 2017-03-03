@@ -1,3 +1,4 @@
+
 function startupMode(){
     var app_params = process.argv.slice(2);
     if(app_params.length===0) return 'production';

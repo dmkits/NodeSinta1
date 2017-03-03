@@ -1,8 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="bin\www" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="C:/Program Files/nodejs/node" path-to-js-file="app.js" application-parameters="test" working-dir="$PROJECT_DIR$">
-    <envs>
-      <env name="DEBUG" value="NodeSinta1:*" />
-    </envs>
+  <configuration default="false" name="bin\www" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="/usr/bin/nodejs" path-to-js-file="app.js" application-parameters="test" working-dir="$PROJECT_DIR$">
     <browser url="http://localhost:3000/" />
     <method />
   </configuration>
