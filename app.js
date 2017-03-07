@@ -12,12 +12,16 @@ var app = express();
 var port=8181;
 var path=require ('path');
 var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
+
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(bodyParser.text());
 app.use('/',express.static('public'));
 var database = require('./dataBase');
 var ConfigurationError, DBConnectError;
+
 
 tryLoadConfiguration();
 function tryLoadConfiguration(){
@@ -47,13 +51,47 @@ function getUnitlist(req){
     }
     return sUnitlist;
 }
-app.get('/', function (req, res) {
+
+app.get('/control*', function (req, res) {
+    //cookies
+    //upswrd
+
+    if(database.getDBConfig()["app.password"] && req.cookies.upswrd == database.getDBConfig()["app.password"] ){
+        res.sendFile(path.join(__dirname, '/views', 'main.html'));
+    }
+
+    if(database.getDBConfig()["app.password"] && database.getDBConfig()["app.password"]!=""){                           console.log("req.cookies =",req.cookies.upswrd);
+        res.sendFile(path.join(__dirname, '/views', 'password.html'));
+    }else{
+        res.sendFile(path.join(__dirname, '/views', 'main.html'));
+    }
+   // res.sendFile(path.join(__dirname, '/views', 'password.html'));
+});
+
+app.post("/control", function (req, res) {
+    // set cookies upswrd=password
+
+   // res.cookie('cookiename', 'cookievalue', { maxAge: 900000, httpOnly: true });
+  //  res.clearCookie('cookiename');
+
+});
+
+//app.get('/control', function (req, res) {
+//    //if(ConfigurationError||DBConnectError) {
+//    //    res.sendFile(path.join(__dirname, '/views', 'err_dbconfig.html'));
+//    //    return;
+//    //}
+//    res.sendFile(path.join(__dirname, '/views', 'password.html'));
+//});
+
+app.get('/main', function (req, res) {
     if(ConfigurationError||DBConnectError) {
         res.sendFile(path.join(__dirname, '/views', 'err_dbconfig.html'));
         return;
     }
     res.sendFile(path.join(__dirname, '/views', 'main.html'));
 });
+
 app.get("/mobile/get_units", function(req, res){
     database.getUnits(
         function (error,recordset) {
@@ -187,9 +225,11 @@ app.post("/sysadmin/sql_queries/save_sql_file", function (req, res) {
         res.send(outData);
     });
 });
-app.get("/password", function(req, res){
-    res.sendFile(path.join(__dirname, '/views', 'password.html'));
-});
+
+//app.get("/password", function(req, res){
+//    res.sendFile(path.join(__dirname, '/views', 'password.html'));
+//});
+
 app.listen(port, function (err) {
 });
 
