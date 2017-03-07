@@ -51,39 +51,26 @@ function getUnitlist(req){
     }
     return sUnitlist;
 }
-
 app.get('/control*', function (req, res) {
-    //cookies
-    //upswrd
-
     if(database.getDBConfig()["app.password"] && req.cookies.upswrd == database.getDBConfig()["app.password"] ){
         res.sendFile(path.join(__dirname, '/views', 'main.html'));
+        return;
     }
-
-    if(database.getDBConfig()["app.password"] && database.getDBConfig()["app.password"]!=""){                           console.log("req.cookies =",req.cookies.upswrd);
-        res.sendFile(path.join(__dirname, '/views', 'password.html'));
-    }else{
+    if(!database.getDBConfig()["app.password"] || database.getDBConfig()["app.password"].length==0){
         res.sendFile(path.join(__dirname, '/views', 'main.html'));
+        return;
     }
-   // res.sendFile(path.join(__dirname, '/views', 'password.html'));
+    res.sendFile(path.join(__dirname, '/views', 'password.html'));
 });
-
 app.post("/control", function (req, res) {
-    // set cookies upswrd=password
-
-   // res.cookie('cookiename', 'cookievalue', { maxAge: 900000, httpOnly: true });
-  //  res.clearCookie('cookiename');
-
+    var pass=req.body.pass;
+    if(pass!==database.getDBConfig()["app.password"]){
+        res.send({error:"Incorrect password!"});
+        return;
+    }
+    res.cookie('upswrd', database.getDBConfig()["app.password"], {maxAge: 900000, httpOnly: true});
+    res.send({ok:""});
 });
-
-//app.get('/control', function (req, res) {
-//    //if(ConfigurationError||DBConnectError) {
-//    //    res.sendFile(path.join(__dirname, '/views', 'err_dbconfig.html'));
-//    //    return;
-//    //}
-//    res.sendFile(path.join(__dirname, '/views', 'password.html'));
-//});
-
 app.get('/main', function (req, res) {
     if(ConfigurationError||DBConnectError) {
         res.sendFile(path.join(__dirname, '/views', 'err_dbconfig.html'));
@@ -225,11 +212,6 @@ app.post("/sysadmin/sql_queries/save_sql_file", function (req, res) {
         res.send(outData);
     });
 });
-
-//app.get("/password", function(req, res){
-//    res.sendFile(path.join(__dirname, '/views', 'password.html'));
-//});
-
 app.listen(port, function (err) {
 });
 
