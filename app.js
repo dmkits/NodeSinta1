@@ -71,13 +71,13 @@ app.post("/control", function (req, res) {
     res.cookie('upswrd', database.getDBConfig()["app.password"], {maxAge: 900000, httpOnly: true});
     res.send({ok:""});
 });
-app.get('/main', function (req, res) {
-    if(ConfigurationError||DBConnectError) {
-        res.sendFile(path.join(__dirname, '/views', 'err_dbconfig.html'));
-        return;
-    }
-    res.sendFile(path.join(__dirname, '/views', 'main.html'));
-});
+//app.get('/main', function (req, res) {
+//    if(ConfigurationError||DBConnectError) {
+//        res.sendFile(path.join(__dirname, '/views', 'err_dbconfig.html'));
+//        return;
+//    }
+//    res.sendFile(path.join(__dirname, '/views', 'main.html'));
+//});
 
 app.get("/mobile/get_units", function(req, res){
     database.getUnits(
