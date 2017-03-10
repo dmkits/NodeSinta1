@@ -115,3 +115,31 @@ function deleteSpaces(text){
     }
     return text;
 }
+
+module.exports.getOrders = function (callback) {
+    var reqSql = new sql.Request(conn);
+    var query_str = fs.readFileSync('./scripts/mobile_orders.sql', 'utf8');
+    reqSql.query(query_str,
+        function (err, recordset) {
+            if (err)
+                callback(err, null);
+            else
+                callback(null, recordset);
+        });
+};
+
+module.exports.getDetailsOrders = function (capid, callback) {
+    var reqSql = new sql.Request(conn);
+    var query_str = fs.readFileSync('./scripts/mobile_orders_detail1.sql', 'utf8');
+
+
+    reqSql.input('PCatID',sql.Int, capid);                                                                              console.log("capid=",capid );
+    reqSql.query(query_str,
+        function (err, recordset) {
+            if (err)
+                callback(err, null);
+            else
+                callback(null, recordset);
+        });
+};
+

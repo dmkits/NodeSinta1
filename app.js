@@ -212,8 +212,52 @@ app.post("/sysadmin/sql_queries/save_sql_file", function (req, res) {
         res.send(outData);
     });
 });
+
+app.get('/', function (req, res) {
+    if(ConfigurationError||DBConnectError) {
+        res.sendFile(path.join(__dirname, '/views', 'err_dbconfig.html'));
+        return;
+    }
+    res.sendFile(path.join(__dirname, '/views', 'orders.html'));
+});
+
+app.get("/mobile/get_orders", function(req, res){
+    database.getOrders(
+        function (error,recordset) {
+            if (error){
+                res.send({error:""});
+                return;
+            }
+            var outData= {};
+            var app_params = process.argv.slice(2);
+            if(app_params.length===0) outData.mode='production';
+            else outData.mode=app_params[0];
+          //  outData.head="Магазины";
+            outData.items = recordset;                                           console.log("outData=", outData);
+            res.send(outData);
+        });
+});
+app.get("/mobile/get_orders_detail1", function(req, res){
+
+    database.getDetailsOrders(req.query.catid,
+        function (error,recordset) {
+            if (error){
+                res.send({error:""});
+                return;
+            }
+            var outData= {};
+           // var app_params = process.argv.slice(2);
+           // if(app_params.length===0) outData.mode='production';
+          //  else outData.mode=app_params[0];
+            //  outData.head="Магазины";
+            outData.items = recordset;                                           console.log("outData=", outData);
+            res.send(outData);
+        });
+});
+
 app.listen(port, function (err) {
 });
+
 
 
 
