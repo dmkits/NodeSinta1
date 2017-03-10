@@ -254,6 +254,25 @@ app.get("/mobile/get_orders_detail1", function(req, res){
             res.send(outData);
         });
 });
+//g
+
+app.get("/mobile/get_product_description", function(req, res){
+
+    database.getProdDecription(req.query.prodName,
+        function (error,recordset) {
+            if (error){
+                res.send({error:""});
+                return;
+            }
+          //  var outData= {};
+            // var app_params = process.argv.slice(2);
+            // if(app_params.length===0) outData.mode='production';
+            //  else outData.mode=app_params[0];
+            //  outData.head="Магазины";
+         //   outData.items = recordset;                                           console.log("outData=", outData);
+            res.send(recordset);
+        });
+});
 
 app.listen(port, function (err) {
 });

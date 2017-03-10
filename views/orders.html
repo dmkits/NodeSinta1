@@ -80,13 +80,17 @@
                 moment.locale("uk");
                 numeral.language('ru-UA');
 
-                var view_main = new View({id: "view_main"});
-                document.getElementById('body').appendChild(view_main.domNode);
+                var viewAllBrands = new View({id:"all_brands"});
+               // viewAllBrands.startup();
+                document.getElementById('body').appendChild(viewAllBrands.domNode);
 
-                view_main.inner_scroll = new ScrollableView({});
-                view_main.top_heading_main = new Heading({id: "th_main"});
-                view_main.addChild(view_main.top_heading_main, 0);
-                var pickUnitBtnHeading = new Heading({id: "pubtn_h"});
+                viewAllBrands.inner_scroll = new ScrollableView({});
+               // viewAllBrands.inner_scroll.startup();
+
+                viewAllBrands.top_heading_main = new Heading({id: "th_main"});
+                viewAllBrands.addChild(viewAllBrands.top_heading_main, 0);
+                viewAllBrands.headingTop = new Heading({id: "pubtn_h"});
+
 
                 var icon_btn = new ToolBarButton({
                     preventTouch: true,
@@ -94,346 +98,343 @@
                     icon: "/icons/hearts29x29.ico",
                     iconPos: "0,0,29,29"
                 });
-                var order_btn = new ToolBarButton({
-                    preventTouch: true,
-                    clickable: false,
-                    icon: "/icons/basket16x16.ico",
-                    style: "float:right",
-                    iconPos: "0,0,29,29"
-                });
-                pickUnitBtnHeading.startup();
-                if (!view_main.dialogWin) {
-                    view_main.dialogWin = new SimpleDialog({
-                        id: "dialogWin"
-                    });
-                    document.getElementById('body').appendChild(view_main.dialogWin.domNode);
-                }
-                if (!view_main.msgBox) {
-                    view_main.msgBox = domConstruct.create("div",
-                            {class: "mblSimpleDialogText"},
-                            view_main.dialogWin.domNode);
-                }
-                if (!view_main.cancelBtn)
-                    view_main.cancelBtn = new Button({
-                        class: "mblSimpleDialogButton mblRedButton",
-                        innerHTML: "Ok"
-                    });
-                view_main.cancelBtn.connect(view_main.cancelBtn.domNode, "click",
-                        function (e) {
-                            view_main.dialogWin.hide()
+
+
+
+
+
+              //     viewAllBrands.headingTop.startup();
+                    if (!viewAllBrands.dialogWin) {
+                        viewAllBrands.dialogWin = new SimpleDialog({
+                            id: "dialogWin"
                         });
-                view_main.cancelBtn.placeAt(view_main.dialogWin.domNode);
-                pickUnitBtnHeading.addChild(icon_btn);
-                pickUnitBtnHeading.addChild(order_btn);
-                view_main.addChild(pickUnitBtnHeading);
-                view_main.addChild(view_main.inner_scroll);
-
-                view_main.setBottomButtonsFor = function (view) {
-                    var tr = registry.byId(view.id + "hfbh");
-                    var bottomHeading = registry.byId(view.id + "hf");
-                    if (!bottomHeading) {
-                        bottomHeading = new Heading({fixed: "bottom"}, view.id + "hf");
-                        document.getElementById('body').appendChild(bottomHeading.domNode);
-
-                        view.inner_scroll.domNode.appendChild(bottomHeading.domNode);
-                        bottomHeading.startup();
+                        document.getElementById('body').appendChild(viewAllBrands.dialogWin.domNode);
                     }
-                };
-//                    if (!tr) {
-//                        var table = document.createElement('table');
-//                        table.setAttribute("align", "center");
-//                        var tbody = document.createElement('tbody');
-//                        var tr = document.createElement('tr');
-//                        var td = document.createElement('td');
-//                        td.setAttribute("aling", "center");
-//                        bottomHeading.domNode.appendChild(table);
-//                        table.appendChild(tbody);
-//                        tbody.appendChild(tr);
-//                        tr.appendChild(td);
-//                    }
-//
-//
-//                var setBottomButtons= function(tr, view, label, get_first_date, get_last_date){
-//                    var btn= new ToolBarButton({
-//                        get_first_date:get_first_date,
-//                        get_last_date:get_last_date,
-//                        style: "padding-left:4px;padding-right:4px; ",
-//                        label: label,
-//                        clickable: "true"
-//                    });
-//                    btn.onClick = function () {
-//                        view.btnBeginDate.dateValue=this.get_first_date();                                                  console.log("this.get_first_date()=", this.get_first_date());
-//                        view.btnEndDate.dateValue=this.get_last_date();                                                     console.log("this.get_last_date()=", this.get_last_date());
-//                        view.btnBeginDate.set("label", this.get_first_date().format("DD.MM.YYYY"));
-//                        view.btnEndDate.set("label", this.get_last_date().format("DD.MM.YYYY"));
-//                        view.loadDetailContent(view_main);
-//                    };
-//                    tr.appendChild(btn.domNode);
-//                    btn.startup();
-//                    return btn;
-//                };
-                /*{
-                 "head": "Магазины",
-                 "units":[
-                 { "id": "Bata1", "short_name": "Bata1", "name": "Магазин  БАТА1" }
-                 ,{ "id": "Bata2", "short_name": "Bata2", "name": "Магазин БАТА2" } ]
-                 }*/
+                    var headingBottomAllBrands = new Heading({fixed: "bottom"});
+                    // document.getElementById('body').appendChild(headingBottomAllBrends.domNode);
 
-                view_main.loadMainContent = function () {
-                    Request.getJSONData({url: "/mobile/get_units", consoleLog: true},
-                            // getJSONData({url: "/mobile", condition: "action=get_units", consoleLog: true},
-                            function (success, result) {
-                                if (success) {
-                                    console.log("result =", result);
-                                    if (result.error) {
-                                        view_main.msgBox.innerHTML = "Нет данных";
-                                        view_main.dialogWin.show();
-                                    } else view_main.setMainContent(result);
-                                } else {//error!!!
-                                    view_main.msgBox.innerHTML = "Нет связи с сервером";
-                                    view_main.dialogWin.show();
-                                }
-                                if (view_main.prog) view_main.prog.stop();
+                    viewAllBrands.inner_scroll.domNode.appendChild(headingBottomAllBrands.domNode);
+                    headingBottomAllBrands.startup();
+
+                    if (!viewAllBrands.msgBox) {
+                        viewAllBrands.msgBox = domConstruct.create("div",
+                                {class: "mblSimpleDialogText"},
+                                viewAllBrands.dialogWin.domNode);
+                    }
+                    if (!viewAllBrands.cancelBtn)
+                        viewAllBrands.cancelBtn = new Button({
+                            class: "mblSimpleDialogButton mblRedButton",
+                            innerHTML: "Ok"
+                        });
+                    viewAllBrands.cancelBtn.connect(viewAllBrands.cancelBtn.domNode, "click",
+                            function (e) {
+                                viewAllBrands.dialogWin.hide()
                             });
-                };
+                    viewAllBrands.cancelBtn.placeAt(viewAllBrands.dialogWin.domNode);
+                    viewAllBrands.headingTop.addChild(icon_btn);
 
-                view_main.setMainContent = function (maindata) {
-//                    view_main.first_header_string = maindata.head;
-//                    view_main.top_heading_main.set("label", view_main.first_header_string);
-//                    view_main.pickUnitBtn.units_data = maindata.units;
-//                    view_main.pickUnitBtn.selected_units = [];
-//                    view_main.string_units="";
-//                    for(var k=0; k<view_main.pickUnitBtn.units_data.length; k++){
-//                        view_main.pickUnitBtn.selected_units[k] = view_main.pickUnitBtn.units_data[k];
-//                        view_main.string_units=view_main.string_units+view_main.pickUnitBtn.selected_units[k].short_name;
-//                        if(k<view_main.pickUnitBtn.units_data.length-1){
-//                            view_main.string_units=view_main.string_units + " | ";
-//                        }
-//                    }
-//                    view_main.pickUnitBtn.set("label", view_main.string_units);
-//                    view_main.setTopButtonsFor(view_main);
-                    view_main.setBottomButtonsFor(view_main);
-                    view_main.inner_scroll.startup();
-                    view_main.startup();
+                    viewAllBrands.addChild(viewAllBrands.headingTop);
+                    viewAllBrands.addChild(viewAllBrands.inner_scroll);
+                    viewAllBrands.inner_scroll.startup();
+                    viewAllBrands.startup();
 
-                    if (maindata.mode && maindata.mode.toString().toLowerCase().indexOf("test") !== -1) {               //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                        var test_btn = new ToolBarButton({
-                            icon: "/icons/exclamation-mark29x29.ico",
-                            iconPos: "0,0,29,29",
+                displayBtnBucketIn(viewAllBrands);
+
+
+                function displayBtnBucketIn(view) {
+                    var btnBasket = registry.byId("btn_basket"+view.id);
+                    if (!btnBasket) {
+                        btnBasket = new ToolBarButton({
+                            id: "btn_basket"+view.id,
+                            icon: "/icons/basket16x16.ico",
                             style: "float:right",
-                            onClick: function () {
-                                view_main.msgBox.innerHTML = maindata.mode;
-                                view_main.dialogWin.show();
-                            }
+                            iconPos: "0,0,29,29",
+                            moveTo: "view_basket",
+                            transition:"none"
                         });
-
-
-                        view_main.top_heading_main.addChild(test_btn);
                     }
-//                    if (!view_main.btnBeginDate.label) view_main.todayBtn.onClick();
-                    view_main.loadDetailContent();
+                    btnBasket.previousView = view;
+                    btnBasket.onClick = function () {
+                        goToViewBasket(btnBasket);
+                    };
+                    view.headingTop.addChild(btnBasket);
+                    view.headingTop.startup();
+                    btnBasket.startup();
                 };
-                view_main.loadDetailContent = function () {
-                    if (view_main.view_main_list_items) view_main.view_main_list_items.destroy();
-                    if (view_main.prog) view_main.prog.destroy();
-                    view_main.prog = new ProgressIndicator({size: 200, center: true});
-                    document.getElementById('body').appendChild(view_main.prog.domNode);
-                    view_main.prog.start();
-//
-//                    var bdate = view_main.btnBeginDate.dateValue.format("YYYY-MM-DD");
-//                    var edate = view_main.btnEndDate.dateValue.format("YYYY-MM-DD");
-//                    var detail = (view_main.detailBtn.get("checked")) ? "&detail" : "";
-//                    var units_list = view_main.pickUnitBtn.selected_units;
-//                    var unit_params = null;
-//                    for (var i in units_list) {
-//                        var unit_condition = "unit_" + i + "_id=" + units_list[i].id;
-//                        unit_params = (unit_params === null) ? unit_condition : unit_params + "&" + unit_condition;         console.log("unit_params=",unit_params);
-//                    }
-                    //getJSONData({
-                    Request.getJSONData({
-                                url: "/mobile/get_orders",
-                                //  condition: "bdate=" + bdate + "&edate=" + edate + "&" + unit_params + detail,
-                                //    condition: "action=get_main_data&bdate=" + bdate + "&edate=" + edate + "&" + unit_params + detail,
-                                consoleLog: true
-                            }
-                            , function (success, result) {
-                                if (success) {
-                                    console.log("view_main.loadDetailContent getJSONData result=", result);
-                                    var data = [];
-                                    if (result.items) data = result.items;
-                                    if (result.error) {
-                                        view_main.msgBox.innerHTML = "Нет данных";
-                                        console.log("view_main.loadDetailContent getJSONData DATA ERROR! error=", result.error);
-                                        view_main.dialogWin.show();
+
+                function goToViewBasket(btnBasket){
+                    var viewBasket = registry.byId("view_basket");
+                    if (!viewBasket) {
+                        viewBasket = new ScrollableView({id: "view_basket"});
+                        document.getElementById('body').appendChild(viewBasket.domNode);
+                        viewBasket.headingTop = new Heading({
+                            label:"Корзина",
+                            fixed: "top",
+                            back: "Назад",
+                            transition:"none"
+                        });
+                        var headingBottomBasket = new Heading({fixed: "bottom"});
+                        viewBasket.domNode.appendChild(viewBasket.headingTop.domNode);
+                        viewBasket.domNode.appendChild(headingBottomBasket.domNode);
+                        viewBasket.startup();
+                    }
+                    viewBasket.headingTop.set("moveTo", btnBasket.previousView.id);
+                }
+
+                    viewAllBrands.loadMainContent = function () {
+                        Request.getJSONData({url: "/mobile/get_units", consoleLog: true},
+                                // getJSONData({url: "/mobile", condition: "action=get_units", consoleLog: true},
+                                function (success, result) {
+                                    if (success) {
+                                        console.log("result =", result);
+                                        if (result.error) {
+                                            viewAllBrands.msgBox.innerHTML = "Нет данных";
+                                            viewAllBrands.dialogWin.show();
+                                        } else viewAllBrands.setMainContent(result);
+                                    } else {//error!!!
+                                        viewAllBrands.msgBox.innerHTML = "Нет связи с сервером";
+                                        viewAllBrands.dialogWin.show();
                                     }
-                                    view_main.setDetailContent(data);
-                                } else {//error!!!
-                                    view_main.msgBox.innerHTML = "Нет связи с сервером";
-                                    view_main.dialogWin.show();
+                                    if (viewAllBrands.prog) viewAllBrands.prog.stop();
+                                });
+                    };
+
+                    viewAllBrands.setMainContent = function (maindata) {
+                        //   viewAllBrands.setBottomButtonsFor(viewAllBrands);
+                        viewAllBrands.inner_scroll.startup();
+                        viewAllBrands.startup();
+
+                        if (maindata.mode && maindata.mode.toString().toLowerCase().indexOf("test") !== -1) {               //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                            var test_btn = new ToolBarButton({
+                                icon: "/icons/exclamation-mark29x29.ico",
+                                iconPos: "0,0,29,29",
+                                style: "float:right",
+                                onClick: function () {
+                                    viewAllBrands.msgBox.innerHTML = maindata.mode;
+                                    viewAllBrands.dialogWin.show();
                                 }
-                                if (view_main.prog) view_main.prog.stop();
+                            });
 
-                            }
-                    );
-                };
-                view_main.setDetailContent = function (detail_data) {
-                    if (view_main.view_main_list_items) view_main.view_main_list_items.destroy();
-                    view_main.view_main_list_items = new roundRectList({
-                        style: "position:relative",
-                        "id": "view_main_list_items"
-                    });
-                    view_main.inner_scroll.scrollTo({x: 0, y: 0});
-                    view_main.inner_scroll.addChild(view_main.view_main_list_items);
-                    view_main.view_main_list_items.startup();
-                    for (var i in detail_data) {
-                        var dataItem = detail_data[i], listItemIdPrefix = "mainListItem_";
-                        //  var string_value = numeral(dataItem.value).format('0,0');
-                        var list_item = new ListItem({
-                            //id: listItemIdPrefix + dataItem.id,
-                            label: dataItem.label,
-                            //data_unit_id: dataItem.unit_id,
-                            //catid:dataItem.catid,
-                            rightText: dataItem.value,
-                            moveTo: "detail_order_view",
-                            transition: "none"
-                        });
-                        if (dataItem.catid) {
-                            list_item.catid = dataItem.catid;
-                            list_item.onClick = function () {
-                                var view = registry.byId("detail_order_view");
-                                if (!view) {
-                                    view = new ScrollableView({
-                                        id: "detail_order_view"
-
-                                    });
-                                    document.getElementById("body").appendChild(view.domNode);
-
-                                    var heading = new Heading({
-                                        fixed: "top",
-                                        back: "Назад",
-                                        moveTo: "view_main"
-                                    });
-                                    view.domNode.appendChild(heading.domNode);
-                                    view.startup();
-                                }
-                                view_main.loadOrderContent(this.catid);
-                            }
+                            viewAllBrands.top_heading_main.addChild(test_btn);
                         }
-                        view_main.view_main_list_items.addChild(list_item);
-                        list_item.startup();
-                    }
-                };
-                view_main.onBeforeTransitionIn = function () {
-                    view_main.loadDetailContent();
-                };
+                        viewAllBrands.loadDetailContent();
+                    };
 
-                //           view_main.showDetailView = function (heading_label, catid) {                                            console.log("showDetailView catid=",catid);
-//                    var view = registry.byId("detail_order_view");
-//                    if (!view) {
-//                        view = new ScrollableView({
-//                            id:"detail_order_view",
-//                            back: view_main,
-//                            // view_main: view_main,
-//                            // id: id,
-//                            //detail_id : detail_id,
-//                            heading_label: heading_label
-//                            // unit_id : unit_id,
-//                            //  pickUnitView:pickUnitView,
-//                            //  url: url
-//                        });
-//                        document.getElementById("body").appendChild(view.domNode);
-//                    }
-//                        view_main.setTopButtonsFor(view);
-//                        view_main.setBottomButtonsFor(view);
-//                        view.inner_scroll.startup();
-//                        view.startup();
-//                    } else {
-//                        view.setPickBtnFor(view_main,pickUnitView, unit_id);
-//                        view_main.setTopButtonsFor(view);
-//                    }
+                    viewAllBrands.loadDetailContent = function () {
+                        if (viewAllBrands.view_main_list_items) viewAllBrands.view_main_list_items.destroy();
+                        if (viewAllBrands.prog) viewAllBrands.prog.destroy();
+                        viewAllBrands.prog = new ProgressIndicator({size: 200, center: true});
+                        document.getElementById('body').appendChild(viewAllBrands.prog.domNode);
+                        viewAllBrands.prog.start();
 
-
-//                    var view = registry.byId(id);
-//                    if (!view) {
-//                        view = new DetailView({
-//                            view_main:view_main,
-//                            id: id,
-//                            detail_id : detail_id,
-//                            heading_label: heading_label,
-//                            unit_id : unit_id,
-//                            pickUnitView:pickUnitView,
-//                            url:url
-//                        });
-//                        view_main.setTopButtonsFor(view);
-//                        view_main.setBottomButtonsFor(view);
-//                        view.inner_scroll.startup();
-//                        view.startup();
-//                    } else {
-//                        view.setPickBtnFor(view_main,pickUnitView, unit_id);
-//                        view_main.setTopButtonsFor(view);
-//                    }
-//                    view.loadDetailContent(view_main,unit_id );
-
-                //             };
-                view_main.loadOrderContent = function (catid) {                                                     console.log("loadOrderContent catid=", catid);
-                    Request.getJSONData({
-                                url: "/mobile/get_orders_detail1",
-                                condition: "catid=" + catid,
-                                //    condition: "action=get_main_data&bdate=" + bdate + "&edate=" + edate + "&" + unit_params + detail,
-                                consoleLog: true
-                            }
-                            , function (success, result) {
-                                if (success) {
-                                    console.log("view_main.loadDetailContent getJSONData result=", result);
-                                    var data = [];
-                                    if (result.items) data = result.items;
-                                    if (result.error) {
-                                        view_main.msgBox.innerHTML = "Нет данных";
-                                        console.log("view_main.loadDetailContent getJSONData DATA ERROR! error=", result.error);
-                                        view_main.dialogWin.show();
-                                    }view_main.fillUpOrderList(data);
-                                } else {//error!!!
-                                    view_main.msgBox.innerHTML = "Нет связи с сервером";
-                                    view_main.dialogWin.show();
+                        Request.getJSONData({
+                                    url: "/mobile/get_orders",
+                                    consoleLog: true
                                 }
-                                if (view_main.prog) view_main.prog.stop();
+                                , function (success, result) {
+                                    if (success) {                                              console.log("view_main.loadDetailContent getJSONData result=", result);
+                                        var data = [];
+                                        if (result.items) data = result.items;
+                                        if (result.error) {
+                                            viewAllBrands.msgBox.innerHTML = "Нет данных";
+                                            console.log("view_main.loadDetailContent getJSONData DATA ERROR! error=", result.error);
+                                            viewAllBrands.dialogWin.show();
+                                        }
+                                        viewAllBrands.setDetailContent(data);
+                                    } else {//error!!!
+                                        viewAllBrands.msgBox.innerHTML = "Нет связи с сервером";
+                                        viewAllBrands.dialogWin.show();
+                                    }
+                                    if (viewAllBrands.prog) viewAllBrands.prog.stop();
 
-                            }
-                    );
-                };
-
-                view_main.fillUpOrderList = function (data) {
-                    var view = registry.byId("detail_order_view");
-//                    if (!view) {
-//                        view = new ScrollableView({
-//                            id: "detail_order_view"
-//
-//                        });
-//                        document.getElementById("body").appendChild(view.domNode);
-//
-//                        var heading = new Heading({
-//                            fixed: "top",
-//                            back: "Назад",
-//                            moveTo: "view_main"
-//                        });
-//                        view.domNode.appendChild(heading.domNode);
-//                    }
-                    var product_list = registry.byId("product_list_d1");
-                    if (product_list) product_list.destroy();
-                    product_list = new roundRectList({id: "product_list_d1"});
-                    var product_list_item;
-                    for (var i in data) {
-                        var dataItem = data[i];
-                        product_list_item = new ListItem({
-                            label: dataItem.label,
-                            rightText: dataItem.value
+                                }
+                        );
+                    };
+                    viewAllBrands.setDetailContent = function (detail_data) {
+                        if (viewAllBrands.view_main_list_items) viewAllBrands.view_main_list_items.destroy();
+                        viewAllBrands.view_main_list_items = new roundRectList({
+                            style: "position:relative",
+                            "id": "view_main_list_items"
                         });
-                        product_list.addChild(product_list_item);
-                    }
-                    view.addChild(product_list);
-                    product_list.startup();
-                };
-                view_main.loadMainContent();
-            });
+                       // viewAllBrands.inner_scroll.scrollTo({x: 0, y: 0});
+                        viewAllBrands.inner_scroll.addChild(viewAllBrands.view_main_list_items);
+                        viewAllBrands.view_main_list_items.startup();
+                        for (var i in detail_data) {
+                            var dataItem = detail_data[i];
+                            var list_item = new ListItem({
+                                variableHeight:true,
+                                label: dataItem.label,
+                                rightText: dataItem.value,
+                                moveTo: "detail_order_view",
+                                transition: "none"
+                            });
+                            if (dataItem.catid) {
+                                list_item.catid = dataItem.catid;
+                                list_item.onClick = function () {
+                                    var viewOneBrand = registry.byId("detail_order_view");
+                                    if (!viewOneBrand) {
+                                        viewOneBrand = new ScrollableView({id: "detail_order_view"});
+                                        document.getElementById("body").appendChild(viewOneBrand.domNode);
+
+                                        viewOneBrand.headingTop = new Heading({
+                                            fixed: "top",
+                                            back: "Назад",
+                                            moveTo: viewAllBrands.id,
+                                            transition:"none"
+                                        });
+                                        var detailViewBottomHeading = new Heading({fixed: "bottom"});
+                                        viewOneBrand.domNode.appendChild(viewOneBrand.headingTop.domNode);
+                                        viewOneBrand.domNode.appendChild(detailViewBottomHeading.domNode);
+                                        displayBtnBucketIn(viewOneBrand);
+                                        viewOneBrand.headingTop.startup();
+                                        viewOneBrand.startup();
+                                    }
+                                    viewOneBrand.scrollTo({x: 0, y: 0});
+                                    viewOneBrand.headingTop.set("label",this.label);
+                                    viewAllBrands.loadOrderContent(viewOneBrand, this.catid);
+                                }
+                            }
+                            viewAllBrands.view_main_list_items.addChild(list_item);
+                            list_item.startup();
+                        }
+                    };
+//                    viewAllBrands.onBeforeTransitionIn = function () {
+//                        viewAllBrands.loadDetailContent();
+//                    };
+
+                    viewAllBrands.loadOrderContent = function (view, catid) {
+                        console.log("loadOrderContent catid=", catid);
+                        Request.getJSONData({
+                                    url: "/mobile/get_orders_detail1",
+                                    condition: "catid=" + catid,
+                                    //    condition: "action=get_main_data&bdate=" + bdate + "&edate=" + edate + "&" + unit_params + detail,
+                                    consoleLog: true
+                                }
+                                , function (success, result) {
+                                    if (success) {
+                                        console.log("view_main.loadDetailContent getJSONData result=", result);
+                                        var data = [];
+                                        if (result.items) data = result.items;
+                                        if (result.error) {
+                                            viewAllBrands.msgBox.innerHTML = "Нет данных";
+                                            console.log("view_main.loadDetailContent getJSONData DATA ERROR! error=", result.error);
+                                            viewAllBrands.dialogWin.show();
+                                        }
+                                        viewAllBrands.fillUpOrderList(view, data);
+                                    } else {//error!!!
+                                        viewAllBrands.msgBox.innerHTML = "Нет связи с сервером";
+                                        viewAllBrands.dialogWin.show();
+                                    }
+                                    if (viewAllBrands.prog) viewAllBrands.prog.stop();
+
+                                }
+                        );
+                    };
+
+                    viewAllBrands.fillUpOrderList = function (view, data) {
+                        // var view = registry.byId("detail_order_view");
+                        var product_list = registry.byId("product_list_d1");
+                        if (product_list) product_list.destroy();
+                        product_list = new roundRectList({id: "product_list_d1"});
+                        var product_list_item;
+                        for (var i in data) {
+                            var dataItem = data[i];
+                            product_list_item = new ListItem({
+                                label: dataItem.label,
+                                variableHeight:true,
+                                rightText: dataItem.value,
+                                moveTo: "product_view",
+                                transition:"none"
+                            });
+                           // product_list_item.innerHTML="<div>" +dataItem.label+"</div>";
+                            product_list_item.onClick = function () {
+                                viewAllBrands.createOrderProductView(this.label);
+                            };
+
+                            product_list.addChild(product_list_item);
+                        }
+                        view.addChild(product_list);
+                        product_list.startup();
+                    };
+
+                    viewAllBrands.createOrderProductView = function (prodName) {
+                        var productView = registry.byId("product_view");
+                        if (!productView) {
+                            productView = new ScrollableView({id: "product_view"});
+                            document.getElementById("body").appendChild(productView.domNode);
+                            productView.headingTop = new Heading({
+                                label:"Описание товара",
+                                back: "Назад",
+                                moveTo: "detail_order_view",
+                                fixed: "top",
+                                transition:"none"
+                            });
+                            var productViewBottomHeading = new Heading({fixed: "bottom"});
+                            productView.domNode.appendChild(productView.headingTop.domNode);
+                            productView.domNode.appendChild(productViewBottomHeading.domNode);
+                            var btnAddToBasket = new ToolBarButton({label: "Добавить в корзину"});
+                            productViewBottomHeading.addChild(btnAddToBasket);
+                            displayBtnBucketIn(productView);
+
+//                            var tr = registry.byId(view.id + "hfbh");
+//                            var bottomHeading = registry.byId(view.id + "hf");
+//                            if (!bottomHeading) {
+//                                bottomHeading = new Heading({fixed: "bottom"}, view.id + "hf");
+//                                document.getElementById('body').appendChild(bottomHeading.domNode);
+//
+//                                view.inner_scroll.domNode.appendChild(bottomHeading.domNode);
+//                                bottomHeading.startup();
+//                            }
+
+                                var table = document.createElement('table');
+                                table.setAttribute("align", "center");
+                                var tbody = document.createElement('tbody');
+                                var tr = document.createElement('tr');
+                                var td = document.createElement('td');
+                                var img=document.createElement('img');
+                                img.setAttribute("src", "/icons/shopping_bag128x128.ico");
+                                td.setAttribute("aling", "center");
+                                td.appendChild(img);
+                                productView.domNode.appendChild(table);
+                                table.appendChild(tbody);
+                                tbody.appendChild(tr);
+                                tr.appendChild(td);
+                                productView.startup();
+                        }
+//                        btnAddToBasket.onClick=function(){
+//                           // addToBasket();
+//                        };
+
+                        viewAllBrands.loadProductContent(prodName);
+
+                        productView.scrollTo({x: 0, y: 0});
+
+                    };
+
+                    viewAllBrands.loadProductContent = function (prodName) {
+                        Request.getJSONData({
+                                    url: "/mobile/get_product_description",
+                                    condition: "prodName=" + prodName,
+                                    //    condition: "action=get_main_data&bdate=" + bdate + "&edate=" + edate + "&" + unit_params + detail,
+                                    consoleLog: true
+                                }
+                                , function (success, result) {
+                                    if (success) {                                          console.log("loadProductContent result=", result);
+                                        var data = [];
+                                      //  if (result.items) data = result.items;
+                                        if (result.error) {
+                                            viewAllBrands.msgBox.innerHTML = "Нет данных";          console.log("view_main.loadDetailContent getJSONData DATA ERROR! error=", result.error);
+                                            viewAllBrands.dialogWin.show();
+                                        }                                                           console.log("data=", result);
+                                    } else {//error!!!
+                                        viewAllBrands.msgBox.innerHTML = "Нет связи с сервером";
+                                        viewAllBrands.dialogWin.show();
+                                    }
+                                    if (viewAllBrands.prog) viewAllBrands.prog.stop();
+
+                                });
+                    };
+                    viewAllBrands.loadMainContent();
+                });
 </script>
 </html>

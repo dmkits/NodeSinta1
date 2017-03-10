@@ -143,3 +143,17 @@ module.exports.getDetailsOrders = function (capid, callback) {
         });
 };
 
+module.exports.getProdDecription = function (prodName, callback) {
+    var reqSql = new sql.Request(conn);
+    var query_str = fs.readFileSync('./scripts/mobile_product_detail.sql', 'utf8');
+
+
+    reqSql.input('ProdName', prodName);                                                                              //console.log("capid=",capid );
+    reqSql.query(query_str,
+        function (err, recordset) {
+            if (err)
+                callback(err, null);
+            else
+                callback(null, recordset);
+        });
+};
