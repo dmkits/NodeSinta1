@@ -81,6 +81,8 @@
                 moment.locale("uk");
                 numeral.language('ru-UA');
 
+                var orderID;
+
                 var mainView = new View({id: "main_view"});
                 mainView.inner_scroll = new ScrollableView({});
                 mainView.firstHeading = new Heading({id: "first_heading"});
@@ -133,10 +135,12 @@
                             transition: "none"
                         });
                         var headingBottomBasket = new Heading({fixed: "bottom"});
+                        var orderBtn = new ToolBarButton({label:"Оформить заказ"});
 
                         document.getElementById('body').appendChild(viewBasket.domNode);
                         viewBasket.domNode.appendChild(viewBasket.headingTop.domNode);
                         viewBasket.domNode.appendChild(headingBottomBasket.domNode);
+                        headingBottomBasket.addChild(orderBtn);
                         viewBasket.startup();
                     }
                     viewBasket.headingTop.set("moveTo", btnBasket.previousView.id);
@@ -257,7 +261,7 @@
 
                 mainView.loadOneBrandItems = function (catid, heading) {
                     Request.getJSONData({
-                                url: "/mobile/get_orders_detail1",
+                                url: "/mobile/get_brand_items",
                                 condition: "catid=" + catid,
                                 consoleLog: true
                             }
@@ -364,11 +368,29 @@
                     mainView.productView.Name.innerText = '' + prodName;
                     mainView.loadProductContent(prodName);
 
-//                    btnAddToBasket.onClick=function(){
-//                    addToBasket();
-//                     };
-
+                    btnAddToBasket.onClick=function(){
+                    addToBasket();
+                     };
                 };
+
+                function addToBasket() {                                                                                console.log("add_to_basket");
+                    Request.postJSONData({
+                                url: "/mobile/add_to_basket",
+                               // condition: condition,
+                                //  condition: "bdate=" + bdate + "&edate=" + edate + "&stocksList=" + stocksList,
+                               data: {order_id: orderID}, consoleLog: true
+                            },
+                            function (success, data) {
+                                if (!success) {
+                                   // displayQueryResultSQl.innerHTML = "<div><b style='color:red'>Error in request</b></div>";
+                                    return;
+                                }
+                                if (data.error){}
+                                  //  displayQueryResultSQl.innerHTML = "<div><b style='color:red'>" + data.error + "</b></div>";
+                                else{}
+                                  //  displayQueryResultSQl.innerHTML = JSON.stringify(data.result);
+                            });
+                }
 
                 mainView.loadProductContent = function (prodName) {
                     Request.getJSONData({

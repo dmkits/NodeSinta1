@@ -130,7 +130,7 @@ module.exports.getOrders = function (callback) {
 
 module.exports.getDetailsOrders = function (capid, callback) {
     var reqSql = new sql.Request(conn);
-    var query_str = fs.readFileSync('./scripts/mobile_orders_detail1.sql', 'utf8');
+    var query_str = fs.readFileSync('./scripts/mobile_brand_items.sql', 'utf8');
 
 
     reqSql.input('PCatID',sql.Int, capid);                                                                            //  console.log("capid=",capid );
@@ -156,3 +156,32 @@ module.exports.getProdDecription = function (prodName, callback) {
                 callback(null, recordset);
         });
 };
+
+module.exports.addNewOrderHead = function (uID, callback) {
+    var reqSql = new sql.Request(conn);
+    var query_str = fs.readFileSync('./scripts/mobile_add_new_order_head.sql', 'utf8');
+
+    //reqSql.input('ChID', prodName);
+    //reqSql.input('DocID', prodName);
+    reqSql.input('orderID', uID);
+    //reqSql.input('Date', prodName);
+        reqSql.query(query_str,
+        function (err,recordset) {                                                                                 //    console.log("recordset=",recordset );
+            if (err)
+                callback(err, null);
+            else
+                callback(null, recordset);
+        });
+};
+
+module.exports.defineChID=function(callback){
+    var reqSql = new sql.Request(conn);
+    reqSql.query("select ISNULL(MAX(ChID),0)+1 from t_ioRec;",
+        function (err,recordset) {                                                                                      console.log(" 181 recordset=",recordset );
+            if (err)
+                callback(err, null);
+            else
+                callback(null, recordset);
+        });
+};
+

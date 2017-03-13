@@ -13,6 +13,7 @@ var port=8181;
 var path=require ('path');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
+const uuidV1 = require('uuid/v1');
 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -229,15 +230,11 @@ app.get("/mobile/get_orders", function(req, res){
                 return;
             }
             var outData= {};
-            var app_params = process.argv.slice(2);
-            if(app_params.length===0) outData.mode='production';
-            else outData.mode=app_params[0];
-          //  outData.head="Магазины";
-            outData.items = recordset;                                           console.log("outData=", outData);
+            outData.items = recordset;
             res.send(outData);
         });
 });
-app.get("/mobile/get_orders_detail1", function(req, res){
+app.get("/mobile/get_brand_items", function(req, res){
 
     database.getDetailsOrders(req.query.catid,
         function (error,recordset) {
@@ -246,10 +243,6 @@ app.get("/mobile/get_orders_detail1", function(req, res){
                 return;
             }
             var outData= {};
-           // var app_params = process.argv.slice(2);
-           // if(app_params.length===0) outData.mode='production';
-          //  else outData.mode=app_params[0];
-            //  outData.head="Магазины";
             outData.items = recordset;
             res.send(outData);
         });
@@ -282,6 +275,33 @@ app.get("/mobile/get_main_info", function(req, res){
             outData.head=database.getDBConfig()["main.heading"];
             res.send(outData);
         });
+});
+
+app.post("/mobile/add_to_basket", function (req, res) {
+
+    if (req.cookies.order_id) {                                                                                         console.log(req.cookies.order_id);
+    } else {
+        var uID = uuidV1();
+var ChID=database.defineChID();
+        //database.defineChID(
+        //    function (error,recordset) {
+        //        if (error){
+        //            res.send({error:""});
+        //            return;
+        //        }
+        //        var outData= {};
+        //        var app_params = process.argv.slice(2);
+        //        if(app_params.length===0) outData.mode='production';
+        //        else outData.mode=app_params[0];
+        //        outData.head=database.getDBConfig()["main.heading"];
+        //      //  res.send(outData);
+        //    });
+
+
+        database.addNewOrderHead(uID,function (err, res){} );
+        res.cookie('order_id', uID, {maxAge: 900000, httpOnly: true});
+        res.send({ok: ""});
+    }
 });
 
 app.listen(port, function (err) {
