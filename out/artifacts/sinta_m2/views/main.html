@@ -87,8 +87,8 @@
             var pickUnitView = new PickUnitView({id:"pick_unit_view"});
 
             view_main.inner_scroll = new ScrollableView({});
-            view_main.top_heading_main = new Heading({id: "th_main"});
-            view_main.addChild(view_main.top_heading_main, 0);
+            view_main.firstHeading = new Heading({id: "th_main"});
+            view_main.addChild(view_main.firstHeading, 0);
             var pickUnitBtnHeading = new Heading({id: "pubtn_h"});
             var icon_btn = new ToolBarButton({
                 preventTouch: true,
@@ -277,7 +277,7 @@
 
             view_main.setMainContent = function (maindata) {
                 view_main.first_header_string = maindata.head;
-                view_main.top_heading_main.set("label", view_main.first_header_string);
+                view_main.firstHeading.set("label", view_main.first_header_string);
                 view_main.pickUnitBtn.units_data = maindata.units;
                 view_main.pickUnitBtn.selected_units = [];
                 view_main.string_units="";
@@ -303,7 +303,7 @@
                             view_main.dialogWin.show();
                         }
                     });
-                    view_main.top_heading_main.addChild(test_btn);
+                    view_main.firstHeading.addChild(test_btn);
                 }
                 if (!view_main.btnBeginDate.label) view_main.todayBtn.onClick();
             };

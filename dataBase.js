@@ -133,7 +133,7 @@ module.exports.getDetailsOrders = function (capid, callback) {
     var query_str = fs.readFileSync('./scripts/mobile_orders_detail1.sql', 'utf8');
 
 
-    reqSql.input('PCatID',sql.Int, capid);                                                                              console.log("capid=",capid );
+    reqSql.input('PCatID',sql.Int, capid);                                                                            //  console.log("capid=",capid );
     reqSql.query(query_str,
         function (err, recordset) {
             if (err)
@@ -145,12 +145,11 @@ module.exports.getDetailsOrders = function (capid, callback) {
 
 module.exports.getProdDecription = function (prodName, callback) {
     var reqSql = new sql.Request(conn);
-    var query_str = fs.readFileSync('./scripts/mobile_product_detail.sql', 'utf8');
+    var query_str = fs.readFileSync('./scripts/mobile_product_description.sql', 'utf8');
 
-
-    reqSql.input('ProdName', prodName);                                                                              //console.log("capid=",capid );
+    reqSql.input('ProdName', prodName);
     reqSql.query(query_str,
-        function (err, recordset) {
+        function (err, recordset) {                                                                                     console.log("recordset=",recordset );
             if (err)
                 callback(err, null);
             else

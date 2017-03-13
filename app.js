@@ -250,27 +250,37 @@ app.get("/mobile/get_orders_detail1", function(req, res){
            // if(app_params.length===0) outData.mode='production';
           //  else outData.mode=app_params[0];
             //  outData.head="Магазины";
-            outData.items = recordset;                                           console.log("outData=", outData);
+            outData.items = recordset;
             res.send(outData);
         });
 });
-//g
 
-app.get("/mobile/get_product_description", function(req, res){
+
+app.get("/mobile/get_product_description", function (req, res) {
 
     database.getProdDecription(req.query.prodName,
+        function (error, recordset) {
+            if (error) {
+                res.send({error: ""});
+                return;
+            }
+            res.send(recordset[0]);
+        });
+});
+
+app.get("/mobile/get_main_info", function(req, res){
+    database.getUnits(
         function (error,recordset) {
             if (error){
                 res.send({error:""});
                 return;
             }
-          //  var outData= {};
-            // var app_params = process.argv.slice(2);
-            // if(app_params.length===0) outData.mode='production';
-            //  else outData.mode=app_params[0];
-            //  outData.head="Магазины";
-         //   outData.items = recordset;                                           console.log("outData=", outData);
-            res.send(recordset);
+            var outData= {};
+            var app_params = process.argv.slice(2);
+            if(app_params.length===0) outData.mode='production';
+            else outData.mode=app_params[0];
+            outData.head=database.getDBConfig()["main.heading"];
+            res.send(outData);
         });
 });
 

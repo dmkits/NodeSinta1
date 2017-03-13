@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/jslib/dojox/widget/Calendar/Calendar.css">
     <link rel="stylesheet" href="/jslib/dojox/calendar/themes/claro/Calendar.css">
     <link href="/jslib/dijit/themes/claro/claro.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="/css/order.css" media="screen">
     <!--<script type="text/javascript" src="/jslib/dojox/mobile/deviceTheme.js"></script>-->
 
     <script src="/jslib/moment/moment-with-locales.js"></script>
@@ -80,77 +81,36 @@
                 moment.locale("uk");
                 numeral.language('ru-UA');
 
-                var viewAllBrands = new View({id:"all_brands"});
-               // viewAllBrands.startup();
-                document.getElementById('body').appendChild(viewAllBrands.domNode);
+                var mainView = new View({id: "main_view"});
+                mainView.inner_scroll = new ScrollableView({});
+                mainView.firstHeading = new Heading({id: "first_heading"});
+                mainView.headingTop = new Heading({id: "heading_top"});
+                var headingBottomMainView = new Heading({fixed: "bottom"});
+                var icon_btn = new ToolBarButton({icon: "/icons/hearts29x29.ico", iconPos: "0,0,29,29"});
 
-                viewAllBrands.inner_scroll = new ScrollableView({});
-               // viewAllBrands.inner_scroll.startup();
+                document.getElementById('body').appendChild(mainView.domNode);
+                mainView.addChild(mainView.firstHeading, 0);
+                mainView.inner_scroll.domNode.appendChild(headingBottomMainView.domNode);
+                headingBottomMainView.startup();
+                mainView.headingTop.addChild(icon_btn);
+                mainView.addChild(mainView.headingTop);
+                mainView.addChild(mainView.inner_scroll);
+                mainView.inner_scroll.startup();
+                mainView.startup();
 
-                viewAllBrands.top_heading_main = new Heading({id: "th_main"});
-                viewAllBrands.addChild(viewAllBrands.top_heading_main, 0);
-                viewAllBrands.headingTop = new Heading({id: "pubtn_h"});
-
-
-                var icon_btn = new ToolBarButton({
-                    preventTouch: true,
-                    clickable: false,
-                    icon: "/icons/hearts29x29.ico",
-                    iconPos: "0,0,29,29"
-                });
-
-
-
-
-
-              //     viewAllBrands.headingTop.startup();
-                    if (!viewAllBrands.dialogWin) {
-                        viewAllBrands.dialogWin = new SimpleDialog({
-                            id: "dialogWin"
-                        });
-                        document.getElementById('body').appendChild(viewAllBrands.dialogWin.domNode);
-                    }
-                    var headingBottomAllBrands = new Heading({fixed: "bottom"});
-                    // document.getElementById('body').appendChild(headingBottomAllBrends.domNode);
-
-                    viewAllBrands.inner_scroll.domNode.appendChild(headingBottomAllBrands.domNode);
-                    headingBottomAllBrands.startup();
-
-                    if (!viewAllBrands.msgBox) {
-                        viewAllBrands.msgBox = domConstruct.create("div",
-                                {class: "mblSimpleDialogText"},
-                                viewAllBrands.dialogWin.domNode);
-                    }
-                    if (!viewAllBrands.cancelBtn)
-                        viewAllBrands.cancelBtn = new Button({
-                            class: "mblSimpleDialogButton mblRedButton",
-                            innerHTML: "Ok"
-                        });
-                    viewAllBrands.cancelBtn.connect(viewAllBrands.cancelBtn.domNode, "click",
-                            function (e) {
-                                viewAllBrands.dialogWin.hide()
-                            });
-                    viewAllBrands.cancelBtn.placeAt(viewAllBrands.dialogWin.domNode);
-                    viewAllBrands.headingTop.addChild(icon_btn);
-
-                    viewAllBrands.addChild(viewAllBrands.headingTop);
-                    viewAllBrands.addChild(viewAllBrands.inner_scroll);
-                    viewAllBrands.inner_scroll.startup();
-                    viewAllBrands.startup();
-
-                displayBtnBucketIn(viewAllBrands);
-
+                displayBtnBucketIn(mainView);
+                createDialogWindow();
 
                 function displayBtnBucketIn(view) {
-                    var btnBasket = registry.byId("btn_basket"+view.id);
+                    var btnBasket = registry.byId("btn_basket" + view.id);
                     if (!btnBasket) {
                         btnBasket = new ToolBarButton({
-                            id: "btn_basket"+view.id,
+                            id: "btn_basket" + view.id,
                             icon: "/icons/basket16x16.ico",
                             style: "float:right",
                             iconPos: "0,0,29,29",
                             moveTo: "view_basket",
-                            transition:"none"
+                            transition: "none"
                         });
                     }
                     btnBasket.previousView = view;
@@ -160,20 +120,21 @@
                     view.headingTop.addChild(btnBasket);
                     view.headingTop.startup();
                     btnBasket.startup();
-                };
+                }
 
-                function goToViewBasket(btnBasket){
+                function goToViewBasket(btnBasket) {
                     var viewBasket = registry.byId("view_basket");
                     if (!viewBasket) {
                         viewBasket = new ScrollableView({id: "view_basket"});
-                        document.getElementById('body').appendChild(viewBasket.domNode);
                         viewBasket.headingTop = new Heading({
-                            label:"Корзина",
+                            label: "Корзина",
                             fixed: "top",
                             back: "Назад",
-                            transition:"none"
+                            transition: "none"
                         });
                         var headingBottomBasket = new Heading({fixed: "bottom"});
+
+                        document.getElementById('body').appendChild(viewBasket.domNode);
                         viewBasket.domNode.appendChild(viewBasket.headingTop.domNode);
                         viewBasket.domNode.appendChild(headingBottomBasket.domNode);
                         viewBasket.startup();
@@ -181,260 +142,286 @@
                     viewBasket.headingTop.set("moveTo", btnBasket.previousView.id);
                 }
 
-                    viewAllBrands.loadMainContent = function () {
-                        Request.getJSONData({url: "/mobile/get_units", consoleLog: true},
-                                // getJSONData({url: "/mobile", condition: "action=get_units", consoleLog: true},
-                                function (success, result) {
-                                    if (success) {
-                                        console.log("result =", result);
-                                        if (result.error) {
-                                            viewAllBrands.msgBox.innerHTML = "Нет данных";
-                                            viewAllBrands.dialogWin.show();
-                                        } else viewAllBrands.setMainContent(result);
-                                    } else {//error!!!
-                                        viewAllBrands.msgBox.innerHTML = "Нет связи с сервером";
-                                        viewAllBrands.dialogWin.show();
-                                    }
-                                    if (viewAllBrands.prog) viewAllBrands.prog.stop();
-                                });
-                    };
-
-                    viewAllBrands.setMainContent = function (maindata) {
-                        //   viewAllBrands.setBottomButtonsFor(viewAllBrands);
-                        viewAllBrands.inner_scroll.startup();
-                        viewAllBrands.startup();
-
-                        if (maindata.mode && maindata.mode.toString().toLowerCase().indexOf("test") !== -1) {               //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                            var test_btn = new ToolBarButton({
-                                icon: "/icons/exclamation-mark29x29.ico",
-                                iconPos: "0,0,29,29",
-                                style: "float:right",
-                                onClick: function () {
-                                    viewAllBrands.msgBox.innerHTML = maindata.mode;
-                                    viewAllBrands.dialogWin.show();
+                mainView.loadMainContent = function () {
+                    Request.getJSONData({url: "/mobile/get_main_info", consoleLog: true},
+                            function (success, result) {
+                                if (success) {
+                                    if (result.error) {
+                                        mainView.msgBox.innerHTML = "Нет данных";
+                                        mainView.dialogWin.show();
+                                    } else mainView.setMainContent(result);
+                                } else {//error!!!
+                                    mainView.msgBox.innerHTML = "Нет связи с сервером";
+                                    mainView.dialogWin.show();
                                 }
+                                if (mainView.prog) mainView.prog.stop();
                             });
+                };
 
-                            viewAllBrands.top_heading_main.addChild(test_btn);
-                        }
-                        viewAllBrands.loadDetailContent();
-                    };
+                mainView.setMainContent = function (maindata) {
+                    mainView.inner_scroll.startup();
+                    mainView.startup();
 
-                    viewAllBrands.loadDetailContent = function () {
-                        if (viewAllBrands.view_main_list_items) viewAllBrands.view_main_list_items.destroy();
-                        if (viewAllBrands.prog) viewAllBrands.prog.destroy();
-                        viewAllBrands.prog = new ProgressIndicator({size: 200, center: true});
-                        document.getElementById('body').appendChild(viewAllBrands.prog.domNode);
-                        viewAllBrands.prog.start();
-
-                        Request.getJSONData({
-                                    url: "/mobile/get_orders",
-                                    consoleLog: true
-                                }
-                                , function (success, result) {
-                                    if (success) {                                              console.log("view_main.loadDetailContent getJSONData result=", result);
-                                        var data = [];
-                                        if (result.items) data = result.items;
-                                        if (result.error) {
-                                            viewAllBrands.msgBox.innerHTML = "Нет данных";
-                                            console.log("view_main.loadDetailContent getJSONData DATA ERROR! error=", result.error);
-                                            viewAllBrands.dialogWin.show();
-                                        }
-                                        viewAllBrands.setDetailContent(data);
-                                    } else {//error!!!
-                                        viewAllBrands.msgBox.innerHTML = "Нет связи с сервером";
-                                        viewAllBrands.dialogWin.show();
-                                    }
-                                    if (viewAllBrands.prog) viewAllBrands.prog.stop();
-
-                                }
-                        );
-                    };
-                    viewAllBrands.setDetailContent = function (detail_data) {
-                        if (viewAllBrands.view_main_list_items) viewAllBrands.view_main_list_items.destroy();
-                        viewAllBrands.view_main_list_items = new roundRectList({
-                            style: "position:relative",
-                            "id": "view_main_list_items"
-                        });
-                       // viewAllBrands.inner_scroll.scrollTo({x: 0, y: 0});
-                        viewAllBrands.inner_scroll.addChild(viewAllBrands.view_main_list_items);
-                        viewAllBrands.view_main_list_items.startup();
-                        for (var i in detail_data) {
-                            var dataItem = detail_data[i];
-                            var list_item = new ListItem({
-                                variableHeight:true,
-                                label: dataItem.label,
-                                rightText: dataItem.value,
-                                moveTo: "detail_order_view",
-                                transition: "none"
-                            });
-                            if (dataItem.catid) {
-                                list_item.catid = dataItem.catid;
-                                list_item.onClick = function () {
-                                    var viewOneBrand = registry.byId("detail_order_view");
-                                    if (!viewOneBrand) {
-                                        viewOneBrand = new ScrollableView({id: "detail_order_view"});
-                                        document.getElementById("body").appendChild(viewOneBrand.domNode);
-
-                                        viewOneBrand.headingTop = new Heading({
-                                            fixed: "top",
-                                            back: "Назад",
-                                            moveTo: viewAllBrands.id,
-                                            transition:"none"
-                                        });
-                                        var detailViewBottomHeading = new Heading({fixed: "bottom"});
-                                        viewOneBrand.domNode.appendChild(viewOneBrand.headingTop.domNode);
-                                        viewOneBrand.domNode.appendChild(detailViewBottomHeading.domNode);
-                                        displayBtnBucketIn(viewOneBrand);
-                                        viewOneBrand.headingTop.startup();
-                                        viewOneBrand.startup();
-                                    }
-                                    viewOneBrand.scrollTo({x: 0, y: 0});
-                                    viewOneBrand.headingTop.set("label",this.label);
-                                    viewAllBrands.loadOrderContent(viewOneBrand, this.catid);
-                                }
+                    if (maindata.mode && maindata.mode.toString().toLowerCase().indexOf("test") !== -1) {
+                        var test_btn = new ToolBarButton({
+                            icon: "/icons/exclamation-mark29x29.ico",
+                            iconPos: "0,0,29,29",
+                            style: "float:right",
+                            onClick: function () {
+                                mainView.msgBox.innerHTML = maindata.mode;
+                                mainView.dialogWin.show();
                             }
-                            viewAllBrands.view_main_list_items.addChild(list_item);
+                        });
+                        mainView.firstHeading.addChild(test_btn);
+                    }
+                    mainView.firstHeading.set("label", maindata.head);
+                    mainView.loadDetailContent();
+                };
+
+                mainView.loadDetailContent = function () {
+                    if (mainView.view_main_list_items) mainView.view_main_list_items.destroy();
+                    if (mainView.prog) mainView.prog.destroy();
+                    mainView.prog = new ProgressIndicator({size: 200, center: true});
+                    document.getElementById('body').appendChild(mainView.prog.domNode);
+                    mainView.prog.start();
+
+                    Request.getJSONData({
+                                url: "/mobile/get_orders",
+                                consoleLog: true
+                            }
+                            , function (success, result) {
+                                if (success) {                                                                           console.log("mainView.loadDetailContentt getJSONData result=", result);
+                                    var data = [];
+                                    if (result.items) data = result.items;
+                                    if (result.error) {
+                                        mainView.msgBox.innerHTML = "Нет данных";                                       console.log("mainView.loadDetailContent getJSONData DATA ERROR! error=", result.error);
+                                        mainView.dialogWin.show();
+                                    }
+                                    mainView.setDetailContent(data);
+                                } else {//error!!!
+                                    mainView.msgBox.innerHTML = "Нет связи с сервером";
+                                    mainView.dialogWin.show();
+                                }
+                                if (mainView.prog) mainView.prog.stop();
+                            }
+                    );
+                };
+
+                mainView.setDetailContent = function (detail_data) {
+                    if (mainView.view_main_list_items) mainView.view_main_list_items.destroy();
+                    mainView.view_main_list_items = new roundRectList({
+                        style: "position:relative",
+                        "id": "view_main_list_items"
+                    });
+                    mainView.inner_scroll.addChild(mainView.view_main_list_items);
+                    mainView.view_main_list_items.startup();
+                    for (var i in detail_data) {
+                        var dataItem = detail_data[i];
+                        var list_item = new ListItem({
+                            variableHeight: true,
+                            label: dataItem.label,
+                            rightText: dataItem.value,
+                            moveTo: "detail_order_view",
+                            transition: "none"
+                        });
+                        if (dataItem.catid) {
+                            list_item.catid = dataItem.catid;
+                            list_item.onClick = function () {
+                                if (!mainView.oneBrandView) {
+                                    mainView.oneBrandView = new ScrollableView({id: "detail_order_view"});
+                                    document.getElementById("body").appendChild(mainView.oneBrandView.domNode);
+                                    mainView.oneBrandView.headingTop = new Heading({
+                                        fixed: "top",
+                                        back: "Назад",
+                                        moveTo: mainView.id,
+                                        transition: "none"
+                                    });
+                                    var detailViewBottomHeading = new Heading({fixed: "bottom"});
+                                    mainView.oneBrandView.domNode.appendChild(mainView.oneBrandView.headingTop.domNode);
+                                    mainView.oneBrandView.domNode.appendChild(detailViewBottomHeading.domNode);
+                                    displayBtnBucketIn(mainView.oneBrandView);
+                                    mainView.oneBrandView.headingTop.startup();
+                                    mainView.oneBrandView.startup();
+                                }
+
+                                mainView.loadOneBrandItems(this.catid, this.label);
+                            };
+                            mainView.view_main_list_items.addChild(list_item);
                             list_item.startup();
                         }
-                    };
-//                    viewAllBrands.onBeforeTransitionIn = function () {
-//                        viewAllBrands.loadDetailContent();
+                    }
+                };
+//                    mainView.onBeforeTransitionIn = function () {
+//                        mainView.loadDetailContent();
 //                    };
 
-                    viewAllBrands.loadOrderContent = function (view, catid) {
-                        console.log("loadOrderContent catid=", catid);
-                        Request.getJSONData({
-                                    url: "/mobile/get_orders_detail1",
-                                    condition: "catid=" + catid,
-                                    //    condition: "action=get_main_data&bdate=" + bdate + "&edate=" + edate + "&" + unit_params + detail,
-                                    consoleLog: true
+                mainView.loadOneBrandItems = function (catid, heading) {
+                    Request.getJSONData({
+                                url: "/mobile/get_orders_detail1",
+                                condition: "catid=" + catid,
+                                consoleLog: true
+                            }
+                            , function (success, result) {
+                                if (success) {                                                                  console.log("mainView.loadOneBrandItems getJSONData result=", result);
+                                    var data = [];
+                                    if (result.items) data = result.items;
+                                    if (result.error) {
+                                        mainView.msgBox.innerHTML = "Нет данных";                               console.log("mainView.loadOneBrandItems getJSONData DATA ERROR! error=", result.error);
+                                        mainView.dialogWin.show();
+                                    }mainView.fillUpOneBrandList(data, heading);
+                                } else {//error!!!
+                                    mainView.msgBox.innerHTML = "Нет связи с сервером";
+                                    mainView.dialogWin.show();
                                 }
-                                , function (success, result) {
-                                    if (success) {
-                                        console.log("view_main.loadDetailContent getJSONData result=", result);
-                                        var data = [];
-                                        if (result.items) data = result.items;
-                                        if (result.error) {
-                                            viewAllBrands.msgBox.innerHTML = "Нет данных";
-                                            console.log("view_main.loadDetailContent getJSONData DATA ERROR! error=", result.error);
-                                            viewAllBrands.dialogWin.show();
-                                        }
-                                        viewAllBrands.fillUpOrderList(view, data);
-                                    } else {//error!!!
-                                        viewAllBrands.msgBox.innerHTML = "Нет связи с сервером";
-                                        viewAllBrands.dialogWin.show();
-                                    }
-                                    if (viewAllBrands.prog) viewAllBrands.prog.stop();
+                                if (mainView.prog) mainView.prog.stop();
 
-                                }
-                        );
-                    };
+                            }
+                    );
+                };
 
-                    viewAllBrands.fillUpOrderList = function (view, data) {
-                        // var view = registry.byId("detail_order_view");
-                        var product_list = registry.byId("product_list_d1");
-                        if (product_list) product_list.destroy();
-                        product_list = new roundRectList({id: "product_list_d1"});
-                        var product_list_item;
-                        for (var i in data) {
-                            var dataItem = data[i];
-                            product_list_item = new ListItem({
-                                label: dataItem.label,
-                                variableHeight:true,
-                                rightText: dataItem.value,
-                                moveTo: "product_view",
-                                transition:"none"
-                            });
-                           // product_list_item.innerHTML="<div>" +dataItem.label+"</div>";
-                            product_list_item.onClick = function () {
-                                viewAllBrands.createOrderProductView(this.label);
-                            };
+                mainView.fillUpOneBrandList = function (data, heading) {
+                    mainView.oneBrandView.scrollTo({x: 0, y: 0});
+                    mainView.oneBrandView.headingTop.set("label", heading);
 
-                            product_list.addChild(product_list_item);
+                    var product_list = registry.byId("product_list_d1");
+                    if (product_list) product_list.destroy();
+                    product_list = new roundRectList({id: "product_list_d1"});
+                    var product_list_item;
+                    for (var i in data) {
+                        var dataItem = data[i];
+                        product_list_item = new ListItem({
+                            label: dataItem.label,
+                            variableHeight: true,
+                            rightText: dataItem.value,
+                            moveTo: "product_view",
+                            transition: "none"
+                        });
+                        product_list_item.onClick = function () {
+                            mainView.showProductView(this.label);
+                        };
+                        product_list.addChild(product_list_item);
+                    }
+                    mainView.oneBrandView.addChild(product_list);
+                    product_list.startup();
+                };
+
+                mainView.showProductView = function (prodName) {
+                    if (!mainView.productView) {
+                        mainView.productView = new ScrollableView({id: "product_view"});
+                        document.getElementById("body").appendChild(mainView.productView.domNode);
+                        mainView.productView.headingTop = new Heading({
+                            label: "Описание товара",
+                            back: "Назад",
+                            moveTo: "detail_order_view",
+                            fixed: "top",
+                            transition: "none"
+                        });
+                        mainView.productView.onTouchMove = function () {
+                            mainView.productView.abort();
+                        };
+                        var productViewBottomHeading = new Heading({fixed: "bottom"});
+                        mainView.productView.domNode.appendChild(mainView.productView.headingTop.domNode);
+                        mainView.productView.domNode.appendChild(productViewBottomHeading.domNode);
+                        var btnAddToBasket = new ToolBarButton({label: "Добавить в корзину"});
+                        productViewBottomHeading.addChild(btnAddToBasket);
+                        displayBtnBucketIn(mainView.productView);
+
+                        var table = document.createElement('table');
+                        var tbody = document.createElement('tbody');
+                        var trImg = document.createElement('tr');
+                        var tdImg = document.createElement('td');
+                        var trName = document.createElement('tr');
+                        mainView.productView.Name = document.createElement('td');
+                        var trPrice = document.createElement('tr');
+                        mainView.productView.tdPrice = document.createElement('td');
+                        var trUm = document.createElement('tr');
+                        mainView.productView.tdUm = document.createElement('td');
+                        mainView.productView.img = document.createElement('img');
+
+                        table.setAttribute("class", "product_description_table");
+                        tdImg.setAttribute("class", "product_img_td");
+                        mainView.productView.img.setAttribute("class", "product_img");
+                        mainView.productView.Name.setAttribute("class", "product_price_name");
+                        mainView.productView.tdUm.setAttribute("class", "product_um_td");
+                        mainView.productView.tdPrice.setAttribute("class", "product_price_td");
+
+                        tdImg.appendChild(mainView.productView.img);
+
+                        trImg.appendChild(tdImg);
+                        trName.appendChild(mainView.productView.Name);
+                        trPrice.appendChild(mainView.productView.tdPrice);
+                        trUm.appendChild(mainView.productView.tdUm);
+
+                        tbody.appendChild(trImg);
+                        tbody.appendChild(trName);
+                        tbody.appendChild(trUm);
+                        tbody.appendChild(trPrice);
+
+                        table.appendChild(tbody);
+                        mainView.productView.domNode.appendChild(table);
+                        mainView.productView.startup();
+                    }
+                    mainView.productView.Name.innerText = '' + prodName;
+                    mainView.loadProductContent(prodName);
+
+//                    btnAddToBasket.onClick=function(){
+//                    addToBasket();
+//                     };
+
+                };
+
+                mainView.loadProductContent = function (prodName) {
+                    Request.getJSONData({
+                        url: "/mobile/get_product_description", condition: "prodName=" + prodName, consoleLog: true
+                    }, function (success, result) {
+                        if (success) {                                                                                  console.log("mainView.loadProductContent result=", result);
+                            var data = [];
+                            if (result.error) {
+                                mainView.msgBox.innerHTML = "Нет данных";                                               console.log("mainView.loadProductContent getJSONData DATA ERROR! error=", result.error);
+                                mainView.dialogWin.show();
+                            }
+                        } else {//error!!!
+                            mainView.msgBox.innerHTML = "Нет связи с сервером";
+                            mainView.dialogWin.show();
                         }
-                        view.addChild(product_list);
-                        product_list.startup();
-                    };
+                        mainView.fillUpProductDescription(result);
+                        if (mainView.prog) mainView.prog.stop();
 
-                    viewAllBrands.createOrderProductView = function (prodName) {
-                        var productView = registry.byId("product_view");
-                        if (!productView) {
-                            productView = new ScrollableView({id: "product_view"});
-                            document.getElementById("body").appendChild(productView.domNode);
-                            productView.headingTop = new Heading({
-                                label:"Описание товара",
-                                back: "Назад",
-                                moveTo: "detail_order_view",
-                                fixed: "top",
-                                transition:"none"
+                    });
+                };
+
+                mainView.fillUpProductDescription = function (data) {
+                    mainView.productView.tdPrice.innerText = "Цена: " + data.price;
+                    mainView.productView.tdUm.innerText = "Ед.изм: " + data.um;
+
+                };
+
+                function createDialogWindow() {
+                    if (!mainView.dialogWin) {
+                        mainView.dialogWin = new SimpleDialog({
+                            id: "dialogWin"
+                        });
+                        document.getElementById('body').appendChild(mainView.dialogWin.domNode);
+                    }
+                    if (!mainView.msgBox) {
+                        mainView.msgBox = domConstruct.create("div",
+                                {class: "mblSimpleDialogText"},
+                                mainView.dialogWin.domNode);
+                    }
+                    if (!mainView.cancelBtn)
+                        mainView.cancelBtn = new Button({
+                            class: "mblSimpleDialogButton mblRedButton",
+                            innerHTML: "Ok"
+                        });
+                    mainView.cancelBtn.connect(mainView.cancelBtn.domNode, "click",
+                            function (e) {
+                                mainView.dialogWin.hide()
                             });
-                            var productViewBottomHeading = new Heading({fixed: "bottom"});
-                            productView.domNode.appendChild(productView.headingTop.domNode);
-                            productView.domNode.appendChild(productViewBottomHeading.domNode);
-                            var btnAddToBasket = new ToolBarButton({label: "Добавить в корзину"});
-                            productViewBottomHeading.addChild(btnAddToBasket);
-                            displayBtnBucketIn(productView);
+                    mainView.cancelBtn.placeAt(mainView.dialogWin.domNode);
+                }
 
-//                            var tr = registry.byId(view.id + "hfbh");
-//                            var bottomHeading = registry.byId(view.id + "hf");
-//                            if (!bottomHeading) {
-//                                bottomHeading = new Heading({fixed: "bottom"}, view.id + "hf");
-//                                document.getElementById('body').appendChild(bottomHeading.domNode);
-//
-//                                view.inner_scroll.domNode.appendChild(bottomHeading.domNode);
-//                                bottomHeading.startup();
-//                            }
+                mainView.loadMainContent();
 
-                                var table = document.createElement('table');
-                                table.setAttribute("align", "center");
-                                var tbody = document.createElement('tbody');
-                                var tr = document.createElement('tr');
-                                var td = document.createElement('td');
-                                var img=document.createElement('img');
-                                img.setAttribute("src", "/icons/shopping_bag128x128.ico");
-                                td.setAttribute("aling", "center");
-                                td.appendChild(img);
-                                productView.domNode.appendChild(table);
-                                table.appendChild(tbody);
-                                tbody.appendChild(tr);
-                                tr.appendChild(td);
-                                productView.startup();
-                        }
-//                        btnAddToBasket.onClick=function(){
-//                           // addToBasket();
-//                        };
-
-                        viewAllBrands.loadProductContent(prodName);
-
-                        productView.scrollTo({x: 0, y: 0});
-
-                    };
-
-                    viewAllBrands.loadProductContent = function (prodName) {
-                        Request.getJSONData({
-                                    url: "/mobile/get_product_description",
-                                    condition: "prodName=" + prodName,
-                                    //    condition: "action=get_main_data&bdate=" + bdate + "&edate=" + edate + "&" + unit_params + detail,
-                                    consoleLog: true
-                                }
-                                , function (success, result) {
-                                    if (success) {                                          console.log("loadProductContent result=", result);
-                                        var data = [];
-                                      //  if (result.items) data = result.items;
-                                        if (result.error) {
-                                            viewAllBrands.msgBox.innerHTML = "Нет данных";          console.log("view_main.loadDetailContent getJSONData DATA ERROR! error=", result.error);
-                                            viewAllBrands.dialogWin.show();
-                                        }                                                           console.log("data=", result);
-                                    } else {//error!!!
-                                        viewAllBrands.msgBox.innerHTML = "Нет связи с сервером";
-                                        viewAllBrands.dialogWin.show();
-                                    }
-                                    if (viewAllBrands.prog) viewAllBrands.prog.stop();
-
-                                });
-                    };
-                    viewAllBrands.loadMainContent();
-                });
+            });
 </script>
 </html>

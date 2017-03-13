@@ -55,6 +55,10 @@
                         <td><label for="password">app.password</label></td>
                         <td><input id="password" type="text" aria-disabled="false"/></td>
                     </tr>
+                    <tr>
+                        <td><label for="main_heading">main heading</label></td>
+                        <td><input id="main_heading" type="text" aria-disabled="false"/></td>
+                    </tr>
                 </table>
             </td>
         </tr>
@@ -87,6 +91,7 @@
                 var controlUrlInput=new TextBox({id:"control.url"},"control.url");
                 var orderUrlInput=new TextBox({id:"order.url"},"order.url");
                 var passwordInput = new TextBox({id:"password"},"password");
+                var mainHeadingInput = new TextBox({id:"main_heading"},"main_heading");
 
                 var sa_startup_params_appLocalConfig = document.getElementById("sa_startup_params_appLocalConfig");
                 var reloadBtn = new Button({id: "SA_startup_params_BtnAppLocalConfigLoad"}, "SA_startup_params_BtnAppLocalConfigLoad");
@@ -137,7 +142,7 @@
                     if(DBConfigData["order.url"]) orderUrlInput.set("value", DBConfigData["order.url"]);
                     else orderUrlInput.set("value","/");
                     if(DBConfigData["app.password"]) passwordInput.set("value", DBConfigData["app.password"]);
-                   // else orderUrlInput.set("value","/");
+                    mainHeadingInput.set("value",DBConfigData["main.heading"]);
                 }
 
                 saveAndReconnectBtn.onClick = function () {                                                             console.log("saveAndReconnectBtn.onClick");
@@ -151,7 +156,9 @@
                         "password": dbPasswordInput.get('value'),
                         "control.url": controlUrlInput.get('value'),
                         "order.url": orderUrlInput.get('value'),
-                        "app.password": passwordInput.get('value')
+                        "app.password": passwordInput.get('value'),
+                        "main.heading":mainHeadingInput.get("value")
+
                     };
                     Request.postJSONData({url:  "/sysadmin/startup_parameters/store_app_config_and_reconnect", data: newDBConfig, consoleLog: true},
                             function (success, data) {

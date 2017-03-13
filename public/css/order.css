@@ -1,0 +1,29 @@
+
+
+/*product description view*/
+
+.product_description_table{
+    width: 100%;
+    height: 100%;
+    text-align:center;
+    font-size: 20px;
+}
+.product_img_td{
+    padding-top: 20px;
+    padding-bottom: 50px;
+}
+.product_img {
+    content: url("../icons/shopping_bag128x128.ico");
+}
+.product_price_td{
+    text-align:left;
+    padding: 10px;
+}
+.product_um_td{
+    text-align:left;
+    padding: 10px;
+}
+.product_price_name{
+    text-align:left;
+    padding: 10px;
+}
