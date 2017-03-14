@@ -149,7 +149,7 @@ module.exports.getProdDecription = function (prodName, callback) {
 
     reqSql.input('ProdName', prodName);
     reqSql.query(query_str,
-        function (err, recordset) {                                                                                     console.log("recordset=",recordset );
+        function (err, recordset) {
             if (err)
                 callback(err, null);
             else
@@ -157,31 +157,36 @@ module.exports.getProdDecription = function (prodName, callback) {
         });
 };
 
-module.exports.addNewOrderHead = function (uID, callback) {
+module.exports.addNewOrderHead = function (uID, callback) {                                                             console.log("module.exports.addNewOrderHead");
     var reqSql = new sql.Request(conn);
     var query_str = fs.readFileSync('./scripts/mobile_add_new_order_head.sql', 'utf8');
-
-    //reqSql.input('ChID', prodName);
-    //reqSql.input('DocID', prodName);
-    reqSql.input('orderID', uID);
-    //reqSql.input('Date', prodName);
+    var date = new Date();
+    reqSql.input('orderID',sql.NVarChar, uID);
+    reqSql.input('Date',sql.DateTime, date);
         reqSql.query(query_str,
-        function (err,recordset) {                                                                                 //    console.log("recordset=",recordset );
-            if (err)
+        function (err,recordset) {                                                                                     // console.log("204 err",err);
+            if (err) {
                 callback(err, null);
-            else
-                callback(null, recordset);
+            }
+            else {
+                callback(null, recordset);                                                                              console.log("Yes!");
+            }
         });
 };
 
-module.exports.defineChID=function(callback){
+//@orderID
+
+module.exports.checkOrderByID= function (uID, callback) {                                                               console.log("module.exports.checkOrderByID");
     var reqSql = new sql.Request(conn);
-    reqSql.query("select ISNULL(MAX(ChID),0)+1 from t_ioRec;",
-        function (err,recordset) {                                                                                      console.log(" 181 recordset=",recordset );
-            if (err)
+    reqSql.input('orderID',sql.NVarChar, uID);
+    reqSql.query(" select * from t_ioRec where IntDocID=@orderID;",
+        function (err,recordset) {
+            if (err) {                                                                                                  console.log("err 184", err);
                 callback(err, null);
-            else
-                callback(null, recordset);
+            }
+            else {                                                                                                      console.log("recordset 187", recordset);
+                callback(null, recordset[0]);
+            }
         });
 };
 

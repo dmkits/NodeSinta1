@@ -278,29 +278,24 @@ app.get("/mobile/get_main_info", function(req, res){
 });
 
 app.post("/mobile/add_to_basket", function (req, res) {
-
-    if (req.cookies.order_id) {                                                                                         console.log(req.cookies.order_id);
+    if (req.cookies.order_id) {
+        console.log("req.cookies=", req.cookies);
+        database.checkOrderByID(req.cookies.order_id, function (err, res) {
+            if (err)            console.log(err);
+            else {
+                if (res.ChID)    console.log("Заказ существует в БД");
+                else            console.log("Заказа нет в БД");
+            }
+        });
     } else {
         var uID = uuidV1();
-var ChID=database.defineChID();
-        //database.defineChID(
-        //    function (error,recordset) {
-        //        if (error){
-        //            res.send({error:""});
-        //            return;
-        //        }
-        //        var outData= {};
-        //        var app_params = process.argv.slice(2);
-        //        if(app_params.length===0) outData.mode='production';
-        //        else outData.mode=app_params[0];
-        //        outData.head=database.getDBConfig()["main.heading"];
-        //      //  res.send(outData);
-        //    });
-
-
-        database.addNewOrderHead(uID,function (err, res){} );
-        res.cookie('order_id', uID, {maxAge: 900000, httpOnly: true});
+        database.addNewOrderHead(uID, function (err, res) {
+            if (err)      console.log(err);
+            else          console.log("Заказ добавлен в БД");
+        });
+        res.cookie('order_id', uID, {maxAge: 5 * 60000, httpOnly: true});
         res.send({ok: ""});
+
     }
 });
 
