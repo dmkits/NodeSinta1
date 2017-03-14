@@ -132,8 +132,7 @@ module.exports.getDetailsOrders = function (capid, callback) {
     var reqSql = new sql.Request(conn);
     var query_str = fs.readFileSync('./scripts/mobile_brand_items.sql', 'utf8');
 
-
-    reqSql.input('PCatID',sql.Int, capid);                                                                            //  console.log("capid=",capid );
+    reqSql.input('PCatID',sql.Int, capid);                                                                              //  console.log("capid=",capid );
     reqSql.query(query_str,
         function (err, recordset) {
             if (err)
@@ -143,11 +142,11 @@ module.exports.getDetailsOrders = function (capid, callback) {
         });
 };
 
-module.exports.getProdDecription = function (prodName, callback) {
+module.exports.getProdDecription = function (ProdID, callback) {
     var reqSql = new sql.Request(conn);
     var query_str = fs.readFileSync('./scripts/mobile_product_description.sql', 'utf8');
 
-    reqSql.input('ProdName', prodName);
+    reqSql.input('ProdID', ProdID);
     reqSql.query(query_str,
         function (err, recordset) {
             if (err)
@@ -157,7 +156,7 @@ module.exports.getProdDecription = function (prodName, callback) {
         });
 };
 
-module.exports.addNewOrderHead = function (uID, callback) {                                                             console.log("module.exports.addNewOrderHead");
+module.exports.createNewOrder = function (uID, callback) {
     var reqSql = new sql.Request(conn);
     var query_str = fs.readFileSync('./scripts/mobile_add_new_order_head.sql', 'utf8');
     var date = new Date();
@@ -174,8 +173,6 @@ module.exports.addNewOrderHead = function (uID, callback) {                     
         });
 };
 
-//@orderID
-
 module.exports.checkOrderByID= function (uID, callback) {                                                               console.log("module.exports.checkOrderByID");
     var reqSql = new sql.Request(conn);
     reqSql.input('orderID',sql.NVarChar, uID);
@@ -184,9 +181,56 @@ module.exports.checkOrderByID= function (uID, callback) {                       
             if (err) {                                                                                                  console.log("err 184", err);
                 callback(err, null);
             }
-            else {                                                                                                      console.log("recordset 187", recordset);
+            else {                                                                                                      console.log("recordset 187", recordset[0]);
                 callback(null, recordset[0]);
             }
         });
 };
+
+module.exports.addItemToOrder = function (ChID,ProdID, callback) {
+    var reqSql = new sql.Request(conn);
+    var query_str = fs.readFileSync('./scripts/mobile_add_item_to_order.sql', 'utf8');
+
+
+    reqSql.input('ChID',sql.Int, ChID);
+    //reqSql.input('SrcPosID ,',sql.NVarChar, uID);
+    reqSql.input('ProdID',sql.Int, ProdID);
+    //reqSql.input('UM',sql.NVarChar, uID);
+    reqSql.input('Qty',sql.Int, 1);
+    //reqSql.input('PriceCC_wt',sql.NVarChar, uID);
+
+    reqSql.query(query_str,
+        function (err,recordset) {                                                                                     // console.log("204 err",err);
+            if (err) {
+                callback(err, null);
+            }
+            else {
+                callback(null, recordset);                                                                              console.log("Yes!");
+            }
+        });
+};
+
+module.exports.getBasketItems = function (ChID, callback) {
+    var reqSql = new sql.Request(conn);
+    var query_str = fs.readFileSync('./scripts/mobile_add_item_to_order.sql', 'utf8');
+    var date = new Date();
+
+    //reqSql.input('ChID',sql.NVarChar, uID);
+    //reqSql.input('SrcPosID ,',sql.NVarChar, uID);
+    //reqSql.input('ProdID',sql.NVarChar, uID);
+    //reqSql.input('UM',sql.NVarChar, uID);
+    //reqSql.input('Qty',sql.NVarChar, uID);
+    //reqSql.input('PriceCC_wt',sql.NVarChar, uID);
+
+    reqSql.query(query_str,
+        function (err,recordset) {                                                                                     // console.log("204 err",err);
+            if (err) {
+                callback(err, null);
+            }
+            else {
+                callback(null, recordset);                                                                              console.log("Yes!");
+            }
+        });
+};
+
 

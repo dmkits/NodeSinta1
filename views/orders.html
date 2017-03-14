@@ -81,7 +81,7 @@
                 moment.locale("uk");
                 numeral.language('ru-UA');
 
-                var orderID;
+
 
                 var mainView = new View({id: "main_view"});
                 mainView.inner_scroll = new ScrollableView({});
@@ -142,9 +142,78 @@
                         viewBasket.domNode.appendChild(headingBottomBasket.domNode);
                         headingBottomBasket.addChild(orderBtn);
                         viewBasket.startup();
+
+//                        var basketTable= document.createElement('table');
+//                        var th=document.createElement('th');
+//                        var thRow=document.createElement('tr');
+//
+//                        document.getElementById('body').appendChild(basketTable);
+//                        basketTable.appendChild(th);
+//                        th.appendChild(thRow);
                     }
+
+                    mainView.loadBasketViewContent();
                     viewBasket.headingTop.set("moveTo", btnBasket.previousView.id);
+
+                    if(viewBasket.table) viewBasket.table.destroy();                                        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 }
+
+                mainView.loadBasketViewContent = function () {
+                    Request.getJSONData({url: "/mobile/get_basket_content", consoleLog: true},
+                            function (success, result) {
+                                if (success) {
+                                    if (result.error) {
+                                        mainView.msgBox.innerHTML = "Нет данных";
+                                        mainView.dialogWin.show();
+                                    } else  createPrintDetailTable(result);                               //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                                } else {//error!!!
+                                    mainView.msgBox.innerHTML = "Нет связи с сервером";
+                                    mainView.dialogWin.show();
+                                }
+                                if (mainView.prog) mainView.prog.stop();
+                            });
+                };
+
+                var createPrintDetailTable = function (tableColumns, tableData, table_width) {
+                    var table = document.createElement('table');
+                    var thead = document.createElement("thead");
+                    var tbody = document.createElement('tbody');
+                    table.appendChild(thead);
+                    table.appendChild(tbody);
+
+                    var table_header_row = table.insertRow(0);
+                    for (var col = 0; col < tableColumns.length; col++) {
+                        var tableColumnData = tableColumns[col];
+                        var h_cell = document.createElement("TH");
+                        var col_width = (tableColumnData.width != undefined) ? tableColumnData.width : 80;
+                        h_cell.setAttribute("style", "width:" + col_width + "px");
+                        h_cell.innerHTML = tableColumnData.name;
+                        table_header_row.appendChild(h_cell);
+                    }
+                    table.setAttribute("style", "width:" + table_width + "px;");
+                    thead.appendChild(table_header_row);
+
+                    for (var row = 0; row < tableData.length; row++) {
+                        var dataItem = tableData[row];
+                        var tableRow = table.insertRow(-1);
+                        tbody.appendChild(tableRow);
+
+                        for (var col = 0; col < tableColumns.length; col++) {
+                            var tableCell = tableRow.insertCell(-1);
+                            var dataItemName = tableColumns[col].data;
+                            var data_type = tableColumns[col].type;
+                            var cellValue;
+                            if (dataItemName) {
+                                cellValue = formatValue(dataItem[dataItemName], data_type);
+                            }
+                            if (cellValue !== undefined && cellValue !== null) {
+                                tableCell.innerText = formatValue(cellValue, data_type);
+                                tableCell.setAttribute("style", createTableValueStyle(tableColumns[col]));
+                            }
+                        }
+                    }
+                    return table;
+                };
 
                 mainView.loadMainContent = function () {
                     Request.getJSONData({url: "/mobile/get_main_info", consoleLog: true},
@@ -292,8 +361,9 @@
                     product_list = new roundRectList({id: "product_list_d1"});
                     var product_list_item;
                     for (var i in data) {
-                        var dataItem = data[i];
+                        var dataItem = data[i];                                                                 console.log("dataItem=",dataItem);
                         product_list_item = new ListItem({
+                            productId:dataItem.prodId,
                             label: dataItem.label,
                             variableHeight: true,
                             rightText: dataItem.value,
@@ -301,7 +371,7 @@
                             transition: "none"
                         });
                         product_list_item.onClick = function () {
-                            mainView.showProductView(this.label);
+                            mainView.showProductView(this.productId);
                         };
                         product_list.addChild(product_list_item);
                     }
@@ -309,7 +379,7 @@
                     product_list.startup();
                 };
 
-                mainView.showProductView = function (prodName) {
+                mainView.showProductView = function (prodId) {
                     if (!mainView.productView) {
                         mainView.productView = new ScrollableView({id: "product_view"});
                         document.getElementById("body").appendChild(mainView.productView.domNode);
@@ -364,21 +434,24 @@
                         table.appendChild(tbody);
                         mainView.productView.domNode.appendChild(table);
                         mainView.productView.startup();
+
                     }
-                    mainView.productView.Name.innerText = '' + prodName;
-                    mainView.loadProductContent(prodName);
+                    //mainView.productView.Name.innerText = '' + prodName;
+
+                    mainView.loadProductContent(prodId);
 
                     btnAddToBasket.onClick=function(){
-                    addToBasket();
-                     };
+                        addToBasket(prodId);
+                    };
+
                 };
 
-                function addToBasket() {                                                                                console.log("add_to_basket");
+                function addToBasket(prodId) {
                     Request.postJSONData({
                                 url: "/mobile/add_to_basket",
                                // condition: condition,
                                 //  condition: "bdate=" + bdate + "&edate=" + edate + "&stocksList=" + stocksList,
-                               data: {order_id: orderID}, consoleLog: true
+                               data: {prodId: prodId}, consoleLog: true
                             },
                             function (success, data) {
                                 if (!success) {
@@ -392,9 +465,9 @@
                             });
                 }
 
-                mainView.loadProductContent = function (prodName) {
+                mainView.loadProductContent = function (prodID) {
                     Request.getJSONData({
-                        url: "/mobile/get_product_description", condition: "prodName=" + prodName, consoleLog: true
+                        url: "/mobile/get_product_description", condition: "prodID=" + prodID, consoleLog: true
                     }, function (success, result) {
                         if (success) {                                                                                  console.log("mainView.loadProductContent result=", result);
                             var data = [];
@@ -413,6 +486,7 @@
                 };
 
                 mainView.fillUpProductDescription = function (data) {
+                    mainView.productView.Name.innerText = '' + data.prodName;
                     mainView.productView.tdPrice.innerText = "Цена: " + data.price;
                     mainView.productView.tdUm.innerText = "Ед.изм: " + data.um;
 

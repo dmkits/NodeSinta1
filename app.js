@@ -251,7 +251,7 @@ app.get("/mobile/get_brand_items", function(req, res){
 
 app.get("/mobile/get_product_description", function (req, res) {
 
-    database.getProdDecription(req.query.prodName,
+    database.getProdDecription(req.query.prodID,
         function (error, recordset) {
             if (error) {
                 res.send({error: ""});
@@ -278,24 +278,46 @@ app.get("/mobile/get_main_info", function(req, res){
 });
 
 app.post("/mobile/add_to_basket", function (req, res) {
-    if (req.cookies.order_id) {
-        console.log("req.cookies=", req.cookies);
+
+    var prodID=req.body.prodId;
+    if (req.cookies.order_id) {                                                                                         console.log("req.cookies.order_id=",req.cookies.order_id);
         database.checkOrderByID(req.cookies.order_id, function (err, res) {
             if (err)            console.log(err);
             else {
-                if (res.ChID)    console.log("Заказ существует в БД");
-                else            console.log("Заказа нет в БД");
+                if (res.ChID) {
+
+                    database.addItemToOrder(res.ChID, prodID, function (err, res) {
+
+                    });
+                }else            console.log("Заказа нет в БД");
             }
         });
     } else {
         var uID = uuidV1();
-        database.addNewOrderHead(uID, function (err, res) {
+        database.createNewOrder(uID, function (err, res) {
             if (err)      console.log(err);
             else          console.log("Заказ добавлен в БД");
         });
         res.cookie('order_id', uID, {maxAge: 5 * 60000, httpOnly: true});
         res.send({ok: ""});
+    }
+});
 
+app.get("/mobile/get_basket_content", function (req, res) {
+
+    if (req.cookies.order_id) {
+        database.checkOrderByID(req.cookies.order_id, function (err, res) {
+            if (err)                                                                                  console.log(err);
+            else {
+                if (res.ChID) {
+                    database.getBasketItems(res.ChID, function (err, res) {
+
+                    });
+                }else            console.log("Заказа нет в БД");
+            }
+        });
+    } else {
+        res.send("Ваша корзина пуста");
     }
 });
 
