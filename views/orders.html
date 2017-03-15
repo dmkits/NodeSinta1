@@ -361,7 +361,7 @@
                     product_list = new roundRectList({id: "product_list_d1"});
                     var product_list_item;
                     for (var i in data) {
-                        var dataItem = data[i];                                                                 console.log("dataItem=",dataItem);
+                        var dataItem = data[i];
                         product_list_item = new ListItem({
                             productId:dataItem.prodId,
                             label: dataItem.label,
@@ -396,8 +396,8 @@
                         var productViewBottomHeading = new Heading({fixed: "bottom"});
                         mainView.productView.domNode.appendChild(mainView.productView.headingTop.domNode);
                         mainView.productView.domNode.appendChild(productViewBottomHeading.domNode);
-                        var btnAddToBasket = new ToolBarButton({label: "Добавить в корзину"});
-                        productViewBottomHeading.addChild(btnAddToBasket);
+                        mainView.btnAddToBasket = new ToolBarButton({label: "Добавить в корзину"});
+                        productViewBottomHeading.addChild(mainView.btnAddToBasket);
                         displayBtnBucketIn(mainView.productView);
 
                         var table = document.createElement('table');
@@ -440,7 +440,7 @@
 
                     mainView.loadProductContent(prodId);
 
-                    btnAddToBasket.onClick=function(){
+                    mainView.btnAddToBasket.onClick=function(){
                         addToBasket(prodId);
                     };
 

@@ -156,7 +156,7 @@ module.exports.getProdDecription = function (ProdID, callback) {
         });
 };
 
-module.exports.createNewOrder = function (uID, callback) {
+module.exports.createNewOrder = function (uID, callback) {                                                              console.log("module.exports.createNewOrder");
     var reqSql = new sql.Request(conn);
     var query_str = fs.readFileSync('./scripts/mobile_add_new_order_head.sql', 'utf8');
     var date = new Date();
@@ -187,7 +187,7 @@ module.exports.checkOrderByID= function (uID, callback) {                       
         });
 };
 
-module.exports.addItemToOrder = function (ChID,ProdID, callback) {
+module.exports.addItemToOrder = function (ChID,ProdID, callback) {                                                      console.log("module.exports.addItemToOrder");
     var reqSql = new sql.Request(conn);
     var query_str = fs.readFileSync('./scripts/mobile_add_item_to_order.sql', 'utf8');
 
