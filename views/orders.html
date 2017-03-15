@@ -125,10 +125,10 @@
                 }
 
                 function goToViewBasket(btnBasket) {
-                    var viewBasket = registry.byId("view_basket");
-                    if (!viewBasket) {
-                        viewBasket = new ScrollableView({id: "view_basket"});
-                        viewBasket.headingTop = new Heading({
+                   // var viewBasket = registry.byId("view_basket");
+                    if (!mainView.viewBasket) {
+                        mainView.viewBasket = new ScrollableView({id: "view_basket"});
+                        mainView.viewBasket.headingTop = new Heading({
                             label: "Корзина",
                             fixed: "top",
                             back: "Назад",
@@ -137,35 +137,25 @@
                         var headingBottomBasket = new Heading({fixed: "bottom"});
                         var orderBtn = new ToolBarButton({label:"Оформить заказ"});
 
-                        document.getElementById('body').appendChild(viewBasket.domNode);
-                        viewBasket.domNode.appendChild(viewBasket.headingTop.domNode);
-                        viewBasket.domNode.appendChild(headingBottomBasket.domNode);
+                        document.getElementById('body').appendChild(mainView.viewBasket.domNode);
+                        mainView.viewBasket.domNode.appendChild(mainView.viewBasket.headingTop.domNode);
+                        mainView.viewBasket.domNode.appendChild(headingBottomBasket.domNode);
                         headingBottomBasket.addChild(orderBtn);
-                        viewBasket.startup();
-
-//                        var basketTable= document.createElement('table');
-//                        var th=document.createElement('th');
-//                        var thRow=document.createElement('tr');
-//
-//                        document.getElementById('body').appendChild(basketTable);
-//                        basketTable.appendChild(th);
-//                        th.appendChild(thRow);
+                        mainView.viewBasket.startup();
                     }
-
                     mainView.loadBasketViewContent();
-                    viewBasket.headingTop.set("moveTo", btnBasket.previousView.id);
-
-                    if(viewBasket.table) viewBasket.table.destroy();                                        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    mainView.viewBasket.headingTop.set("moveTo", btnBasket.previousView.id);
+                    mainView.loadBasketViewContent();
                 }
 
                 mainView.loadBasketViewContent = function () {
                     Request.getJSONData({url: "/mobile/get_basket_content", consoleLog: true},
-                            function (success, result) {
+                            function (success, result) {                                                                console.log(result);
                                 if (success) {
-                                    if (result.error) {
-                                        mainView.msgBox.innerHTML = "Нет данных";
+                                    if (result.empty) {
+                                        mainView.msgBox.innerHTML = "Ваша корзина пуста";
                                         mainView.dialogWin.show();
-                                    } else  createPrintDetailTable(result);                               //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                                    } else  mainView.setBasketContent(result);                               //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                                 } else {//error!!!
                                     mainView.msgBox.innerHTML = "Нет связи с сервером";
                                     mainView.dialogWin.show();
@@ -174,45 +164,32 @@
                             });
                 };
 
-                var createPrintDetailTable = function (tableColumns, tableData, table_width) {
-                    var table = document.createElement('table');
-                    var thead = document.createElement("thead");
-                    var tbody = document.createElement('tbody');
-                    table.appendChild(thead);
-                    table.appendChild(tbody);
-
-                    var table_header_row = table.insertRow(0);
-                    for (var col = 0; col < tableColumns.length; col++) {
-                        var tableColumnData = tableColumns[col];
-                        var h_cell = document.createElement("TH");
-                        var col_width = (tableColumnData.width != undefined) ? tableColumnData.width : 80;
-                        h_cell.setAttribute("style", "width:" + col_width + "px");
-                        h_cell.innerHTML = tableColumnData.name;
-                        table_header_row.appendChild(h_cell);
+                mainView.setBasketContent = function(data){
+                    if(mainView.viewBasket.list)mainView.viewBasket.list.destroy();
+                    mainView.viewBasket.list= new roundRectList({id:"basket_view"});
+                    mainView.viewBasket.addChild(mainView.viewBasket.list);
+                    var listItem;
+                    var posNum=0;
+                    var totalSum=0;
+                    for(var i in data){
+                        posNum=posNum+1;
+                        var itemData = data[i];
+                        listItem = new ListItem({
+                            prodID:itemData.ProdID,
+                            label:posNum+". "+itemData.ProdName+"<br>"+ itemData.Qty+"x"+itemData.PriceCC_wt,
+                            variableHeight: true,
+                            rightText:itemData.Qty * itemData.PriceCC_wt,
+                            moveTo:"product_view",
+                            onClick:function(){mainView.showProductView(this.prodID, true)}
+                        });
+                        totalSum+=itemData.Qty * itemData.PriceCC_wt;
+                        mainView.viewBasket.list.addChild(listItem);
                     }
-                    table.setAttribute("style", "width:" + table_width + "px;");
-                    thead.appendChild(table_header_row);
-
-                    for (var row = 0; row < tableData.length; row++) {
-                        var dataItem = tableData[row];
-                        var tableRow = table.insertRow(-1);
-                        tbody.appendChild(tableRow);
-
-                        for (var col = 0; col < tableColumns.length; col++) {
-                            var tableCell = tableRow.insertCell(-1);
-                            var dataItemName = tableColumns[col].data;
-                            var data_type = tableColumns[col].type;
-                            var cellValue;
-                            if (dataItemName) {
-                                cellValue = formatValue(dataItem[dataItemName], data_type);
-                            }
-                            if (cellValue !== undefined && cellValue !== null) {
-                                tableCell.innerText = formatValue(cellValue, data_type);
-                                tableCell.setAttribute("style", createTableValueStyle(tableColumns[col]));
-                            }
-                        }
-                    }
-                    return table;
+                    listItem = new ListItem({
+                        label:"Итого:",
+                        rightText:totalSum
+                    });
+                    mainView.viewBasket.list.addChild(listItem);
                 };
 
                 mainView.loadMainContent = function () {
@@ -379,25 +356,26 @@
                     product_list.startup();
                 };
 
-                mainView.showProductView = function (prodId) {
+                mainView.showProductView= function (prodId, deleteFromBasketBtn) {
                     if (!mainView.productView) {
                         mainView.productView = new ScrollableView({id: "product_view"});
                         document.getElementById("body").appendChild(mainView.productView.domNode);
                         mainView.productView.headingTop = new Heading({
                             label: "Описание товара",
                             back: "Назад",
-                            moveTo: "detail_order_view",
+                            //moveTo: "detail_order_view",
                             fixed: "top",
                             transition: "none"
                         });
-                        mainView.productView.onTouchMove = function () {
-                            mainView.productView.abort();
-                        };
-                        var productViewBottomHeading = new Heading({fixed: "bottom"});
+//                        mainView.productView.onTouchMove = function () {
+//                            mainView.productView.abort();
+//                        };
+                        mainView.productViewBottomHeading = new Heading({fixed: "bottom"});
                         mainView.productView.domNode.appendChild(mainView.productView.headingTop.domNode);
-                        mainView.productView.domNode.appendChild(productViewBottomHeading.domNode);
-                        mainView.btnAddToBasket = new ToolBarButton({label: "Добавить в корзину"});
-                        productViewBottomHeading.addChild(mainView.btnAddToBasket);
+                        mainView.productView.domNode.appendChild(mainView.productViewBottomHeading.domNode);
+                        mainView.productViewBtn = new ToolBarButton({});
+                        mainView.productViewBottomHeading.addChild(mainView.productViewBtn);
+
                         displayBtnBucketIn(mainView.productView);
 
                         var table = document.createElement('table');
@@ -412,6 +390,11 @@
                         mainView.productView.tdUm = document.createElement('td');
                         mainView.productView.img = document.createElement('img');
 
+
+                        var imgDiv= document.createElement('div');
+                        imgDiv.appendChild(mainView.productView.img);
+                        mainView.productView.domNode.appendChild(imgDiv);
+
                         table.setAttribute("class", "product_description_table");
                         tdImg.setAttribute("class", "product_img_td");
                         mainView.productView.img.setAttribute("class", "product_img");
@@ -419,7 +402,7 @@
                         mainView.productView.tdUm.setAttribute("class", "product_um_td");
                         mainView.productView.tdPrice.setAttribute("class", "product_price_td");
 
-                        tdImg.appendChild(mainView.productView.img);
+                       // tdImg.appendChild(mainView.productView.img);
 
                         trImg.appendChild(tdImg);
                         trName.appendChild(mainView.productView.Name);
@@ -436,15 +419,48 @@
                         mainView.productView.startup();
 
                     }
-                    //mainView.productView.Name.innerText = '' + prodName;
 
                     mainView.loadProductContent(prodId);
 
-                    mainView.btnAddToBasket.onClick=function(){
-                        addToBasket(prodId);
-                    };
 
+                    if (deleteFromBasketBtn) {
+                        mainView.productView.headingTop.set("moveTo","view_basket" );
+                        mainView.productViewBtn.set("label", "Удалить из корзины");
+                        mainView.productViewBtn.set("moveTo", "view_basket");
+                        mainView.productViewBtn.onClick = function () {
+                             deleteFromBasket(prodId);
+                        };
+
+                    } else {
+                        mainView.productView.headingTop.set("moveTo","detail_order_view" );
+                        mainView.productViewBtn.set("label", "Добавить в корзину");
+                        mainView.productViewBtn.set("moveTo", null);
+                        mainView.productViewBtn.onClick = function () {
+                            addToBasket(prodId);
+                        };
+                    }
                 };
+
+                function deleteFromBasket(prodId){
+                    Request.postJSONData({
+                                url: "/mobile/delete_from_basket",
+                                // condition: condition,
+                                //  condition: "bdate=" + bdate + "&edate=" + edate + "&stocksList=" + stocksList,
+                                data: {prodId: prodId}, consoleLog: true
+                            },
+                            function (success, data) {
+                                if (!success) {
+                                    // displayQueryResultSQl.innerHTML = "<div><b style='color:red'>Error in request</b></div>";
+                                    return;
+                                }
+                                if (data.error){}
+                                //  displayQueryResultSQl.innerHTML = "<div><b style='color:red'>" + data.error + "</b></div>";
+                                else{}
+                                mainView.msgBox.innerHTML = "Удален из корзины<br>"+ mainView.productView.Name.innerText;
+                                mainView.dialogWin.show();
+                                goToViewBasket("btn_basket"+mainView.id);
+                            });
+                }
 
                 function addToBasket(prodId) {
                     Request.postJSONData({
@@ -465,7 +481,7 @@
                             });
                 }
 
-                mainView.loadProductContent = function (prodID) {
+                mainView.loadProductContent=function (prodID) {
                     Request.getJSONData({
                         url: "/mobile/get_product_description", condition: "prodID=" + prodID, consoleLog: true
                     }, function (success, result) {

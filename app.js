@@ -309,27 +309,43 @@ app.post("/mobile/add_to_basket", function (req, res) {
                 });
             }else     console.log("Заказа нет в БД");
         });
-        res.cookie('order_id', uID, {maxAge: 20000, httpOnly: true});                      //5* 60000
+        res.cookie('order_id', uID, {maxAge: 5* 60000, httpOnly: true});                      //5* 60000
     }
     res.send({ok: ""});
 });
 
 app.get("/mobile/get_basket_content", function (req, res) {
     var outData={};
-    if (req.cookies.order_id) {
-        database.checkOrderByID(req.cookies.order_id, function (err, res) {
-            if (err)   console.log(err);
-            else {
-                if (res.ChID) {
-                    database.getBasketItems(res.ChID, function (err, res) {
-                        if (err)   console.log(err);
-                    });
-                }else            console.log("Заказа нет в БД");
-            }
-        });
-    } else {
+    if (!req.cookies.order_id) {
         res.send(outData.empty);
+        return;
     }
+    database.getBasketItems(req.cookies.order_id, function (err, recordset) {
+        if (err)   console.log(err);
+        outData=recordset;
+        res.send(outData);
+    });
+});
+
+app.post("/mobile/delete_from_basket", function (req, res) {
+    var outData = {};
+    if (!req.cookies.order_id) {
+        res.send(outData.empty);
+        return;
+    }
+    var prodID = req.body.prodId;
+    database.checkOrderByID(req.cookies.order_id, function (err, res) {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        if (res.ChID) {
+            database.deleteItemFromOrder(res.ChID, prodID, function (err, res) {
+                if (err) console.log("291 app.js err", err);
+            });
+        } else     console.log("Заказа нет в БД");
+    });
+    res.send({ok: ""});
 });
 
 app.listen(port, function (err) {

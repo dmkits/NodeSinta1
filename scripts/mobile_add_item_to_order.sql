@@ -17,9 +17,3 @@ VALUES (@ChID, @SrcPosID ,@ProdID, @UM, @Qty,
         0, 0, 0, 0, @PriceCC_wt,
         @PriceCC_wt*@Qty, 0,0, 0, 0,
         0, 0, 0, 0);
-
-
-
-
-
-

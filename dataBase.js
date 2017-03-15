@@ -191,46 +191,52 @@ module.exports.addItemToOrder = function (ChID,ProdID, callback) {              
     var reqSql = new sql.Request(conn);
     var query_str = fs.readFileSync('./scripts/mobile_add_item_to_order.sql', 'utf8');
 
+    reqSql.input('ChID',sql.Int, ChID);
+    reqSql.input('ProdID',sql.Int, ProdID);
+    reqSql.input('Qty',sql.Int, 1);
+
+    reqSql.query(query_str,
+        function (err,recordset) {
+            if (err) {
+                callback(err, null);
+            }
+            else {
+                callback(null, recordset);
+            }
+        });
+};
+
+module.exports.getBasketItems = function (DocID, callback) {                                                            console.log("module.exports.getBasketItems");
+    var reqSql = new sql.Request(conn);
+    var query_str = fs.readFileSync('./scripts/mobile_get_basket_content.sql', 'utf8');
+
+    reqSql.input('DocID',sql.NVarChar, DocID);
+
+    reqSql.query(query_str,
+        function (err,recordset) {
+            if (err) {
+                callback(err, null);
+            }
+            else {                                                                                                      console.log("getBasketItems recordset=", recordset);
+                callback(null, recordset);
+            }
+        });
+};
+
+module.exports.deleteItemFromOrder = function (ChID,ProdID, callback) {                                                      console.log("module.exports.addItemToOrder");
+    var reqSql = new sql.Request(conn);
+    var query_str = fs.readFileSync('./scripts/mobile_delete_item_from_order.sql', 'utf8');
 
     reqSql.input('ChID',sql.Int, ChID);
-    //reqSql.input('SrcPosID ,',sql.NVarChar, uID);
     reqSql.input('ProdID',sql.Int, ProdID);
-    //reqSql.input('UM',sql.NVarChar, uID);
-    reqSql.input('Qty',sql.Int, 1);
-    //reqSql.input('PriceCC_wt',sql.NVarChar, uID);
 
     reqSql.query(query_str,
-        function (err,recordset) {                                                                                     // console.log("204 err",err);
+        function (err,recordset) {
             if (err) {
                 callback(err, null);
             }
             else {
-                callback(null, recordset);                                                                              console.log("Yes!");
+                callback(null, recordset);
             }
         });
 };
-
-module.exports.getBasketItems = function (ChID, callback) {
-    var reqSql = new sql.Request(conn);
-    var query_str = fs.readFileSync('./scripts/mobile_add_item_to_order.sql', 'utf8');
-    var date = new Date();
-
-    //reqSql.input('ChID',sql.NVarChar, uID);
-    //reqSql.input('SrcPosID ,',sql.NVarChar, uID);
-    //reqSql.input('ProdID',sql.NVarChar, uID);
-    //reqSql.input('UM',sql.NVarChar, uID);
-    //reqSql.input('Qty',sql.NVarChar, uID);
-    //reqSql.input('PriceCC_wt',sql.NVarChar, uID);
-
-    reqSql.query(query_str,
-        function (err,recordset) {                                                                                     // console.log("204 err",err);
-            if (err) {
-                callback(err, null);
-            }
-            else {
-                callback(null, recordset);                                                                              console.log("Yes!");
-            }
-        });
-};
-
-
