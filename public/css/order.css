@@ -31,3 +31,21 @@
     text-align:left;
     padding: 10px;
 }
+
+#div_empty_basket_text {
+    padding-top: 50px;
+    padding-bottom: 30px;
+    text-align: center;
+    font-size: 1.5em;
+    color: #4a6c9b;
+    text-shadow: 2px 2px white;
+    font-weight: bold;
+}
+
+/*#div_empty_basket_img{*/
+    /*align: center;*/
+/*}*/
+
+#empty_basket_img{
+    content: url("../icons/shopping_basket_empty_256.png");
+}

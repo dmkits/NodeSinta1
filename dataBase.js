@@ -95,11 +95,6 @@ module.exports.getResultToNewQuery=function(newQuery, parameters, callback ){
 
     for(var paramName in parameters) reqSql.input(paramName, deleteSpaces(parameters[paramName]));
 
-
-    //reqSql.input('BDATE',sql.Date,bdate);
-    //reqSql.input('EDATE',sql.Date,edate);
-    //if(unit_condition){unit_condition=deleteSpaces(unit_condition)}
-    //reqSql.input('StocksList',sql.NVarChar,unit_condition);
         reqSql.query(newQueryString,
             function (err, result) {
                 if (err) {
@@ -132,7 +127,7 @@ module.exports.getDetailsOrders = function (capid, callback) {
     var reqSql = new sql.Request(conn);
     var query_str = fs.readFileSync('./scripts/mobile_brand_items.sql', 'utf8');
 
-    reqSql.input('PCatID',sql.Int, capid);                                                                              //  console.log("capid=",capid );
+    reqSql.input('PCatID',sql.Int, capid);
     reqSql.query(query_str,
         function (err, recordset) {
             if (err)
@@ -156,38 +151,38 @@ module.exports.getProdDecription = function (ProdID, callback) {
         });
 };
 
-module.exports.createNewOrder = function (uID, callback) {                                                              console.log("module.exports.createNewOrder");
+module.exports.createNewOrder = function (uID, callback) {
     var reqSql = new sql.Request(conn);
     var query_str = fs.readFileSync('./scripts/mobile_add_new_order_head.sql', 'utf8');
     var date = new Date();
     reqSql.input('orderID',sql.NVarChar, uID);
     reqSql.input('Date',sql.DateTime, date);
         reqSql.query(query_str,
-        function (err,recordset) {                                                                                     // console.log("204 err",err);
+        function (err,recordset) {
             if (err) {
                 callback(err, null);
             }
             else {
-                callback(null, recordset);                                                                              console.log("Yes!");
+                callback(null, recordset);
             }
         });
 };
 
-module.exports.checkOrderByID= function (uID, callback) {                                                               console.log("module.exports.checkOrderByID");
+module.exports.checkOrderByID= function (uID, callback) {
     var reqSql = new sql.Request(conn);
     reqSql.input('orderID',sql.NVarChar, uID);
     reqSql.query(" select * from t_ioRec where IntDocID=@orderID;",
         function (err,recordset) {
-            if (err) {                                                                                                  console.log("err 184", err);
+            if (err) {
                 callback(err, null);
             }
-            else {                                                                                                      console.log("recordset 187", recordset[0]);
+            else {
                 callback(null, recordset[0]);
             }
         });
 };
 
-module.exports.addItemToOrder = function (ChID,ProdID, callback) {                                                      console.log("module.exports.addItemToOrder");
+module.exports.addItemToOrder = function (ChID,ProdID, callback) {
     var reqSql = new sql.Request(conn);
     var query_str = fs.readFileSync('./scripts/mobile_add_item_to_order.sql', 'utf8');
 
@@ -206,7 +201,7 @@ module.exports.addItemToOrder = function (ChID,ProdID, callback) {              
         });
 };
 
-module.exports.getBasketItems = function (DocID, callback) {                                                            console.log("module.exports.getBasketItems");
+module.exports.getBasketItems = function (DocID, callback) {
     var reqSql = new sql.Request(conn);
     var query_str = fs.readFileSync('./scripts/mobile_get_basket_content.sql', 'utf8');
 
@@ -217,13 +212,13 @@ module.exports.getBasketItems = function (DocID, callback) {                    
             if (err) {
                 callback(err, null);
             }
-            else {                                                                                                      console.log("getBasketItems recordset=", recordset);
+            else {
                 callback(null, recordset);
             }
         });
 };
 
-module.exports.deleteItemFromOrder = function (ChID,ProdID, callback) {                                                      console.log("module.exports.addItemToOrder");
+module.exports.deleteItemFromOrder = function (ChID,ProdID, callback) {
     var reqSql = new sql.Request(conn);
     var query_str = fs.readFileSync('./scripts/mobile_delete_item_from_order.sql', 'utf8');
 

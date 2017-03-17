@@ -309,7 +309,7 @@ app.post("/mobile/add_to_basket", function (req, res) {
                 });
             }else     console.log("Заказа нет в БД");
         });
-        res.cookie('order_id', uID, {maxAge: 5* 60000, httpOnly: true});                      //5* 60000
+        res.cookie('order_id', uID, {maxAge: 5* 60000, httpOnly: true});
     }
     res.send({ok: ""});
 });

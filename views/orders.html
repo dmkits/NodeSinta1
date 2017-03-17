@@ -21,50 +21,6 @@
             data-dojo-config="async: true, parseOnLoad: false"></script>
     <title></title>
     <style>
-        .claro table.dijitCalendarContainer {
-            margin: 25px auto;
-        }
-
-        .mblTooltipBubble {
-            overflow: visible;
-            padding: 3px;
-        . mblTooltipBubble-styles;
-        }
-
-        #date_picker {
-            text-align: center;
-            position: relative;
-            font-size: 1.5em;
-            font-weight: lighter;
-        }
-
-        /*#view_main_detail_btn {*/
-        /*display: inline-block;*/
-        /*position: relative;*/
-        /*cursor: pointer;*/
-        /*-webkit-tap-highlight-color: rgba(255, 255, 255, 0);*/
-        /*padding-bottom: 10px;*/
-        /*margin-bottom: 5px;*/
-        /*height: 29px;*/
-        /*line-height: 29px;*/
-        /*text-align: center;*/
-        /*font-family: Helvetica;*/
-        /*text-shadow: 0 1px 0 rgba(0, 0, 0, 1);*/
-        /*font-size: 13px;*/
-        /*font-weight: bold;*/
-        /*vertical-align: middle;*/
-
-        /*border-width: 1px;*/
-        /*border-style: solid;*/
-        /*border-color: #2f3740 #405a7e #375073 #3a4755;*/
-        /*-webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.305);*/
-        /*box-shadow: 0 1px 0 rgba(255, 255, 255, 0.305);*/
-
-        /*color: #ffffff;*/
-        /*background-color: #5877a2;*/
-        /*background-image: -webkit-gradient(linear, left top, left bottom, from(#222222), to(#4a6c9b), color-stop(0.02, #8ea4c1), color-stop(0.5, #5877a2), color-stop(0.5, #476999));*/
-        /*background-image: linear-gradient(to bottom, #222222 0%, #8ea4c1 2%, #5877a2 50%, #476999 50%, #4a6c9b 100%);*/
-        /*}*/
     </style>
 </head>
 <body id="body" class="claro" style="width:100%; height: 100%">
@@ -80,8 +36,6 @@
                       CalendarView, PickUnitView, DetailView, Request) {
                 moment.locale("uk");
                 numeral.language('ru-UA');
-
-
 
                 var mainView = new View({id: "main_view"});
                 mainView.inner_scroll = new ScrollableView({});
@@ -100,13 +54,9 @@
                 mainView.inner_scroll.startup();
                 mainView.startup();
 
-                displayBtnBucketIn(mainView);
-                createDialogWindow();
-
-                function displayBtnBucketIn(view) {
-                    var btnBasket = registry.byId("btn_basket" + view.id);
-                    if (!btnBasket) {
-                        btnBasket = new ToolBarButton({
+                mainView.displayBtnBasketIn = function(view) {
+                    if (!view.btnBasket) {
+                        view.btnBasket = new ToolBarButton({
                             id: "btn_basket" + view.id,
                             icon: "/icons/basket16x16.ico",
                             style: "float:right",
@@ -115,17 +65,42 @@
                             transition: "none"
                         });
                     }
-                    btnBasket.previousView = view;
-                    btnBasket.onClick = function () {
-                        goToViewBasket(btnBasket);
+                    view.btnBasket.previousView = view;
+                    view.btnBasket.onClick = function () {
+                        mainView.goToViewBasket(view.btnBasket);
                     };
-                    view.headingTop.addChild(btnBasket);
+                    view.headingTop.addChild(view.btnBasket);
                     view.headingTop.startup();
-                    btnBasket.startup();
-                }
+                    view.btnBasket.startup();
+                };
 
-                function goToViewBasket(btnBasket) {
-                   // var viewBasket = registry.byId("view_basket");
+                mainView.createDialogWindow = function() {
+                    if (!mainView.dialogWin) {
+                        mainView.dialogWin = new SimpleDialog({
+                            id: "dialogWin"
+                        });
+                        document.getElementById('body').appendChild(mainView.dialogWin.domNode);
+                    }
+                    if (!mainView.msgBox) {
+                        mainView.msgBox = domConstruct.create("div",
+                                {class: "mblSimpleDialogText"},
+                                mainView.dialogWin.domNode);
+                    }
+                    if (!mainView.cancelBtn)
+                        mainView.cancelBtn = new Button({
+                            class: "mblSimpleDialogButton mblRedButton",
+                            innerHTML: "Ok"
+                        });
+                    mainView.cancelBtn.connect(mainView.cancelBtn.domNode, "click",
+                            function (e) {
+                                mainView.dialogWin.hide()
+                            });
+                    mainView.cancelBtn.placeAt(mainView.dialogWin.domNode);
+                };
+                mainView.displayBtnBasketIn(mainView);
+                mainView.createDialogWindow();
+
+                mainView.goToViewBasket = function(btnBasket) {
                     if (!mainView.viewBasket) {
                         mainView.viewBasket = new ScrollableView({id: "view_basket"});
                         mainView.viewBasket.headingTop = new Heading({
@@ -135,27 +110,26 @@
                             transition: "none"
                         });
                         var headingBottomBasket = new Heading({fixed: "bottom"});
-                        var orderBtn = new ToolBarButton({label:"Оформить заказ"});
+                        mainView.viewBasket.orderBtn = new ToolBarButton({label:"Оформить заказ"});
 
                         document.getElementById('body').appendChild(mainView.viewBasket.domNode);
                         mainView.viewBasket.domNode.appendChild(mainView.viewBasket.headingTop.domNode);
                         mainView.viewBasket.domNode.appendChild(headingBottomBasket.domNode);
-                        headingBottomBasket.addChild(orderBtn);
+                        headingBottomBasket.addChild(mainView.viewBasket.orderBtn);
                         mainView.viewBasket.startup();
                     }
-                    mainView.loadBasketViewContent();
+                    mainView.viewBasket.orderBtn.onClick=function(){
+                        console.log("Оформить заказ");
+                    };
                     mainView.viewBasket.headingTop.set("moveTo", btnBasket.previousView.id);
                     mainView.loadBasketViewContent();
-                }
+                };
 
                 mainView.loadBasketViewContent = function () {
                     Request.getJSONData({url: "/mobile/get_basket_content", consoleLog: true},
-                            function (success, result) {                                                                console.log(result);
+                            function (success, result) {
                                 if (success) {
-                                    if (result.empty) {
-                                        mainView.msgBox.innerHTML = "Ваша корзина пуста";
-                                        mainView.dialogWin.show();
-                                    } else  mainView.setBasketContent(result);                               //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                                    mainView.setBasketContent(result);
                                 } else {//error!!!
                                     mainView.msgBox.innerHTML = "Нет связи с сервером";
                                     mainView.dialogWin.show();
@@ -165,13 +139,26 @@
                 };
 
                 mainView.setBasketContent = function(data){
-                    if(mainView.viewBasket.list)mainView.viewBasket.list.destroy();
-                    mainView.viewBasket.list= new roundRectList({id:"basket_view"});
+                    if(mainView.viewBasket.list) mainView.viewBasket.list.destroy();
+                    if (data.length < 1) {
+                        mainView.setEmptyBasketContent();
+                        mainView.viewBasket.orderBtn.set("clickable", false);
+                        mainView.viewBasket.orderBtn.set("disabled", true);
+                        return;
+                    }
+
+                    mainView.viewBasket.list = new roundRectList({id:"basket_view"});
                     mainView.viewBasket.addChild(mainView.viewBasket.list);
+                    mainView.viewBasket.orderBtn.set("clickable", true);
                     var listItem;
                     var posNum=0;
                     var totalSum=0;
+
                     for(var i in data){
+                        if(mainView.viewBasket.divEmptyBasketContent){
+                            mainView.viewBasket.divEmptyBasketContent.setAttribute("style","display:none");
+                        }
+                       // mainView.viewBasket.orderBtn.set("disabled", true);
                         posNum=posNum+1;
                         var itemData = data[i];
                         listItem = new ListItem({
@@ -179,8 +166,9 @@
                             label:posNum+". "+itemData.ProdName+"<br>"+ itemData.Qty+"x"+itemData.PriceCC_wt,
                             variableHeight: true,
                             rightText:itemData.Qty * itemData.PriceCC_wt,
-                            moveTo:"product_view",
-                            onClick:function(){mainView.showProductView(this.prodID, true)}
+                            moveTo:"product_in_basket_view",
+                            transition: "none",
+                            onClick:function(){mainView.showProductInBasketView(this.prodID)}
                         });
                         totalSum+=itemData.Qty * itemData.PriceCC_wt;
                         mainView.viewBasket.list.addChild(listItem);
@@ -190,6 +178,63 @@
                         rightText:totalSum
                     });
                     mainView.viewBasket.list.addChild(listItem);
+                };
+
+                mainView.setEmptyBasketContent = function () {
+
+                    if(!mainView.viewBasket.divEmptyBasketContent) {
+
+                        mainView.viewBasket.divEmptyBasketContent=document.createElement('div');
+
+                        var divEmptyBasketText = document.createElement("div");
+                        var divEmptyBasketImg = document.createElement("div");
+                        var emptyBasketImg = document.createElement('img');
+                        divEmptyBasketImg.appendChild(emptyBasketImg);
+                        mainView.viewBasket.domNode.appendChild(mainView.viewBasket.divEmptyBasketContent);
+                        //mainView.viewBasket.domNode.appendChild(divEmptyBasketImg);
+                        divEmptyBasketText.innerText = "Ваша корзина пуста";
+                        divEmptyBasketText.setAttribute("id", "div_empty_basket_text");
+                        divEmptyBasketImg.setAttribute("id", "div_empty_basket_img");
+                        emptyBasketImg.setAttribute("id", "empty_basket_img");
+                        divEmptyBasketImg.setAttribute("align", "center");
+                        mainView.viewBasket.divEmptyBasketContent.appendChild(divEmptyBasketText);
+                        mainView.viewBasket.divEmptyBasketContent.appendChild(divEmptyBasketImg);
+
+                    }
+                    mainView.viewBasket.divEmptyBasketContent.setAttribute("style","display:inline");
+                };
+
+                mainView.setProductTable = function(view){
+                    var table = document.createElement('table');
+                    var tbody = document.createElement('tbody');
+                    var trName = document.createElement('tr');
+                    view.Name = document.createElement('td');
+                    var trPrice = document.createElement('tr');
+                    view.tdPrice = document.createElement('td');
+                    var trUm = document.createElement('tr');
+                    view.tdUm = document.createElement('td');
+                    view.img = document.createElement('img');
+
+                    var imgDiv= document.createElement('div');
+                    imgDiv.appendChild(view.img);
+                    view.domNode.appendChild(imgDiv);
+
+                    imgDiv.setAttribute("align","center");
+                    table.setAttribute("class", "product_description_table");
+                    view.img.setAttribute("class", "product_img");
+                    view.Name.setAttribute("class", "product_price_name");
+                    view.tdUm.setAttribute("class", "product_um_td");
+                    view.tdPrice.setAttribute("class", "product_price_td");
+
+                    trName.appendChild(view.Name);
+                    trPrice.appendChild(view.tdPrice);
+                    trUm.appendChild(view.tdUm);
+
+                    tbody.appendChild(trName);
+                    tbody.appendChild(trUm);
+                    tbody.appendChild(trPrice);
+                    table.appendChild(tbody);
+                    view.domNode.appendChild(table);
                 };
 
                 mainView.loadMainContent = function () {
@@ -289,7 +334,7 @@
                                     var detailViewBottomHeading = new Heading({fixed: "bottom"});
                                     mainView.oneBrandView.domNode.appendChild(mainView.oneBrandView.headingTop.domNode);
                                     mainView.oneBrandView.domNode.appendChild(detailViewBottomHeading.domNode);
-                                    displayBtnBucketIn(mainView.oneBrandView);
+                                    mainView.displayBtnBasketIn(mainView.oneBrandView);
                                     mainView.oneBrandView.headingTop.startup();
                                     mainView.oneBrandView.startup();
                                 }
@@ -356,122 +401,91 @@
                     product_list.startup();
                 };
 
-                mainView.showProductView= function (prodId, deleteFromBasketBtn) {
+                mainView.showProductView= function (prodId) {
                     if (!mainView.productView) {
                         mainView.productView = new ScrollableView({id: "product_view"});
                         document.getElementById("body").appendChild(mainView.productView.domNode);
                         mainView.productView.headingTop = new Heading({
                             label: "Описание товара",
                             back: "Назад",
-                            //moveTo: "detail_order_view",
+                            moveTo: "detail_order_view",
                             fixed: "top",
                             transition: "none"
                         });
-//                        mainView.productView.onTouchMove = function () {
-//                            mainView.productView.abort();
-//                        };
+                        mainView.productViewBtn = new ToolBarButton({
+                            label:"Добавить в корзину"
+                        });
                         mainView.productViewBottomHeading = new Heading({fixed: "bottom"});
                         mainView.productView.domNode.appendChild(mainView.productView.headingTop.domNode);
                         mainView.productView.domNode.appendChild(mainView.productViewBottomHeading.domNode);
-                        mainView.productViewBtn = new ToolBarButton({});
                         mainView.productViewBottomHeading.addChild(mainView.productViewBtn);
-
-                        displayBtnBucketIn(mainView.productView);
-
-                        var table = document.createElement('table');
-                        var tbody = document.createElement('tbody');
-                        var trImg = document.createElement('tr');
-                        var tdImg = document.createElement('td');
-                        var trName = document.createElement('tr');
-                        mainView.productView.Name = document.createElement('td');
-                        var trPrice = document.createElement('tr');
-                        mainView.productView.tdPrice = document.createElement('td');
-                        var trUm = document.createElement('tr');
-                        mainView.productView.tdUm = document.createElement('td');
-                        mainView.productView.img = document.createElement('img');
-
-
-                        var imgDiv= document.createElement('div');
-                        imgDiv.appendChild(mainView.productView.img);
-                        mainView.productView.domNode.appendChild(imgDiv);
-
-                        table.setAttribute("class", "product_description_table");
-                        tdImg.setAttribute("class", "product_img_td");
-                        mainView.productView.img.setAttribute("class", "product_img");
-                        mainView.productView.Name.setAttribute("class", "product_price_name");
-                        mainView.productView.tdUm.setAttribute("class", "product_um_td");
-                        mainView.productView.tdPrice.setAttribute("class", "product_price_td");
-
-                       // tdImg.appendChild(mainView.productView.img);
-
-                        trImg.appendChild(tdImg);
-                        trName.appendChild(mainView.productView.Name);
-                        trPrice.appendChild(mainView.productView.tdPrice);
-                        trUm.appendChild(mainView.productView.tdUm);
-
-                        tbody.appendChild(trImg);
-                        tbody.appendChild(trName);
-                        tbody.appendChild(trUm);
-                        tbody.appendChild(trPrice);
-
-                        table.appendChild(tbody);
-                        mainView.productView.domNode.appendChild(table);
+                        mainView.displayBtnBasketIn(mainView.productView);
+                        mainView.setProductTable(mainView.productView);
                         mainView.productView.startup();
-
                     }
-
-                    mainView.loadProductContent(prodId);
-
-
-                    if (deleteFromBasketBtn) {
-                        mainView.productView.headingTop.set("moveTo","view_basket" );
-                        mainView.productViewBtn.set("label", "Удалить из корзины");
-                        mainView.productViewBtn.set("moveTo", "view_basket");
-                        mainView.productViewBtn.onClick = function () {
-                             deleteFromBasket(prodId);
-                        };
-
-                    } else {
-                        mainView.productView.headingTop.set("moveTo","detail_order_view" );
-                        mainView.productViewBtn.set("label", "Добавить в корзину");
-                        mainView.productViewBtn.set("moveTo", null);
-                        mainView.productViewBtn.onClick = function () {
-                            addToBasket(prodId);
-                        };
-                    }
+                    mainView.productViewBtn.onClick = function () {
+                        mainView.addToBasket(prodId);
+                    };
+                    mainView.loadProductContent(mainView.productView, prodId);
                 };
 
-                function deleteFromBasket(prodId){
+                mainView.showProductInBasketView=function (prodId){
+                    if(!mainView.productInBasketView){
+                        mainView.productInBasketView = new ScrollableView({id: "product_in_basket_view"});
+                        document.getElementById("body").appendChild(mainView.productInBasketView.domNode);
+                        mainView.productInBasketView.headingTop = new Heading({
+                            label: "Описание товара",
+                            back: "Назад",
+                            moveTo: "view_basket",
+                            fixed: "top",
+                            transition: "none"
+                        });
+                        mainView.productInBasketViewBtn = new ToolBarButton({
+                            label:"Удалить из корзины",
+                            transition: "none",
+                            moveTo:"view_basket"
+                        });
+                        mainView.productInBasketViewBottomHeading = new Heading({fixed: "bottom"});
+                        mainView.productInBasketView.domNode.appendChild(mainView.productInBasketView.headingTop.domNode);
+                        mainView.productInBasketView.domNode.appendChild(mainView.productInBasketViewBottomHeading.domNode);
+                        mainView.productInBasketViewBottomHeading.addChild(mainView.productInBasketViewBtn);
+                        mainView.setProductTable(mainView.productInBasketView);
+                        mainView.productInBasketView.startup();
+                    }
+                    mainView.productInBasketViewBtn.onClick = function () {
+                        mainView.deleteFromBasket(prodId);
+                        mainView.loadBasketViewContent();
+                    };
+                    mainView.loadProductContent(mainView.productInBasketView, prodId);
+                };
+
+
+                mainView.deleteFromBasket = function(prodId){
                     Request.postJSONData({
                                 url: "/mobile/delete_from_basket",
-                                // condition: condition,
-                                //  condition: "bdate=" + bdate + "&edate=" + edate + "&stocksList=" + stocksList,
                                 data: {prodId: prodId}, consoleLog: true
                             },
                             function (success, data) {
                                 if (!success) {
-                                    // displayQueryResultSQl.innerHTML = "<div><b style='color:red'>Error in request</b></div>";
+                                    mainView.msgBox.innerHTML = "Нет связи с сервером";
+                                    mainView.dialogWin.show();
                                     return;
                                 }
-                                if (data.error){}
-                                //  displayQueryResultSQl.innerHTML = "<div><b style='color:red'>" + data.error + "</b></div>";
-                                else{}
-                                mainView.msgBox.innerHTML = "Удален из корзины<br>"+ mainView.productView.Name.innerText;
+                                mainView.msgBox.innerHTML = "Удалено <br>"+ mainView.productView.Name.innerText;
                                 mainView.dialogWin.show();
-                                goToViewBasket("btn_basket"+mainView.id);
+                                mainView.loadBasketViewContent();
                             });
-                }
+                };
 
-                function addToBasket(prodId) {
+                mainView.addToBasket = function (prodId) {
                     Request.postJSONData({
                                 url: "/mobile/add_to_basket",
-                               // condition: condition,
-                                //  condition: "bdate=" + bdate + "&edate=" + edate + "&stocksList=" + stocksList,
-                               data: {prodId: prodId}, consoleLog: true
+                                data: {prodId: prodId}, consoleLog: true
                             },
                             function (success, data) {
                                 if (!success) {
-                                   // displayQueryResultSQl.innerHTML = "<div><b style='color:red'>Error in request</b></div>";
+                                    mainView.msgBox.innerHTML = "Нет связи с сервером";
+                                    mainView.dialogWin.show();
                                     return;
                                 }
                                 if (data.error){}
@@ -479,13 +493,13 @@
                                 else{}
                                   //  displayQueryResultSQl.innerHTML = JSON.stringify(data.result);
                             });
-                }
+                };
 
-                mainView.loadProductContent=function (prodID) {
+                mainView.loadProductContent=function (view,prodID) {
                     Request.getJSONData({
                         url: "/mobile/get_product_description", condition: "prodID=" + prodID, consoleLog: true
                     }, function (success, result) {
-                        if (success) {                                                                                  console.log("mainView.loadProductContent result=", result);
+                        if (success) {
                             var data = [];
                             if (result.error) {
                                 mainView.msgBox.innerHTML = "Нет данных";                                               console.log("mainView.loadProductContent getJSONData DATA ERROR! error=", result.error);
@@ -495,45 +509,18 @@
                             mainView.msgBox.innerHTML = "Нет связи с сервером";
                             mainView.dialogWin.show();
                         }
-                        mainView.fillUpProductDescription(result);
+                        mainView.fillUpProductDescription(view, result);
                         if (mainView.prog) mainView.prog.stop();
-
                     });
                 };
 
-                mainView.fillUpProductDescription = function (data) {
-                    mainView.productView.Name.innerText = '' + data.prodName;
-                    mainView.productView.tdPrice.innerText = "Цена: " + data.price;
-                    mainView.productView.tdUm.innerText = "Ед.изм: " + data.um;
+                mainView.fillUpProductDescription = function (view, data) {
+                    view.Name.innerText = '' + data.prodName;
+                    view.tdPrice.innerText = "Цена: " + data.price;
+                    view.tdUm.innerText = "Ед.изм: " + data.um;
 
                 };
-
-                function createDialogWindow() {
-                    if (!mainView.dialogWin) {
-                        mainView.dialogWin = new SimpleDialog({
-                            id: "dialogWin"
-                        });
-                        document.getElementById('body').appendChild(mainView.dialogWin.domNode);
-                    }
-                    if (!mainView.msgBox) {
-                        mainView.msgBox = domConstruct.create("div",
-                                {class: "mblSimpleDialogText"},
-                                mainView.dialogWin.domNode);
-                    }
-                    if (!mainView.cancelBtn)
-                        mainView.cancelBtn = new Button({
-                            class: "mblSimpleDialogButton mblRedButton",
-                            innerHTML: "Ok"
-                        });
-                    mainView.cancelBtn.connect(mainView.cancelBtn.domNode, "click",
-                            function (e) {
-                                mainView.dialogWin.hide()
-                            });
-                    mainView.cancelBtn.placeAt(mainView.dialogWin.domNode);
-                }
-
                 mainView.loadMainContent();
-
             });
 </script>
 </html>
