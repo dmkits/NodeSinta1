@@ -222,8 +222,8 @@ app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, '/views', 'orders.html'));
 });
 
-app.get("/mobile/get_orders", function(req, res){
-    database.getOrders(
+app.get("/mobile/get_orders_main_content", function(req, res){
+    database.getOrdersMainContent(
         function (error,recordset) {
             if (error){
                 res.send({error:""});
@@ -234,9 +234,9 @@ app.get("/mobile/get_orders", function(req, res){
             res.send(outData);
         });
 });
-app.get("/mobile/get_brand_items", function(req, res){
+app.get("/mobile/get_orders_one_brand_items", function(req, res){
 
-    database.getDetailsOrders(req.query.catid,
+    database.getOneBrandItems(req.query.catid,
         function (error,recordset) {
             if (error){
                 res.send({error:""});
@@ -249,7 +249,7 @@ app.get("/mobile/get_brand_items", function(req, res){
 });
 
 
-app.get("/mobile/get_product_description", function (req, res) {
+app.get("/mobile/orders_get_product_description", function (req, res) {
 
     database.getProdDecription(req.query.prodID,
         function (error, recordset) {
@@ -261,7 +261,7 @@ app.get("/mobile/get_product_description", function (req, res) {
         });
 });
 
-app.get("/mobile/get_main_info", function(req, res){
+app.get("/mobile/get_orders_main_info", function(req, res){
     database.getUnits(
         function (error,recordset) {
             if (error){
@@ -277,7 +277,7 @@ app.get("/mobile/get_main_info", function(req, res){
         });
 });
 
-app.post("/mobile/add_to_basket", function (req, res) {
+app.post("/mobile/orders_add_to_basket", function (req, res) {
     var prodID=req.body.prodId;
     if (req.cookies.order_id) {                                                                                         console.log("req.cookies.order_id=",req.cookies.order_id);
         database.checkOrderByID(req.cookies.order_id, function (err, res) {
@@ -317,7 +317,8 @@ app.post("/mobile/add_to_basket", function (req, res) {
 app.get("/mobile/get_basket_content", function (req, res) {
     var outData={};
     if (!req.cookies.order_id) {
-        res.send(outData.empty);
+        outData.empty="empty";
+        res.send(outData);
         return;
     }
     database.getBasketItems(req.cookies.order_id, function (err, recordset) {
@@ -327,20 +328,22 @@ app.get("/mobile/get_basket_content", function (req, res) {
     });
 });
 
-app.post("/mobile/delete_from_basket", function (req, res) {
+app.post("/mobile/orders_delete_from_basket", function (req, res) {
     var outData = {};
     if (!req.cookies.order_id) {
-        res.send(outData.empty);
+        outData.empty="empty";
+        res.send(outData);
         return;
     }
     var prodID = req.body.prodId;
+    var posID=req.body.posId;
     database.checkOrderByID(req.cookies.order_id, function (err, res) {
         if (err) {
             console.log(err);
             return;
         }
         if (res.ChID) {
-            database.deleteItemFromOrder(res.ChID, prodID, function (err, res) {
+            database.deleteItemFromOrder(res.ChID, prodID,posID, function (err, res) {
                 if (err) console.log("291 app.js err", err);
             });
         } else     console.log("Заказа нет в БД");

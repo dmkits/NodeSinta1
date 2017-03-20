@@ -111,9 +111,9 @@ function deleteSpaces(text){
     return text;
 }
 
-module.exports.getOrders = function (callback) {
+module.exports.getOrdersMainContent = function (callback) {
     var reqSql = new sql.Request(conn);
-    var query_str = fs.readFileSync('./scripts/mobile_orders.sql', 'utf8');
+    var query_str = fs.readFileSync('./scripts/mobile_orders_main_content.sql', 'utf8');
     reqSql.query(query_str,
         function (err, recordset) {
             if (err)
@@ -123,9 +123,9 @@ module.exports.getOrders = function (callback) {
         });
 };
 
-module.exports.getDetailsOrders = function (capid, callback) {
+module.exports.getOneBrandItems = function (capid, callback) {
     var reqSql = new sql.Request(conn);
-    var query_str = fs.readFileSync('./scripts/mobile_brand_items.sql', 'utf8');
+    var query_str = fs.readFileSync('./scripts/mobile_orders_brand_items.sql', 'utf8');
 
     reqSql.input('PCatID',sql.Int, capid);
     reqSql.query(query_str,
@@ -139,7 +139,7 @@ module.exports.getDetailsOrders = function (capid, callback) {
 
 module.exports.getProdDecription = function (ProdID, callback) {
     var reqSql = new sql.Request(conn);
-    var query_str = fs.readFileSync('./scripts/mobile_product_description.sql', 'utf8');
+    var query_str = fs.readFileSync('./scripts/mobile_orders_product_description.sql', 'utf8');
 
     reqSql.input('ProdID', ProdID);
     reqSql.query(query_str,
@@ -184,7 +184,7 @@ module.exports.checkOrderByID= function (uID, callback) {
 
 module.exports.addItemToOrder = function (ChID,ProdID, callback) {
     var reqSql = new sql.Request(conn);
-    var query_str = fs.readFileSync('./scripts/mobile_add_item_to_order.sql', 'utf8');
+    var query_str = fs.readFileSync('./scripts/mobile_orders_add_item_to_order.sql', 'utf8');
 
     reqSql.input('ChID',sql.Int, ChID);
     reqSql.input('ProdID',sql.Int, ProdID);
@@ -203,7 +203,7 @@ module.exports.addItemToOrder = function (ChID,ProdID, callback) {
 
 module.exports.getBasketItems = function (DocID, callback) {
     var reqSql = new sql.Request(conn);
-    var query_str = fs.readFileSync('./scripts/mobile_get_basket_content.sql', 'utf8');
+    var query_str = fs.readFileSync('./scripts/mobile_orders_get_basket_content.sql', 'utf8');
 
     reqSql.input('DocID',sql.NVarChar, DocID);
 
@@ -218,12 +218,13 @@ module.exports.getBasketItems = function (DocID, callback) {
         });
 };
 
-module.exports.deleteItemFromOrder = function (ChID,ProdID, callback) {
+module.exports.deleteItemFromOrder = function (ChID,ProdID,posID, callback) {
     var reqSql = new sql.Request(conn);
     var query_str = fs.readFileSync('./scripts/mobile_delete_item_from_order.sql', 'utf8');
 
     reqSql.input('ChID',sql.Int, ChID);
     reqSql.input('ProdID',sql.Int, ProdID);
+    reqSql.input('SrcPosID',sql.Int, posID);
 
     reqSql.query(query_str,
         function (err,recordset) {

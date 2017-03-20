@@ -5,7 +5,11 @@
     <link rel="shortcut icon" type="image/x-icon" href="/icons/heart16.ico"/>
     <meta charset="UTF-8">
     <meta name="viewport"
-          content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no"/>
+          content="width=device-width,height=device-height,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no"/>
+    <meta name="format-detection" content="telephone=no"/>
+
+    <!--<meta name="viewport" content="user-scalable=no, initial-scale=1, minimum-scale=1, maximum-scale=1,-->
+    <!--width=device-width, height=device-height, target-densitydpi=device-dpi"/>-->
     <!--<meta name="apple-mobile-web-app-capable" content="yes"/>-->
     <link href="/jslib/dojox/mobile/themes/iphone/iphone.css" rel="stylesheet"/>
     <link rel="stylesheet" href="/jslib/dojox/widget/Calendar/Calendar.css">
@@ -54,7 +58,14 @@
                 mainView.inner_scroll.startup();
                 mainView.startup();
 
-                mainView.displayBtnBasketIn = function(view) {
+                mainView.startProgressIndicator=function(){
+                    if(mainView.prog) mainView.prog.destroy();
+                    mainView.prog = new ProgressIndicator({size: 200, center: true,startSpinning:true});
+                    document.getElementById('body').appendChild(mainView.prog.domNode);
+                    mainView.prog.startup();
+                };
+
+                mainView.setBtnBasketIn = function(view) {
                     if (!view.btnBasket) {
                         view.btnBasket = new ToolBarButton({
                             id: "btn_basket" + view.id,
@@ -67,7 +78,8 @@
                     }
                     view.btnBasket.previousView = view;
                     view.btnBasket.onClick = function () {
-                        mainView.goToViewBasket(view.btnBasket);
+                        mainView.startProgressIndicator();
+                        mainView.buildUpBasketView(view.btnBasket);
                     };
                     view.headingTop.addChild(view.btnBasket);
                     view.headingTop.startup();
@@ -97,10 +109,23 @@
                             });
                     mainView.cancelBtn.placeAt(mainView.dialogWin.domNode);
                 };
-                mainView.displayBtnBasketIn(mainView);
+                mainView.setTestModeBtnIn=function(view){
+                    var test_btn = new ToolBarButton({
+                        icon: "/icons/exclamation-mark29x29.ico",
+                        iconPos: "0,0,29,29",
+                        style: "float:right",
+                        onClick: function () {
+                            mainView.msgBox.innerHTML = mainView.mode;
+                            mainView.dialogWin.show();
+                        }
+                    });
+                    view.firstHeading.addChild(test_btn);
+                };
+                mainView.setBtnBasketIn(mainView);
                 mainView.createDialogWindow();
+                mainView.startProgressIndicator();
 
-                mainView.goToViewBasket = function(btnBasket) {
+                mainView.buildUpBasketView = function(btnBasket) {
                     if (!mainView.viewBasket) {
                         mainView.viewBasket = new ScrollableView({id: "view_basket"});
                         mainView.viewBasket.headingTop = new Heading({
@@ -118,10 +143,8 @@
                         headingBottomBasket.addChild(mainView.viewBasket.orderBtn);
                         mainView.viewBasket.startup();
                     }
-                    mainView.viewBasket.orderBtn.onClick=function(){
-                        console.log("Оформить заказ");
-                    };
                     mainView.viewBasket.headingTop.set("moveTo", btnBasket.previousView.id);
+                    //mainView.startProgressIndicator();
                     mainView.loadBasketViewContent();
                 };
 
@@ -129,46 +152,56 @@
                     Request.getJSONData({url: "/mobile/get_basket_content", consoleLog: true},
                             function (success, result) {
                                 if (success) {
+                                    if (result.empty) {
+                                        mainView.setEmptyBasketContent();
+                                        mainView.viewBasket.orderBtn.set("onClick", function () {
+                                            //do nothing
+                                        });
+                                        return;
+                                    }
                                     mainView.setBasketContent(result);
                                 } else {//error!!!
                                     mainView.msgBox.innerHTML = "Нет связи с сервером";
                                     mainView.dialogWin.show();
                                 }
-                                if (mainView.prog) mainView.prog.stop();
                             });
-                };
+                    if (mainView.prog) mainView.prog.stop();
+                    };
 
                 mainView.setBasketContent = function(data){
                     if(mainView.viewBasket.list) mainView.viewBasket.list.destroy();
                     if (data.length < 1) {
                         mainView.setEmptyBasketContent();
-                        mainView.viewBasket.orderBtn.set("clickable", false);
-                        mainView.viewBasket.orderBtn.set("disabled", true);
+                        mainView.viewBasket.orderBtn.set("onClick",function() {
+                            //do nothing
+                        });
                         return;
                     }
-
+                    mainView.viewBasket.orderBtn.set("onClick",function(){
+                        console.log("Оформить заказ");
+                    });
                     mainView.viewBasket.list = new roundRectList({id:"basket_view"});
                     mainView.viewBasket.addChild(mainView.viewBasket.list);
                     mainView.viewBasket.orderBtn.set("clickable", true);
                     var listItem;
-                    var posNum=0;
                     var totalSum=0;
 
                     for(var i in data){
                         if(mainView.viewBasket.divEmptyBasketContent){
                             mainView.viewBasket.divEmptyBasketContent.setAttribute("style","display:none");
                         }
-                       // mainView.viewBasket.orderBtn.set("disabled", true);
-                        posNum=posNum+1;
                         var itemData = data[i];
                         listItem = new ListItem({
+                            posID:itemData.SrcPosID,
                             prodID:itemData.ProdID,
-                            label:posNum+". "+itemData.ProdName+"<br>"+ itemData.Qty+"x"+itemData.PriceCC_wt,
+                            label:itemData.SrcPosID+". "+itemData.ProdName+"<br>"+ itemData.Qty+"x"+itemData.PriceCC_wt,
                             variableHeight: true,
                             rightText:itemData.Qty * itemData.PriceCC_wt,
                             moveTo:"product_in_basket_view",
                             transition: "none",
-                            onClick:function(){mainView.showProductInBasketView(this.prodID)}
+                            onClick:function(){
+                                mainView.startProgressIndicator();
+                                mainView.buildUpProductInBasketView(this.prodID, this.posID)}
                         });
                         totalSum+=itemData.Qty * itemData.PriceCC_wt;
                         mainView.viewBasket.list.addChild(listItem);
@@ -237,14 +270,14 @@
                     view.domNode.appendChild(table);
                 };
 
-                mainView.loadMainContent = function () {
-                    Request.getJSONData({url: "/mobile/get_main_info", consoleLog: true},
-                            function (success, result) {
+                mainView.loadMainViewHeaderInfo = function () {
+                    Request.getJSONData({url: "/mobile/get_orders_main_info", consoleLog: true},
+                            function (success, result) {                                                                console.log("loadMainViewHeaderInfo result=", result);
                                 if (success) {
                                     if (result.error) {
                                         mainView.msgBox.innerHTML = "Нет данных";
                                         mainView.dialogWin.show();
-                                    } else mainView.setMainContent(result);
+                                    } else mainView.setMainViewHeaderInfo(result);
                                 } else {//error!!!
                                     mainView.msgBox.innerHTML = "Нет связи с сервером";
                                     mainView.dialogWin.show();
@@ -253,46 +286,38 @@
                             });
                 };
 
-                mainView.setMainContent = function (maindata) {
+                mainView.setMainViewHeaderInfo = function (maindata) {
                     mainView.inner_scroll.startup();
                     mainView.startup();
 
                     if (maindata.mode && maindata.mode.toString().toLowerCase().indexOf("test") !== -1) {
-                        var test_btn = new ToolBarButton({
-                            icon: "/icons/exclamation-mark29x29.ico",
-                            iconPos: "0,0,29,29",
-                            style: "float:right",
-                            onClick: function () {
-                                mainView.msgBox.innerHTML = maindata.mode;
-                                mainView.dialogWin.show();
-                            }
-                        });
-                        mainView.firstHeading.addChild(test_btn);
+                        mainView.mode=maindata.mode;
+                        mainView.setTestModeBtnIn(mainView);
                     }
                     mainView.firstHeading.set("label", maindata.head);
-                    mainView.loadDetailContent();
+                    mainView.loadMainViewContent();
                 };
 
-                mainView.loadDetailContent = function () {
+                mainView.loadMainViewContent = function () {
                     if (mainView.view_main_list_items) mainView.view_main_list_items.destroy();
                     if (mainView.prog) mainView.prog.destroy();
                     mainView.prog = new ProgressIndicator({size: 200, center: true});
                     document.getElementById('body').appendChild(mainView.prog.domNode);
-                    mainView.prog.start();
+
 
                     Request.getJSONData({
-                                url: "/mobile/get_orders",
+                                url: "/mobile/get_orders_main_content",
                                 consoleLog: true
                             }
                             , function (success, result) {
-                                if (success) {                                                                           console.log("mainView.loadDetailContentt getJSONData result=", result);
+                                if (success) {                                                                           console.log("mainView.loadMainViewContent getJSONData result=", result);
                                     var data = [];
                                     if (result.items) data = result.items;
                                     if (result.error) {
-                                        mainView.msgBox.innerHTML = "Нет данных";                                       console.log("mainView.loadDetailContent getJSONData DATA ERROR! error=", result.error);
+                                        mainView.msgBox.innerHTML = "Нет данных";                                       console.log("mainView.loadMainViewContent getJSONData DATA ERROR! error=", result.error);
                                         mainView.dialogWin.show();
                                     }
-                                    mainView.setDetailContent(data);
+                                    mainView.setMainViewContent(data);
                                 } else {//error!!!
                                     mainView.msgBox.innerHTML = "Нет связи с сервером";
                                     mainView.dialogWin.show();
@@ -302,7 +327,7 @@
                     );
                 };
 
-                mainView.setDetailContent = function (detail_data) {
+                mainView.setMainViewContent = function (detail_data) {
                     if (mainView.view_main_list_items) mainView.view_main_list_items.destroy();
                     mainView.view_main_list_items = new roundRectList({
                         style: "position:relative",
@@ -325,62 +350,86 @@
                                 if (!mainView.oneBrandView) {
                                     mainView.oneBrandView = new ScrollableView({id: "detail_order_view"});
                                     document.getElementById("body").appendChild(mainView.oneBrandView.domNode);
+                                    mainView.oneBrandView.firstHeading = new Heading({
+                                        fixed: "top"
+//                                        back: "Назад",
+//                                        moveTo: mainView.id,
+//                                        transition: "none"
+                                    });
+                                 //   mainView.oneBrandView.addChild(mainView.oneBrandView.firstHeading,0);
                                     mainView.oneBrandView.headingTop = new Heading({
                                         fixed: "top",
                                         back: "Назад",
                                         moveTo: mainView.id,
                                         transition: "none"
                                     });
+
                                     var detailViewBottomHeading = new Heading({fixed: "bottom"});
+                                    mainView.oneBrandView.domNode.appendChild(mainView.oneBrandView.firstHeading.domNode);
                                     mainView.oneBrandView.domNode.appendChild(mainView.oneBrandView.headingTop.domNode);
                                     mainView.oneBrandView.domNode.appendChild(detailViewBottomHeading.domNode);
-                                    mainView.displayBtnBasketIn(mainView.oneBrandView);
+                                    mainView.setBtnBasketIn(mainView.oneBrandView);
+                                    mainView.oneBrandView.firstHeading.startup();
                                     mainView.oneBrandView.headingTop.startup();
                                     mainView.oneBrandView.startup();
-                                }
+                                    if(mainView.mode=="test"){
+                                        mainView.setTestModeBtnIn(mainView.oneBrandView);
+                                    }
+                                    mainView.onAnimationEnd=function() {                                                /////!!!!!!!!!!!
+                                        if (mainView.oneBrandView.getPos() < 50) {
+                                            mainView.oneBrandView.scrollTo({x: 0, y: 50});
 
-                                mainView.loadOneBrandItems(this.catid, this.label);
+                                        }
+                                    };
+                                }
+                                if (mainView.oneBrandView.product_list) mainView.oneBrandView.product_list.destroy();
+                                mainView.startProgressIndicator();
+                                mainView.loadOneBrandViewContent(this.catid, this.label);
                             };
+//                            if(mainView.oneBrandView.getPos()==0){
+//                                mainView.oneBrandView.scrollTo({x: 0, y: 50});
+//                            }
                             mainView.view_main_list_items.addChild(list_item);
                             list_item.startup();
                         }
                     }
                 };
 //                    mainView.onBeforeTransitionIn = function () {
-//                        mainView.loadDetailContent();
+//                        mainView.loadMainViewContent();
 //                    };
 
-                mainView.loadOneBrandItems = function (catid, heading) {
+                mainView.loadOneBrandViewContent = function (catid, heading) {
                     Request.getJSONData({
-                                url: "/mobile/get_brand_items",
+                                url: "/mobile/get_orders_one_brand_items",
                                 condition: "catid=" + catid,
                                 consoleLog: true
                             }
                             , function (success, result) {
-                                if (success) {                                                                  console.log("mainView.loadOneBrandItems getJSONData result=", result);
+                                if (success) {
+                                    console.log("mainView.loadOneBrandViewContent getJSONData result=", result);
                                     var data = [];
                                     if (result.items) data = result.items;
                                     if (result.error) {
-                                        mainView.msgBox.innerHTML = "Нет данных";                               console.log("mainView.loadOneBrandItems getJSONData DATA ERROR! error=", result.error);
+                                        mainView.msgBox.innerHTML = "Нет данных";
+                                        console.log("mainView.loadOneBrandViewContent getJSONData DATA ERROR! error=", result.error);
                                         mainView.dialogWin.show();
-                                    }mainView.fillUpOneBrandList(data, heading);
+                                    }
+                                    mainView.setOneBrandViewContent(data, heading);
                                 } else {//error!!!
                                     mainView.msgBox.innerHTML = "Нет связи с сервером";
                                     mainView.dialogWin.show();
                                 }
                                 if (mainView.prog) mainView.prog.stop();
-
-                            }
-                    );
+                            });
                 };
 
-                mainView.fillUpOneBrandList = function (data, heading) {
-                    mainView.oneBrandView.scrollTo({x: 0, y: 0});
+                mainView.setOneBrandViewContent = function (data, heading) {
+                    mainView.oneBrandView.scrollTo({x: 0, y: 50});
                     mainView.oneBrandView.headingTop.set("label", heading);
 
-                    var product_list = registry.byId("product_list_d1");
-                    if (product_list) product_list.destroy();
-                    product_list = new roundRectList({id: "product_list_d1"});
+                    //mainView.oneBrandView.product_list = registry.byId("product_list_d1");
+                   // if (mainView.oneBrandView.product_list) mainView.oneBrandView.product_list.destroy();
+                    mainView.oneBrandView.product_list = new roundRectList({id: "product_list_d1"});
                     var product_list_item;
                     for (var i in data) {
                         var dataItem = data[i];
@@ -393,24 +442,24 @@
                             transition: "none"
                         });
                         product_list_item.onClick = function () {
-                            mainView.showProductView(this.productId);
+                            mainView.buildUpProductView(this.productId);
                         };
-                        product_list.addChild(product_list_item);
+                        mainView.oneBrandView.product_list.addChild(product_list_item);
                     }
-                    mainView.oneBrandView.addChild(product_list);
-                    product_list.startup();
+                    mainView.oneBrandView.addChild(mainView.oneBrandView.product_list);
+//                    mainView.oneBrandView.watch(function(){   if(mainView.oneBrandView.getPos()<50){
+//                        mainView.oneBrandView.scrollTo({x: 0, y: 50});
+//                    }});
+
+                    mainView.oneBrandView.product_list.startup();
                 };
 
-                mainView.showProductView= function (prodId) {
+                mainView.buildUpProductView= function (prodId) {
                     if (!mainView.productView) {
                         mainView.productView = new ScrollableView({id: "product_view"});
                         document.getElementById("body").appendChild(mainView.productView.domNode);
-                        mainView.productView.headingTop = new Heading({
-                            label: "Описание товара",
-                            back: "Назад",
-                            moveTo: "detail_order_view",
-                            fixed: "top",
-                            transition: "none"
+                        mainView.productView.headingTop = new Heading({label: "Описание товара", back: "Назад",
+                            moveTo: "detail_order_view", fixed: "top", transition: "none"
                         });
                         mainView.productViewBtn = new ToolBarButton({
                             label:"Добавить в корзину"
@@ -419,26 +468,23 @@
                         mainView.productView.domNode.appendChild(mainView.productView.headingTop.domNode);
                         mainView.productView.domNode.appendChild(mainView.productViewBottomHeading.domNode);
                         mainView.productViewBottomHeading.addChild(mainView.productViewBtn);
-                        mainView.displayBtnBasketIn(mainView.productView);
+                        mainView.setBtnBasketIn(mainView.productView);
                         mainView.setProductTable(mainView.productView);
                         mainView.productView.startup();
                     }
                     mainView.productViewBtn.onClick = function () {
                         mainView.addToBasket(prodId);
                     };
-                    mainView.loadProductContent(mainView.productView, prodId);
+                    mainView.loadProductViewContent(mainView.productView, prodId);
                 };
 
-                mainView.showProductInBasketView=function (prodId){
+                mainView.buildUpProductInBasketView=function (prodId, posId){
                     if(!mainView.productInBasketView){
                         mainView.productInBasketView = new ScrollableView({id: "product_in_basket_view"});
                         document.getElementById("body").appendChild(mainView.productInBasketView.domNode);
                         mainView.productInBasketView.headingTop = new Heading({
-                            label: "Описание товара",
-                            back: "Назад",
-                            moveTo: "view_basket",
-                            fixed: "top",
-                            transition: "none"
+                            label: "Описание товара", back: "Назад", moveTo: "view_basket",
+                            fixed: "top", transition: "none"
                         });
                         mainView.productInBasketViewBtn = new ToolBarButton({
                             label:"Удалить из корзины",
@@ -453,17 +499,18 @@
                         mainView.productInBasketView.startup();
                     }
                     mainView.productInBasketViewBtn.onClick = function () {
-                        mainView.deleteFromBasket(prodId);
+                        mainView.startProgressIndicator();
+                        mainView.deleteFromBasket(prodId,posId);
+                        mainView.startProgressIndicator();
                         mainView.loadBasketViewContent();
                     };
-                    mainView.loadProductContent(mainView.productInBasketView, prodId);
+                    mainView.loadProductViewContent(mainView.productInBasketView, prodId);
                 };
 
-
-                mainView.deleteFromBasket = function(prodId){
+                mainView.deleteFromBasket = function(prodId,posId){
                     Request.postJSONData({
-                                url: "/mobile/delete_from_basket",
-                                data: {prodId: prodId}, consoleLog: true
+                                url: "/mobile/orders_delete_from_basket",
+                                data: {prodId: prodId,posId:posId }, consoleLog: true
                             },
                             function (success, data) {
                                 if (!success) {
@@ -475,11 +522,12 @@
                                 mainView.dialogWin.show();
                                 mainView.loadBasketViewContent();
                             });
+                    if(mainView.prog)mainView.prog.stop();
                 };
 
                 mainView.addToBasket = function (prodId) {
                     Request.postJSONData({
-                                url: "/mobile/add_to_basket",
+                                url: "/mobile/orders_add_to_basket",
                                 data: {prodId: prodId}, consoleLog: true
                             },
                             function (success, data) {
@@ -488,21 +536,21 @@
                                     mainView.dialogWin.show();
                                     return;
                                 }
-                                if (data.error){}
-                                  //  displayQueryResultSQl.innerHTML = "<div><b style='color:red'>" + data.error + "</b></div>";
-                                else{}
-                                  //  displayQueryResultSQl.innerHTML = JSON.stringify(data.result);
+                                mainView.msgBox.innerHTML = "Товар добавлен в корзину";
+                                mainView.dialogWin.show();
+
                             });
+                    if(mainView.prog)mainView.prog.stop();
                 };
 
-                mainView.loadProductContent=function (view,prodID) {
+                mainView.loadProductViewContent=function (view,prodID) {
                     Request.getJSONData({
-                        url: "/mobile/get_product_description", condition: "prodID=" + prodID, consoleLog: true
+                        url: "/mobile/orders_get_product_description", condition: "prodID=" + prodID, consoleLog: true
                     }, function (success, result) {
                         if (success) {
                             var data = [];
                             if (result.error) {
-                                mainView.msgBox.innerHTML = "Нет данных";                                               console.log("mainView.loadProductContent getJSONData DATA ERROR! error=", result.error);
+                                mainView.msgBox.innerHTML = "Нет данных";                                               console.log("mainView.loadProductViewContent getJSONData DATA ERROR! error=", result.error);
                                 mainView.dialogWin.show();
                             }
                         } else {//error!!!
@@ -520,7 +568,7 @@
                     view.tdUm.innerText = "Ед.изм: " + data.um;
 
                 };
-                mainView.loadMainContent();
+                mainView.loadMainViewHeaderInfo();
             });
 </script>
 </html>

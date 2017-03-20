@@ -19,6 +19,9 @@
 .product_img {
     content: url("../icons/shopping_bag256.png");
 }
+.product_img:after {
+    content: url("../icons/shopping_bag256.png");
+}
 .product_price_td{
     text-align:left;
     padding: 10px;
@@ -47,5 +50,8 @@
 /*}*/
 
 #empty_basket_img{
+    content: url("../icons/shopping_basket_empty_256.png");
+}
+#empty_basket_img:after{
     content: url("../icons/shopping_basket_empty_256.png");
 }

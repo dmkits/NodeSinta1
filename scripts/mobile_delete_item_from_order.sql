@@ -1,3 +1,3 @@
 DELETE
 FROM t_ioRecD
-WHERE ChID = @ChID AND ProdID=@ProdID;
+WHERE ChID = @ChID AND ProdID=@ProdID AND SrcPosID=@SrcPosID;
