@@ -41,22 +41,22 @@
                 moment.locale("uk");
                 numeral.language('ru-UA');
 
-                var mainView = new View({id: "main_view"});
-                mainView.inner_scroll = new ScrollableView({});
-                mainView.firstHeading = new Heading({id: "first_heading"});
-                mainView.headingTop = new Heading({id: "heading_top"});
+                var mainView = new ScrollableView({id: "main_view"});
+               // mainView.inner_scroll = new ScrollableView({{id: "main_view"}});
+               // mainView.firstHeading = new Heading({id: "first_heading"});
+                mainView.headingTop = new Heading({fixed:"top"});
                 var headingBottomMainView = new Heading({fixed: "bottom"});
                 var icon_btn = new ToolBarButton({icon: "/icons/hearts29x29.ico", iconPos: "0,0,29,29"});
 
                 document.getElementById('body').appendChild(mainView.domNode);
-                mainView.addChild(mainView.firstHeading, 0);
-                mainView.inner_scroll.domNode.appendChild(headingBottomMainView.domNode);
+                mainView.domNode.appendChild(mainView.headingTop.domNode);
+                mainView.domNode.appendChild(headingBottomMainView.domNode);
                 headingBottomMainView.startup();
                 mainView.headingTop.addChild(icon_btn);
-                mainView.addChild(mainView.headingTop);
-                mainView.addChild(mainView.inner_scroll);
-                mainView.inner_scroll.startup();
+              //  mainView.addChild(mainView);
+
                 mainView.startup();
+                //mainView.startup();
 
                 mainView.startProgressIndicator=function(){
                     if(mainView.prog) mainView.prog.destroy();
@@ -113,13 +113,13 @@
                     var test_btn = new ToolBarButton({
                         icon: "/icons/exclamation-mark29x29.ico",
                         iconPos: "0,0,29,29",
-                        style: "float:right",
+                        //style: "float:right",
                         onClick: function () {
                             mainView.msgBox.innerHTML = mainView.mode;
                             mainView.dialogWin.show();
                         }
                     });
-                    view.firstHeading.addChild(test_btn);
+                    view.headingTop.addChild(test_btn);
                 };
                 mainView.setBtnBasketIn(mainView);
                 mainView.createDialogWindow();
@@ -287,14 +287,14 @@
                 };
 
                 mainView.setMainViewHeaderInfo = function (maindata) {
-                    mainView.inner_scroll.startup();
+                  //  mainView.startup();
                     mainView.startup();
 
                     if (maindata.mode && maindata.mode.toString().toLowerCase().indexOf("test") !== -1) {
                         mainView.mode=maindata.mode;
                         mainView.setTestModeBtnIn(mainView);
                     }
-                    mainView.firstHeading.set("label", maindata.head);
+                    mainView.headingTop.set("label", maindata.head);
                     mainView.loadMainViewContent();
                 };
 
@@ -333,7 +333,7 @@
                         style: "position:relative",
                         "id": "view_main_list_items"
                     });
-                    mainView.inner_scroll.addChild(mainView.view_main_list_items);
+                    mainView.addChild(mainView.view_main_list_items);
                     mainView.view_main_list_items.startup();
                     for (var i in detail_data) {
                         var dataItem = detail_data[i];
@@ -350,13 +350,7 @@
                                 if (!mainView.oneBrandView) {
                                     mainView.oneBrandView = new ScrollableView({id: "detail_order_view"});
                                     document.getElementById("body").appendChild(mainView.oneBrandView.domNode);
-                                    mainView.oneBrandView.firstHeading = new Heading({
-                                        fixed: "top"
-//                                        back: "Назад",
-//                                        moveTo: mainView.id,
-//                                        transition: "none"
-                                    });
-                                 //   mainView.oneBrandView.addChild(mainView.oneBrandView.firstHeading,0);
+
                                     mainView.oneBrandView.headingTop = new Heading({
                                         fixed: "top",
                                         back: "Назад",
@@ -365,30 +359,21 @@
                                     });
 
                                     var detailViewBottomHeading = new Heading({fixed: "bottom"});
-                                    mainView.oneBrandView.domNode.appendChild(mainView.oneBrandView.firstHeading.domNode);
+                                   // mainView.oneBrandView.domNode.appendChild(mainView.oneBrandView.firstHeading.domNode);
                                     mainView.oneBrandView.domNode.appendChild(mainView.oneBrandView.headingTop.domNode);
                                     mainView.oneBrandView.domNode.appendChild(detailViewBottomHeading.domNode);
                                     mainView.setBtnBasketIn(mainView.oneBrandView);
-                                    mainView.oneBrandView.firstHeading.startup();
+                                  //  mainView.oneBrandView.firstHeading.startup();
                                     mainView.oneBrandView.headingTop.startup();
                                     mainView.oneBrandView.startup();
                                     if(mainView.mode=="test"){
                                         mainView.setTestModeBtnIn(mainView.oneBrandView);
                                     }
-                                    mainView.onAnimationEnd=function() {                                                /////!!!!!!!!!!!
-                                        if (mainView.oneBrandView.getPos() < 50) {
-                                            mainView.oneBrandView.scrollTo({x: 0, y: 50});
-
-                                        }
-                                    };
                                 }
                                 if (mainView.oneBrandView.product_list) mainView.oneBrandView.product_list.destroy();
                                 mainView.startProgressIndicator();
                                 mainView.loadOneBrandViewContent(this.catid, this.label);
                             };
-//                            if(mainView.oneBrandView.getPos()==0){
-//                                mainView.oneBrandView.scrollTo({x: 0, y: 50});
-//                            }
                             mainView.view_main_list_items.addChild(list_item);
                             list_item.startup();
                         }
@@ -424,7 +409,6 @@
                 };
 
                 mainView.setOneBrandViewContent = function (data, heading) {
-                    mainView.oneBrandView.scrollTo({x: 0, y: 50});
                     mainView.oneBrandView.headingTop.set("label", heading);
 
                     //mainView.oneBrandView.product_list = registry.byId("product_list_d1");
@@ -447,10 +431,6 @@
                         mainView.oneBrandView.product_list.addChild(product_list_item);
                     }
                     mainView.oneBrandView.addChild(mainView.oneBrandView.product_list);
-//                    mainView.oneBrandView.watch(function(){   if(mainView.oneBrandView.getPos()<50){
-//                        mainView.oneBrandView.scrollTo({x: 0, y: 50});
-//                    }});
-
                     mainView.oneBrandView.product_list.startup();
                 };
 

@@ -1,2 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project version="4" />
+<project version="4">
+  <component name="dataSourceStorageLocal">
+    <data-source name="SQL Server - GMSData38@192.168.0.93" uuid="580d367c-3d33-496d-84dd-3623a49d7dec">
+      <secret-storage>master_key</secret-storage>
+      <first-sync>true</first-sync>
+      <user-name>sa</user-name>
+    </data-source>
+  </component>
+</project>
