@@ -115,7 +115,8 @@
                 };
                 mainView.setTestModeBtnIn = function (view) {
                     if (!mainView.testMode) return;
-                    var test_btn = new ToolBarButton({
+                    if(view.test_btn) return;
+                    view.test_btn = new ToolBarButton({
                         icon: "/icons/exclamation-mark29x29.ico",
                         iconPos: "0,0,29,29",
                         style: "float:right",
@@ -124,7 +125,7 @@
                             mainView.dialogWin.show();
                         }
                     });
-                    view.headingTop.addChild(test_btn);
+                    view.headingTop.addChild(view.test_btn);
                 };
 
                 mainView.setBtnEmblemIn(mainView);
@@ -151,11 +152,11 @@
                         mainView.viewBasket.domNode.appendChild(mainView.viewBasket.headingTop.domNode);
                         mainView.viewBasket.domNode.appendChild(headingBottomBasket.domNode);
                         headingBottomBasket.addChild(mainView.viewBasket.orderBtn);
+                        mainView.setBtnEmblemIn(mainView.viewBasket);
+                        mainView.setTestModeBtnIn(mainView.viewBasket);
                         mainView.viewBasket.startup();
                     }
                     mainView.viewBasket.headingTop.set("moveTo", btnBasket.previousView.id);
-                    mainView.setBtnEmblemIn(mainView.viewBasket);
-                    mainView.setTestModeBtnIn(mainView.viewBasket);
                     mainView.loadBasketViewContent();
                 };
 
@@ -380,7 +381,7 @@
                                     mainView.setTestModeBtnIn(mainView.oneBrandView);
                                     mainView.setBtnBasketIn(mainView.oneBrandView);
                                     //  mainView.oneBrandView.firstHeading.startup();
-                                    mainView.oneBrandView.headingTop.startup();
+                                    //mainView.oneBrandView.headingTop.startup();
                                     mainView.oneBrandView.startup();
                                 }
                                 if (mainView.oneBrandView.product_list) mainView.oneBrandView.product_list.destroy();
@@ -420,26 +421,57 @@
                                 if (mainView.prog) mainView.prog.stop();
                             });
                 };
-
+                var centerSpace=window.innerWidth - 160;
+                window.onresize = function () {
+                    centerSpace = window.innerWidth - 160;
+                    if(!(mainView.oneBrandView  && mainView.oneBrandView.pane)) return;
+                    mainView.oneBrandView.divLabel.stop();
+                    centerSpace = window.innerWidth - 160;
+                    mainView.oneBrandView.pane.set("style", "width:" + centerSpace + "px");
+                    mainView.oneBrandView.divLabel.setAttribute("style", "width:" + centerSpace + "px");
+                   // mainView.oneBrandView.pane.buildRendering();
+                    mainView.oneBrandView.divLabel.start();
+                };
                 mainView.setOneBrandViewContent = function (data, heading) {
+
                     if (!mainView.oneBrandView.divLabel) {
                         mainView.oneBrandView.divLabel = document.createElement('marquee');
-                        mainView.oneBrandView.divLabel.setAttribute("hspace", "5");
-                       // mainView.oneBrandView.divLabel.setAttribute("style", "width:100%");
+                       //mainView.oneBrandView.divLabel.setAttribute("hspace", "5");
+                      //  mainView.oneBrandView.divLabel.setAttribute("style", "width:250px");
+                       // mainView.oneBrandView.divLabel.setAttribute("scrolldelay", "70");
                     }
+                    //mainView.oneBrandView.divLabel.stop();
                     mainView.oneBrandView.divLabel.innerHTML = heading;
+
 
                     if(!mainView.oneBrandView.pane) {
                         mainView.oneBrandView.pane = new Pane({
-                          // style:"width:150px;"
-                          //  style:"float:left"
+                            style: "width:"+centerSpace+"px"
                         });
+
                         mainView.oneBrandView.pane.domNode.appendChild(mainView.oneBrandView.divLabel);
                         mainView.oneBrandView.headingTop.addChild(mainView.oneBrandView.pane);
+                        mainView.oneBrandView.pane.startup();
                     }
+                    mainView.oneBrandView.onBeforeTransitionOut=function(){
+                        mainView.oneBrandView.divLabel.stop();
+                      //  mainView.oneBrandView.divLabel.innerHTML = "";
+                    };
 
+                    mainView.oneBrandView.onBeforeTransitionIn=function(){
+                        mainView.oneBrandView.divLabel.start();
+                       // mainView.oneBrandView.divLabel.innerHTML = "";
+                    };
 
+                    mainView.onBeforeTransitionOut=function(){
+                        if(!(mainView.oneBrandView  && mainView.oneBrandView.divLabel)) return;
+                        mainView.oneBrandView.divLabel.innerHTML = "";
+                    };
+
+                    //   mainView.oneBrandView.headingTop.domNode.appendChild(mainView.oneBrandView.divLabel);
+                    //  mainView.oneBrandView.headingTop.startup();
                     // mainView.oneBrandView.headingTop.set("label", heading);
+
                     mainView.oneBrandView.product_list = new roundRectList({id: "product_list_d1"});
                     var product_list_item;
                     for (var i in data) {
@@ -459,7 +491,7 @@
                     }
                     mainView.oneBrandView.addChild(mainView.oneBrandView.product_list);
                     mainView.oneBrandView.product_list.startup();
-                };
+                 };
 
                 mainView.buildUpProductView = function (prodId) {
                     if (!mainView.productView) {
@@ -477,8 +509,8 @@
                         mainView.productView.domNode.appendChild(mainView.productView.headingTop.domNode);
                         mainView.productView.domNode.appendChild(mainView.productView.headingBottom.domNode);
                         mainView.productView.headingBottom.addChild(mainView.productViewBtn);
-                        mainView.setTestModeBtnIn(mainView.productView);
                         mainView.setBtnEmblemIn(mainView.productView);
+                        mainView.setTestModeBtnIn(mainView.productView);
                         mainView.setBtnBasketIn(mainView.productView);
                         mainView.setProductTable(mainView.productView);
                         mainView.productView.startup();
