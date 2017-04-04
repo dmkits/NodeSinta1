@@ -309,7 +309,7 @@ app.post("/mobile/orders_add_to_basket", function (req, res) {
                 });
             }
         });
-        res.cookie('order_id', uID, {maxAge: 5* 60000, httpOnly: true});
+        res.cookie('order_id', uID, {maxAge: 20* 60000, httpOnly: true});
     }
     res.send({ok: ""});
 });

@@ -75,9 +75,14 @@
                 detailContentSQL.addButtonTo(leftContentSQL, "main_view", "mobile_main_view.sql");
                 detailContentSQL.addButtonTo(leftContentSQL, "main_view_d", "mobile_main_view_d.sql");
                 detailContentSQL.addButtonTo(leftContentSQL, "units", "mobile_units.sql");
-                detailContentSQL.addButtonTo(leftContentSQL, "orders", "mobile_orders.sql");
-                detailContentSQL.addButtonTo(leftContentSQL, "brand_items", "mobile_brand_items.sql");
-                detailContentSQL.addButtonTo(leftContentSQL, "product_description", "mobile_product_description.sql");
+
+                detailContentSQL.addButtonTo(leftContentSQL, "orders", "mobile_orders_main_content.sql");
+                detailContentSQL.addButtonTo(leftContentSQL, "brand_items", "mobile_orders_brand_items.sql");
+                detailContentSQL.addButtonTo(leftContentSQL, "product_description", "mobile_orders_product_description.sql");
+                detailContentSQL.addButtonTo(leftContentSQL, "orders_add_item", "mobile_orders_add_item_to_order.sql");
+                detailContentSQL.addButtonTo(leftContentSQL, "orders_delete_item", "mobile_delete_item_from_order.sql");
+                detailContentSQL.addButtonTo(leftContentSQL, "add_new_order_head", "mobile_add_new_order_head.sql");
+                detailContentSQL.addButtonTo(leftContentSQL, "get_basket_content", "mobile_orders_get_basket_content.sql");
 
                 var btnRunSQL = APP.initElem("sql_runBtn", Button, {});
                 var btnSaveSQl = APP.initElem("sql_saveBtn", Button, {});

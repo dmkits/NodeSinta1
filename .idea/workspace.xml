@@ -7,8 +7,11 @@
   <component name="ChangeListManager">
     <list default="true" id="aa57be44-41f9-406b-94ea-c9ee4d70eb12" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app.js" afterPath="$PROJECT_DIR$/app.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/views/main.html" afterPath="$PROJECT_DIR$/views/main.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scripts/mobile_add_new_order_head.sql" afterPath="$PROJECT_DIR$/scripts/mobile_add_new_order_head.sql" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scripts/mobile_delete_item_from_order.sql" afterPath="$PROJECT_DIR$/scripts/mobile_delete_item_from_order.sql" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/scripts/mobile_orders_get_basket_content.sql" afterPath="$PROJECT_DIR$/scripts/mobile_orders_get_basket_content.sql" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/views/orders.html" afterPath="$PROJECT_DIR$/views/orders.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/views/sysadmin/sql_queries.html" afterPath="$PROJECT_DIR$/views/sysadmin/sql_queries.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <list id="5b2c351e-8042-4e8c-88ee-877778d9f9d6" name="New changelist" comment="" />
@@ -50,9 +53,27 @@
       <file leaf-file-name="orders.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/views/orders.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.33333334">
-              <caret line="586" column="16" selection-start-line="586" selection-start-column="16" selection-end-line="586" selection-end-column="16" />
+            <state vertical-scroll-proportion="0.436209">
+              <caret line="203" column="0" selection-start-line="203" selection-start-column="0" selection-end-line="203" selection-end-column="0" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="sql_queries.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/views/sysadmin/sql_queries.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-6.464286">
+              <caret line="159" column="24" selection-start-line="159" selection-start-column="24" selection-end-line="159" selection-end-column="56" />
+              <folding>
+                <marker date="1491306920884" expanded="true" signature="5915:5924" placeholder="..." />
+                <marker date="1491306920884" expanded="true" signature="11509:11518" placeholder="..." />
+                <marker date="1491306920884" expanded="true" signature="11761:11770" placeholder="..." />
+                <marker date="1491306920884" expanded="true" signature="12249:12258" placeholder="..." />
+                <marker date="1491306920884" expanded="true" signature="13069:13078" placeholder="..." />
+                <marker date="1491306920884" expanded="true" signature="13337:13346" placeholder="..." />
+                <marker date="1491306920884" expanded="true" signature="13510:13521" placeholder="..." />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -61,17 +82,7 @@
         <entry file="file://$PROJECT_DIR$/app.js">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="328" column="3" selection-start-line="328" selection-start-column="3" selection-end-line="328" selection-end-column="3" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="main.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/views/main.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-4.875">
-              <caret line="354" column="16" selection-start-line="354" selection-start-column="16" selection-end-line="354" selection-end-column="62" />
+              <caret line="330" column="67" selection-start-line="330" selection-start-column="67" selection-end-line="330" selection-end-column="67" />
               <folding />
             </state>
           </provider>
@@ -112,7 +123,6 @@
         <option value="$PROJECT_DIR$/scripts/mobile_product_detail.sql" />
         <option value="$PROJECT_DIR$/test.cfg" />
         <option value="$PROJECT_DIR$/views/sysadmin/startup_parameters.html" />
-        <option value="$PROJECT_DIR$/views/sysadmin/sql_queries.html" />
         <option value="$PROJECT_DIR$/scripts/mobile_add_new_order_head.sql" />
         <option value="$PROJECT_DIR$/scripts/mobile_brand_items.sql" />
         <option value="$PROJECT_DIR$/scripts/mobile_product_description.sql" />
@@ -124,6 +134,7 @@
         <option value="$PROJECT_DIR$/scripts/mobile_delete_item_from_order.sql" />
         <option value="$PROJECT_DIR$/public/css/order.css" />
         <option value="$PROJECT_DIR$/views/main.html" />
+        <option value="$PROJECT_DIR$/views/sysadmin/sql_queries.html" />
         <option value="$PROJECT_DIR$/app.js" />
         <option value="$PROJECT_DIR$/views/orders.html" />
       </list>
@@ -209,6 +220,38 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="views" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sinta_m_2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sinta_m_2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="views" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sysadmin" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sinta_m_2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="sinta_m_2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scripts" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -531,7 +574,7 @@
       <workItem from="1490521754455" duration="38000" />
       <workItem from="1490771977536" duration="88000" />
       <workItem from="1491230023114" duration="1242000" />
-      <workItem from="1491285776428" duration="17724000" />
+      <workItem from="1491285776428" duration="27906000" />
     </task>
     <task id="LOCAL-00001" summary="cookie password from server">
       <created>1488895731944</created>
@@ -635,11 +678,17 @@
       <option name="project" value="LOCAL" />
       <updated>1491297274265</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="progress indicator fixed">
+      <created>1491306218537</created>
+      <option name="number" value="00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1491306218557</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="276824000" />
+    <option name="totallyTimeSpent" value="287006000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -665,14 +714,14 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17824498" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3281106" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.12982273" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.22627737" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23253389" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.06215722" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24973376" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.17367458" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.17001829" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -737,11 +786,12 @@
     <MESSAGE value="display btn is ready! Work on MARQUEE" />
     <MESSAGE value="work on mozilla marquee display&#10;" />
     <MESSAGE value="marquee display fixed&#10;" />
-    <option name="LAST_COMMIT_MESSAGE" value="marquee display fixed&#10;" />
+    <MESSAGE value="progress indicator fixed" />
+    <option name="LAST_COMMIT_MESSAGE" value="progress indicator fixed" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="13" />
+      <option name="time" value="14" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -941,13 +991,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/views/sysadmin/sql_queries.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.37962964">
-          <caret line="191" column="53" selection-start-line="191" selection-start-column="53" selection-end-line="191" selection-end-column="53" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/views/password.html">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.76592976">
@@ -1102,26 +1145,42 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app.js">
+    <entry file="file://$PROJECT_DIR$/views/main.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="328" column="3" selection-start-line="328" selection-start-column="3" selection-end-line="328" selection-end-column="3" />
+        <state vertical-scroll-proportion="0.40206185">
+          <caret line="354" column="16" selection-start-line="354" selection-start-column="16" selection-end-line="354" selection-end-column="62" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/views/main.html">
+    <entry file="file://$PROJECT_DIR$/views/sysadmin/sql_queries.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-4.875">
-          <caret line="354" column="16" selection-start-line="354" selection-start-column="16" selection-end-line="354" selection-end-column="62" />
+        <state vertical-scroll-proportion="-6.464286">
+          <caret line="159" column="24" selection-start-line="159" selection-start-column="24" selection-end-line="159" selection-end-column="56" />
+          <folding>
+            <marker date="1491306920884" expanded="true" signature="5915:5924" placeholder="..." />
+            <marker date="1491306920884" expanded="true" signature="11509:11518" placeholder="..." />
+            <marker date="1491306920884" expanded="true" signature="11761:11770" placeholder="..." />
+            <marker date="1491306920884" expanded="true" signature="12249:12258" placeholder="..." />
+            <marker date="1491306920884" expanded="true" signature="13069:13078" placeholder="..." />
+            <marker date="1491306920884" expanded="true" signature="13337:13346" placeholder="..." />
+            <marker date="1491306920884" expanded="true" signature="13510:13521" placeholder="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="330" column="67" selection-start-line="330" selection-start-column="67" selection-end-line="330" selection-end-column="67" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/views/orders.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33333334">
-          <caret line="586" column="16" selection-start-line="586" selection-start-column="16" selection-end-line="586" selection-end-column="16" />
+        <state vertical-scroll-proportion="0.436209">
+          <caret line="203" column="0" selection-start-line="203" selection-start-column="0" selection-end-line="203" selection-end-column="0" />
           <folding />
         </state>
       </provider>

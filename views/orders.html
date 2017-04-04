@@ -34,10 +34,10 @@
                 "dojox/mobile/ListItem", "dojo/parser", "dojo/ready", "dojox/mobile/ToolBarButton",
                 "dijit/registry", "dojox/mobile/Tooltip", "dijit/CalendarLite", "dojox/mobile/IconItem", "dojox/mobile/IconContainer",
                 "dojox/mobile/ToggleButton", "dojox/mobile/ScrollableView", "dojox/mobile/ProgressIndicator", "dojox/mobile/SimpleDialog", "dojox/mobile/Button",
-                "calendarView", "pickUnitView", "detailView", "dojox/mobile/Pane", "request"],
+                "calendarView", "pickUnitView", "detailView", "dojox/mobile/Pane", "dojox/mobile/TextBox", "request"],
             function (domConstruct, xhr, mobile, mparser, View, Heading, roundRectList, ListItem, parser, ready, ToolBarButton, registry,
                       Tooltip, CalendarLite, IconItem, IconContainer, ToggleButton, ScrollableView, ProgressIndicator, SimpleDialog, Button,
-                      CalendarView, PickUnitView, DetailView, Pane, Request) {
+                      CalendarView, PickUnitView, DetailView, Pane, TextBox, Request) {
                 moment.locale("uk");
                 numeral.language('ru-UA');
 
@@ -115,7 +115,7 @@
                 };
                 mainView.setTestModeBtnIn = function (view) {
                     if (!mainView.testMode) return;
-                    if(view.test_btn) return;
+                    if (view.test_btn) return;
                     view.test_btn = new ToolBarButton({
                         icon: "/icons/exclamation-mark29x29.ico",
                         iconPos: "0,0,29,29",
@@ -144,9 +144,84 @@
                         });
                         var headingBottomBasket = new Heading({fixed: "bottom"});
                         mainView.viewBasket.orderBtn = new ToolBarButton({
+                            moveTo: "place_order_view",
+                            transition: "none",
                             label: "Оформить заказ",
                             style: "float:right"
                         });
+
+                        //-------
+                        mainView.viewBasket.orderBtn.set("onClick", function () {
+                            if (!mainView.PlaceAnOrderView) {
+                                mainView.PlaceAnOrderView = new ScrollableView({id: "place_order_view"});
+                                document.getElementById("body").appendChild(mainView.PlaceAnOrderView.domNode);
+
+                                mainView.PlaceAnOrderView.headingTop = new Heading({
+                                    label: "Оформление заказа",
+                                    fixed: "top",
+                                    back: "Назад",
+                                    moveTo: mainView.viewBasket.id,
+                                    transition: "none"
+                                });
+
+                                mainView.PlaceAnOrderView.headingBottom = new Heading({fixed: "bottom"});
+                                var sendOrderBtn=new ToolBarButton({
+                                    label:"Отправить",
+                                    style: "float:right",
+                                    onClick: function(){mainView.setOrder()}
+
+                                });
+                                mainView.PlaceAnOrderView.headingBottom.addChild(sendOrderBtn);
+
+                                mainView.PlaceAnOrderView.domNode.appendChild(mainView.PlaceAnOrderView.headingTop.domNode);
+                                mainView.PlaceAnOrderView.domNode.appendChild(mainView.PlaceAnOrderView.headingBottom.domNode);
+                                mainView.setBtnEmblemIn(mainView.PlaceAnOrderView);
+                                mainView.setTestModeBtnIn(mainView.PlaceAnOrderView);
+                                mainView.PlaceAnOrderView.startup();
+
+                                var table = document.createElement('table');
+                                var tr1 = document.createElement('tr');
+                                var td11 = document.createElement('td');
+                                var td12 = document.createElement('td');
+                                tr1.appendChild(td11);
+                                tr1.appendChild(td12);
+                                table.appendChild(tr1);
+
+                                var tr2 = document.createElement('tr');
+                                var td21 = document.createElement('td');
+                                var td22 = document.createElement('td');
+                                tr2.appendChild(td21);
+                                tr2.appendChild(td22);
+                                table.appendChild(tr2);
+
+                                var tr3 = document.createElement('tr');
+                                var td31 = document.createElement('td');
+                                var td32 = document.createElement('td');
+                                tr3.appendChild(td31);
+                                tr3.appendChild(td32);
+                                table.appendChild(tr3);
+                                mainView.PlaceAnOrderView.domNode.appendChild(table);
+
+                                td11.innerText = "Имя:";
+                                td21.innerText = "Телефон:";
+                                td31.innerText = "Email:";
+
+                                mainView.PlaceAnOrderView.nameTextBox = new TextBox({});
+                                mainView.PlaceAnOrderView.telTextBox = new TextBox({});
+                                mainView.PlaceAnOrderView.emailTextBox = new TextBox({});
+
+                                td12.appendChild(mainView.PlaceAnOrderView.nameTextBox.domNode);
+                                td22.appendChild(mainView.PlaceAnOrderView.telTextBox.domNode);
+                                td32.appendChild(mainView.PlaceAnOrderView.emailTextBox.domNode);
+
+                                mainView.PlaceAnOrderView.nameTextBox.startup();
+                                mainView.PlaceAnOrderView.telTextBox.startup();
+                                mainView.PlaceAnOrderView.emailTextBox.startup();
+                            }
+                        });
+
+                        //---------
+
 
                         document.getElementById('body').appendChild(mainView.viewBasket.domNode);
                         mainView.viewBasket.domNode.appendChild(mainView.viewBasket.headingTop.domNode);
@@ -160,6 +235,32 @@
                     mainView.loadBasketViewContent();
                 };
 
+                mainView.setOrder=function(){
+                    var notesText = mainView.PlaceAnOrderView.nameTextBox.get("value")+", "+
+                            +mainView.PlaceAnOrderView.telTextBox.get("value")+", "+
+                            +mainView.PlaceAnOrderView.emailTextBox.get("value");                    console.log("notesText=",notesText);
+//                    Request.postJSONData({
+//                                url: "/mobile/orders_set_order",
+//                                data: {prodId: prodId, posId: posId}, consoleLog: true
+//                            },
+//                            function (success, data) {
+//                                console.log("data 544", data);
+//                                if (!success) {
+//                                    mainView.msgBox.innerHTML = "Нет связи с сервером";
+//                                    mainView.dialogWin.show();
+//                                    return;
+//                                }
+//                                if (data.empty) {
+//                                    mainView.msgBox.innerHTML = "Срок хранения истек! Корзина пуста!";
+//                                    mainView.dialogWin.show();
+//                                    mainView.setEmptyBasketContent();
+//                                    return;
+//                                }
+//                                mainView.msgBox.innerHTML = "Удалено <br>" + mainView.productView.Name.innerText;
+//                                mainView.dialogWin.show();
+//                                mainView.loadBasketViewContent();
+//                            });
+                };
                 mainView.loadBasketViewContent = function () {
                     Request.getJSONData({url: "/mobile/get_basket_content", consoleLog: true},
                             function (success, result) {
@@ -181,14 +282,45 @@
                     if (mainView.viewBasket.list) mainView.viewBasket.list.destroy();
                     if (data.length < 1) {
                         mainView.setEmptyBasketContent();
-                        mainView.viewBasket.orderBtn.set("onClick", function () {
-                            //do nothing
-                        });
+//                        mainView.viewBasket.orderBtn.set("onClick", function () {
+//                            //do nothing
+//                        });
                         return;
                     }
-                    mainView.viewBasket.orderBtn.set("onClick", function () {
-                        console.log("Оформить заказ");
-                    });
+
+//                    mainView.viewBasket.orderBtn.set("onClick", function () {
+//                       if(!mainView.PlaceAnOrderView){
+//                           mainView.PlaceAnOrderView= new ScrollableView({id:"place_order_view"});
+//                           document.getElementById("body").appendChild(mainView.PlaceAnOrderView.domNode);
+//
+//                           mainView.PlaceAnOrderView.headingTop = new Heading({
+//                               label:"Оформление заказа",
+//                               fixed: "top",
+//                               back: "Назад",
+//                               moveTo: mainView.viewBasket.id,
+//                               transition: "none"
+//                           });
+//
+//                           mainView.PlaceAnOrderView.headingBottom = new Heading({fixed: "bottom"});
+//                           mainView.PlaceAnOrderView.domNode.appendChild(mainView.PlaceAnOrderView.headingTop.domNode);
+//                           mainView.PlaceAnOrderView.domNode.appendChild(mainView.PlaceAnOrderView.headingBottom.domNode);
+//                           mainView.setBtnEmblemIn(mainView.PlaceAnOrderView);
+//                           mainView.setTestModeBtnIn(mainView.PlaceAnOrderView);
+//                           mainView.PlaceAnOrderView.startup();
+//
+//                           var nameTextBox=new TextBox({});
+//                           mainView.PlaceAnOrderView.domNode.appendChild(nameTextBox.domNode);
+////                           var telTextBox=new TextBox();
+////                           mainView.PlaceAnOrderView.addChild(telTextBox);
+////                           var emailTextBox=new TextBox();
+////                           mainView.PlaceAnOrderView.addChild(emailTextBox);
+//
+//                           var label = document.createElement("label");
+//                           label.htmlFor = nameTextBox.domNode;
+//                           label.innerText = "Имя";
+//                           mainView.PlaceAnOrderView.domNode.insertBefore(label, nameTextBox.domNode);
+//                       }
+//                    });
                     mainView.viewBasket.list = new roundRectList({id: "basket_view"});
                     mainView.viewBasket.addChild(mainView.viewBasket.list);
                     mainView.viewBasket.orderBtn.set("clickable", true);
@@ -225,9 +357,9 @@
 
                 mainView.setEmptyBasketContent = function () {
                     if (mainView.viewBasket.list) mainView.viewBasket.list.destroy();
-                    mainView.viewBasket.orderBtn.set("onClick", function () {
-                        //do nothing
-                    });
+//                    mainView.viewBasket.orderBtn.set("onClick", function () {
+//                        //do nothing
+//                    });
                     if (!mainView.viewBasket.divEmptyBasketContent) {
 
                         mainView.viewBasket.divEmptyBasketContent = document.createElement('div');
@@ -422,19 +554,18 @@
                             });
                 };
 
-                mainView.setMarqueeLabel=function(){
-                    if(mainView.oneBrandView  && mainView.oneBrandView.marquee) {
+                mainView.setMarqueeLabel = function () {
+                    if (mainView.oneBrandView && mainView.oneBrandView.marquee) {
                         mainView.oneBrandView.marquee.parentNode.removeChild(mainView.oneBrandView.marquee);
                     }
                     mainView.oneBrandView.marquee = document.createElement('marquee');
                     mainView.oneBrandView.marquee.innerHTML = mainView.oneBrandView.heading;
-                    var centerSpace=window.innerWidth - 160;
-                    if(!mainView.oneBrandView.pane) {
-                        mainView.oneBrandView.pane = new Pane({
-                        });
+                    var centerSpace = window.innerWidth - 160;
+                    if (!mainView.oneBrandView.pane) {
+                        mainView.oneBrandView.pane = new Pane({});
                         mainView.oneBrandView.pane.startup();
                     }
-                    mainView.oneBrandView.pane.set('style',"width:"+centerSpace+"px");
+                    mainView.oneBrandView.pane.set('style', "width:" + centerSpace + "px");
                     mainView.oneBrandView.headingTop.addChild(mainView.oneBrandView.pane);
                     mainView.oneBrandView.pane.domNode.appendChild(mainView.oneBrandView.marquee);
                 };
@@ -444,13 +575,13 @@
                 mainView.setOneBrandViewContent = function (data, heading) {
                     mainView.oneBrandView.heading = heading;
                     mainView.setMarqueeLabel();
-                    mainView.onBeforeTransitionOut=function(){
-                        if(!(mainView.oneBrandView  && mainView.oneBrandView.marquee)) return;
+                    mainView.onBeforeTransitionOut = function () {
+                        if (!(mainView.oneBrandView && mainView.oneBrandView.marquee)) return;
                         mainView.oneBrandView.marquee.innerHTML = "";
                         mainView.oneBrandView.scrollTo({x: 0, y: 0});
                     };
-                    mainView.oneBrandView.onBeforeTransitionIn=function(){
-                      //  mainView.oneBrandView.heading = heading;
+                    mainView.oneBrandView.onBeforeTransitionIn = function () {
+                        //  mainView.oneBrandView.heading = heading;
                         mainView.setMarqueeLabel();
                     };
                     mainView.oneBrandView.product_list = new roundRectList({id: "product_list_d1"});
@@ -472,7 +603,7 @@
                     }
                     mainView.oneBrandView.addChild(mainView.oneBrandView.product_list);
                     mainView.oneBrandView.product_list.startup();
-                 };
+                };
 
                 mainView.buildUpProductView = function (prodId) {
                     if (!mainView.productView) {
@@ -497,9 +628,9 @@
                         mainView.productView.startup();
                     }
                     mainView.startProgressIndicator();
-                    if(mainView.productView.Name.innerText)mainView.productView.Name.innerText = '' ;
-                    if(mainView.productView.tdPrice.innerText)mainView.productView.tdPrice.innerText = "Цена: " ;
-                    if(mainView.productView.tdUm.innerText)mainView.productView.tdUm.innerText = "Ед.изм: ";
+                    if (mainView.productView.Name.innerText)mainView.productView.Name.innerText = '';
+                    if (mainView.productView.tdPrice.innerText)mainView.productView.tdPrice.innerText = "Цена: ";
+                    if (mainView.productView.tdUm.innerText)mainView.productView.tdUm.innerText = "Ед.изм: ";
                     mainView.productViewBtn.onClick = function () {
                         mainView.addToBasket(prodId);
                     };
@@ -530,12 +661,12 @@
                         mainView.productInBasketView.startup();
                     }
                     mainView.startProgressIndicator();
-                    if(mainView.productInBasketView.Name.innerText)mainView.productInBasketView.Name.innerText = '' ;
-                    if(mainView.productInBasketView.tdPrice.innerText)mainView.productInBasketView.tdPrice.innerText = "Цена: " ;
-                    if(mainView.productInBasketView.tdUm.innerText)mainView.productInBasketView.tdUm.innerText = "Ед.изм: ";
+                    if (mainView.productInBasketView.Name.innerText)mainView.productInBasketView.Name.innerText = '';
+                    if (mainView.productInBasketView.tdPrice.innerText)mainView.productInBasketView.tdPrice.innerText = "Цена: ";
+                    if (mainView.productInBasketView.tdUm.innerText)mainView.productInBasketView.tdUm.innerText = "Ед.изм: ";
                     mainView.productInBasketViewBtn.onClick = function () {
                         mainView.deleteFromBasket(prodId, posId);
-                      //  mainView.startProgressIndicator();
+                        //  mainView.startProgressIndicator();
                         mainView.loadBasketViewContent();
                     };
 
@@ -547,13 +678,14 @@
                                 url: "/mobile/orders_delete_from_basket",
                                 data: {prodId: prodId, posId: posId}, consoleLog: true
                             },
-                            function (success, data) {                                                                 console.log("data 544", data);
+                            function (success, data) {
+                                console.log("data 544", data);
                                 if (!success) {
                                     mainView.msgBox.innerHTML = "Нет связи с сервером";
                                     mainView.dialogWin.show();
                                     return;
                                 }
-                                if(data.empty){
+                                if (data.empty) {
                                     mainView.msgBox.innerHTML = "Срок хранения истек! Корзина пуста!";
                                     mainView.dialogWin.show();
                                     mainView.setEmptyBasketContent();
@@ -607,7 +739,6 @@
                     view.Name.innerText = '' + data.prodName;
                     view.tdPrice.innerText = "Цена: " + data.price;
                     view.tdUm.innerText = "Ед.изм: " + data.um;
-
                 };
                 mainView.loadMainViewHeaderInfo();
             });
