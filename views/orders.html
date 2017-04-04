@@ -421,57 +421,40 @@
                                 if (mainView.prog) mainView.prog.stop();
                             });
                 };
-                var centerSpace=window.innerWidth - 160;
-                window.onresize = function () {
-                    centerSpace = window.innerWidth - 160;
-                    if(!(mainView.oneBrandView  && mainView.oneBrandView.pane)) return;
-                    mainView.oneBrandView.divLabel.stop();
-                    centerSpace = window.innerWidth - 160;
-                    mainView.oneBrandView.pane.set("style", "width:" + centerSpace + "px");
-                    mainView.oneBrandView.divLabel.setAttribute("style", "width:" + centerSpace + "px");
-                   // mainView.oneBrandView.pane.buildRendering();
-                    mainView.oneBrandView.divLabel.start();
-                };
-                mainView.setOneBrandViewContent = function (data, heading) {
 
-                    if (!mainView.oneBrandView.divLabel) {
-                        mainView.oneBrandView.divLabel = document.createElement('marquee');
-                       //mainView.oneBrandView.divLabel.setAttribute("hspace", "5");
-                      //  mainView.oneBrandView.divLabel.setAttribute("style", "width:250px");
-                       // mainView.oneBrandView.divLabel.setAttribute("scrolldelay", "70");
-                    }
-                    //mainView.oneBrandView.divLabel.stop();
-                    mainView.oneBrandView.divLabel.innerHTML = heading;
+                mainView.setMarqueeLabel=function(){
+                    if(mainView.oneBrandView  && mainView.oneBrandView.marquee)
+                        mainView.oneBrandView.marquee.parentNode.removeChild(mainView.oneBrandView.marquee);
 
-
+                        mainView.oneBrandView.marquee = document.createElement('marquee');
+                        //mainView.oneBrandView.marquee.setAttribute("hspace", "5");
+                        // mainView.oneBrandView.marquee.setAttribute("scrolldelay", "6");
+                        //  mainView.oneBrandView.marquee.setAttribute("scrollamount", "4");
+                    mainView.oneBrandView.marquee.innerHTML = mainView.oneBrandView.heading;
+                    var centerSpace=window.innerWidth - 160;
                     if(!mainView.oneBrandView.pane) {
                         mainView.oneBrandView.pane = new Pane({
-                            style: "width:"+centerSpace+"px"
                         });
-
-                        mainView.oneBrandView.pane.domNode.appendChild(mainView.oneBrandView.divLabel);
-                        mainView.oneBrandView.headingTop.addChild(mainView.oneBrandView.pane);
                         mainView.oneBrandView.pane.startup();
                     }
-                    mainView.oneBrandView.onBeforeTransitionOut=function(){
-                        mainView.oneBrandView.divLabel.stop();
-                      //  mainView.oneBrandView.divLabel.innerHTML = "";
-                    };
-
-                    mainView.oneBrandView.onBeforeTransitionIn=function(){
-                        mainView.oneBrandView.divLabel.start();
-                       // mainView.oneBrandView.divLabel.innerHTML = "";
-                    };
-
+                    mainView.oneBrandView.pane.set('style',"width:"+centerSpace+"px");
+                    mainView.oneBrandView.headingTop.addChild(mainView.oneBrandView.pane);
+                    mainView.oneBrandView.pane.domNode.appendChild(mainView.oneBrandView.marquee);
+                };
+                window.onresize = function () {
+                    mainView.setMarqueeLabel();
+                };
+                mainView.setOneBrandViewContent = function (data, heading) {
+                    mainView.oneBrandView.heading = heading;
+                    mainView.setMarqueeLabel();
                     mainView.onBeforeTransitionOut=function(){
-                        if(!(mainView.oneBrandView  && mainView.oneBrandView.divLabel)) return;
-                        mainView.oneBrandView.divLabel.innerHTML = "";
+                        if(!(mainView.oneBrandView  && mainView.oneBrandView.marquee)) return;
+                        mainView.oneBrandView.marquee.innerHTML = "";
                     };
-
-                    //   mainView.oneBrandView.headingTop.domNode.appendChild(mainView.oneBrandView.divLabel);
-                    //  mainView.oneBrandView.headingTop.startup();
-                    // mainView.oneBrandView.headingTop.set("label", heading);
-
+                    mainView.oneBrandView.onBeforeTransitionIn=function(){
+                      //  mainView.oneBrandView.heading = heading;
+                        mainView.setMarqueeLabel();
+                    };
                     mainView.oneBrandView.product_list = new roundRectList({id: "product_list_d1"});
                     var product_list_item;
                     for (var i in data) {
