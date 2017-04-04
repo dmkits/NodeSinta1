@@ -307,11 +307,9 @@ app.post("/mobile/orders_add_to_basket", function (req, res) {
                         });
                     }else     console.log("Заказа нет в БД");
                 });
-
             }
         });
-
-        res.cookie('order_id', uID, {maxAge: 20000, httpOnly: true});                   //5* 60000
+        res.cookie('order_id', uID, {maxAge: 5* 60000, httpOnly: true});
     }
     res.send({ok: ""});
 });
@@ -331,7 +329,7 @@ app.get("/mobile/get_basket_content", function (req, res) {
 });
 
 app.post("/mobile/orders_delete_from_basket", function (req, res) {
-    var outData = {};
+    var outData = {};                                                            console.log("req.cookies.order_id 333", req.cookies.order_id);
     if (!req.cookies.order_id) {
         outData.empty="empty";
         res.send(outData);

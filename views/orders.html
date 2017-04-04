@@ -166,9 +166,6 @@
                                 if (success) {
                                     if (result.empty) {
                                         mainView.setEmptyBasketContent();
-                                        mainView.viewBasket.orderBtn.set("onClick", function () {
-                                            //do nothing
-                                        });
                                         return;
                                     }
                                     mainView.setBasketContent(result);
@@ -227,7 +224,10 @@
                 };
 
                 mainView.setEmptyBasketContent = function () {
-
+                    if (mainView.viewBasket.list) mainView.viewBasket.list.destroy();
+                    mainView.viewBasket.orderBtn.set("onClick", function () {
+                        //do nothing
+                    });
                     if (!mainView.viewBasket.divEmptyBasketContent) {
 
                         mainView.viewBasket.divEmptyBasketContent = document.createElement('div');
@@ -423,13 +423,10 @@
                 };
 
                 mainView.setMarqueeLabel=function(){
-                    if(mainView.oneBrandView  && mainView.oneBrandView.marquee)
+                    if(mainView.oneBrandView  && mainView.oneBrandView.marquee) {
                         mainView.oneBrandView.marquee.parentNode.removeChild(mainView.oneBrandView.marquee);
-
-                        mainView.oneBrandView.marquee = document.createElement('marquee');
-                        //mainView.oneBrandView.marquee.setAttribute("hspace", "5");
-                        // mainView.oneBrandView.marquee.setAttribute("scrolldelay", "6");
-                        //  mainView.oneBrandView.marquee.setAttribute("scrollamount", "4");
+                    }
+                    mainView.oneBrandView.marquee = document.createElement('marquee');
                     mainView.oneBrandView.marquee.innerHTML = mainView.oneBrandView.heading;
                     var centerSpace=window.innerWidth - 160;
                     if(!mainView.oneBrandView.pane) {
@@ -450,6 +447,7 @@
                     mainView.onBeforeTransitionOut=function(){
                         if(!(mainView.oneBrandView  && mainView.oneBrandView.marquee)) return;
                         mainView.oneBrandView.marquee.innerHTML = "";
+                        mainView.oneBrandView.scrollTo({x: 0, y: 0});
                     };
                     mainView.oneBrandView.onBeforeTransitionIn=function(){
                       //  mainView.oneBrandView.heading = heading;
@@ -498,6 +496,10 @@
                         mainView.setProductTable(mainView.productView);
                         mainView.productView.startup();
                     }
+                    mainView.startProgressIndicator();
+                    if(mainView.productView.Name.innerText)mainView.productView.Name.innerText = '' ;
+                    if(mainView.productView.tdPrice.innerText)mainView.productView.tdPrice.innerText = "Цена: " ;
+                    if(mainView.productView.tdUm.innerText)mainView.productView.tdUm.innerText = "Ед.изм: ";
                     mainView.productViewBtn.onClick = function () {
                         mainView.addToBasket(prodId);
                     };
@@ -527,12 +529,16 @@
                         mainView.setProductTable(mainView.productInBasketView);
                         mainView.productInBasketView.startup();
                     }
+                    mainView.startProgressIndicator();
+                    if(mainView.productInBasketView.Name.innerText)mainView.productInBasketView.Name.innerText = '' ;
+                    if(mainView.productInBasketView.tdPrice.innerText)mainView.productInBasketView.tdPrice.innerText = "Цена: " ;
+                    if(mainView.productInBasketView.tdUm.innerText)mainView.productInBasketView.tdUm.innerText = "Ед.изм: ";
                     mainView.productInBasketViewBtn.onClick = function () {
-                        mainView.startProgressIndicator();
                         mainView.deleteFromBasket(prodId, posId);
-                        mainView.startProgressIndicator();
+                      //  mainView.startProgressIndicator();
                         mainView.loadBasketViewContent();
                     };
+
                     mainView.loadProductViewContent(mainView.productInBasketView, prodId);
                 };
 
@@ -541,10 +547,16 @@
                                 url: "/mobile/orders_delete_from_basket",
                                 data: {prodId: prodId, posId: posId}, consoleLog: true
                             },
-                            function (success, data) {
+                            function (success, data) {                                                                 console.log("data 544", data);
                                 if (!success) {
                                     mainView.msgBox.innerHTML = "Нет связи с сервером";
                                     mainView.dialogWin.show();
+                                    return;
+                                }
+                                if(data.empty){
+                                    mainView.msgBox.innerHTML = "Срок хранения истек! Корзина пуста!";
+                                    mainView.dialogWin.show();
+                                    mainView.setEmptyBasketContent();
                                     return;
                                 }
                                 mainView.msgBox.innerHTML = "Удалено <br>" + mainView.productView.Name.innerText;
@@ -591,7 +603,6 @@
                         if (mainView.prog) mainView.prog.stop();
                     });
                 };
-
                 mainView.fillUpProductDescription = function (view, data) {
                     view.Name.innerText = '' + data.prodName;
                     view.tdPrice.innerText = "Цена: " + data.price;

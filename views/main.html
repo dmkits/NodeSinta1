@@ -168,6 +168,7 @@
                 var btn = new ToolBarButton({id: id, moveTo: "calendar_view", transition: "none"});
 
                 btn.onClick= function () {
+                    if(view_main.prog) view_main.prog.stop();
                     calendarView.setContent(view, this);
                 };
                 view.dateBtnHeading.addChild(btn);
