@@ -147,81 +147,18 @@
                             moveTo: "place_order_view",
                             transition: "none",
                             label: "Оформить заказ",
-                            style: "float:right"
-                        });
-
-                        //-------
-                        mainView.viewBasket.orderBtn.set("onClick", function () {
-                            if (!mainView.PlaceAnOrderView) {
-                                mainView.PlaceAnOrderView = new ScrollableView({id: "place_order_view"});
-                                document.getElementById("body").appendChild(mainView.PlaceAnOrderView.domNode);
-
-                                mainView.PlaceAnOrderView.headingTop = new Heading({
-                                    label: "Оформление заказа",
-                                    fixed: "top",
-                                    back: "Назад",
-                                    moveTo: mainView.viewBasket.id,
-                                    transition: "none"
-                                });
-
-                                mainView.PlaceAnOrderView.headingBottom = new Heading({fixed: "bottom"});
-                                var sendOrderBtn=new ToolBarButton({
-                                    label:"Отправить",
-                                    style: "float:right",
-                                    onClick: function(){mainView.setOrder()}
-
-                                });
-                                mainView.PlaceAnOrderView.headingBottom.addChild(sendOrderBtn);
-
-                                mainView.PlaceAnOrderView.domNode.appendChild(mainView.PlaceAnOrderView.headingTop.domNode);
-                                mainView.PlaceAnOrderView.domNode.appendChild(mainView.PlaceAnOrderView.headingBottom.domNode);
-                                mainView.setBtnEmblemIn(mainView.PlaceAnOrderView);
-                                mainView.setTestModeBtnIn(mainView.PlaceAnOrderView);
-                                mainView.PlaceAnOrderView.startup();
-
-                                var table = document.createElement('table');
-                                var tr1 = document.createElement('tr');
-                                var td11 = document.createElement('td');
-                                var td12 = document.createElement('td');
-                                tr1.appendChild(td11);
-                                tr1.appendChild(td12);
-                                table.appendChild(tr1);
-
-                                var tr2 = document.createElement('tr');
-                                var td21 = document.createElement('td');
-                                var td22 = document.createElement('td');
-                                tr2.appendChild(td21);
-                                tr2.appendChild(td22);
-                                table.appendChild(tr2);
-
-                                var tr3 = document.createElement('tr');
-                                var td31 = document.createElement('td');
-                                var td32 = document.createElement('td');
-                                tr3.appendChild(td31);
-                                tr3.appendChild(td32);
-                                table.appendChild(tr3);
-                                mainView.PlaceAnOrderView.domNode.appendChild(table);
-
-                                td11.innerText = "Имя:";
-                                td21.innerText = "Телефон:";
-                                td31.innerText = "Email:";
-
-                                mainView.PlaceAnOrderView.nameTextBox = new TextBox({});
-                                mainView.PlaceAnOrderView.telTextBox = new TextBox({});
-                                mainView.PlaceAnOrderView.emailTextBox = new TextBox({});
-
-                                td12.appendChild(mainView.PlaceAnOrderView.nameTextBox.domNode);
-                                td22.appendChild(mainView.PlaceAnOrderView.telTextBox.domNode);
-                                td32.appendChild(mainView.PlaceAnOrderView.emailTextBox.domNode);
-
-                                mainView.PlaceAnOrderView.nameTextBox.startup();
-                                mainView.PlaceAnOrderView.telTextBox.startup();
-                                mainView.PlaceAnOrderView.emailTextBox.startup();
+                            style: "float:right",
+                            onClick: function () {
+                                var order_id=mainView.getCookie("order_id");
+                                if(!order_id){
+                                    mainView.msgBox.innerHTML = "Срок хранения истек! Корзина пуста!";
+                                    mainView.dialogWin.show();
+                                    mainView.show();
+                                    return;
+                                }
+                                mainView.buildUpPlaceOrderView();
                             }
                         });
-
-                        //---------
-
 
                         document.getElementById('body').appendChild(mainView.viewBasket.domNode);
                         mainView.viewBasket.domNode.appendChild(mainView.viewBasket.headingTop.domNode);
@@ -234,33 +171,124 @@
                     mainView.viewBasket.headingTop.set("moveTo", btnBasket.previousView.id);
                     mainView.loadBasketViewContent();
                 };
+                mainView.getCookie=function(name) {
+                    var value = "; " + document.cookie;
+                    var parts = value.split("; " + name + "=");
+                    if (parts.length == 2) return parts.pop().split(";").shift();
+                };
+
+                mainView.buildUpPlaceOrderView = function(){
+                    if (!mainView.PlaceOrderView) {
+                        mainView.PlaceOrderView = new ScrollableView({id: "place_order_view"});
+                        document.getElementById("body").appendChild(mainView.PlaceOrderView.domNode);
+
+                        mainView.PlaceOrderView.headingTop = new Heading({
+                            label: "Оформление заказа",
+                            fixed: "top",
+                            back: "Назад",
+                            moveTo: mainView.viewBasket.id,
+                            transition: "none"
+                        });
+
+                        mainView.PlaceOrderView.headingBottom = new Heading({fixed: "bottom"});
+                        var sendOrderBtn=new ToolBarButton({
+                            label:"Отправить",
+                            style: "float:right",
+                            onClick: function(){mainView.setOrder()}
+
+                        });
+                        mainView.PlaceOrderView.headingBottom.addChild(sendOrderBtn);
+
+                        mainView.PlaceOrderView.domNode.appendChild(mainView.PlaceOrderView.headingTop.domNode);
+                        mainView.PlaceOrderView.domNode.appendChild(mainView.PlaceOrderView.headingBottom.domNode);
+                        mainView.setBtnEmblemIn(mainView.PlaceOrderView);
+                        mainView.setTestModeBtnIn(mainView.PlaceOrderView);
+                        mainView.PlaceOrderView.startup();
+
+                        var table = document.createElement('table');
+                        var tr1 = document.createElement('tr');
+                        var td11 = document.createElement('td');
+                        var td12 = document.createElement('td');
+                        tr1.appendChild(td11);
+                        tr1.appendChild(td12);
+                        table.appendChild(tr1);
+
+                        var tr2 = document.createElement('tr');
+                        var td21 = document.createElement('td');
+                        var td22 = document.createElement('td');
+                        tr2.appendChild(td21);
+                        tr2.appendChild(td22);
+                        table.appendChild(tr2);
+
+                        var tr3 = document.createElement('tr');
+                        var td31 = document.createElement('td');
+                        var td32 = document.createElement('td');
+                        tr3.appendChild(td31);
+                        tr3.appendChild(td32);
+                        table.appendChild(tr3);
+                        mainView.PlaceOrderView.domNode.appendChild(table);
+
+                        td11.innerText = "Имя:";
+                        td21.innerText = "Телефон:";
+                        td31.innerText = "Email:";
+
+                        mainView.PlaceOrderView.nameTextBox = new TextBox({type:"text"});
+                        mainView.PlaceOrderView.telTextBox = new TextBox({type:"tel"});
+                        mainView.PlaceOrderView.emailTextBox = new TextBox({type:"email"});
+
+                        td12.appendChild(mainView.PlaceOrderView.nameTextBox.domNode);
+                        td22.appendChild(mainView.PlaceOrderView.telTextBox.domNode);
+                        td32.appendChild(mainView.PlaceOrderView.emailTextBox.domNode);
+
+                        mainView.PlaceOrderView.nameTextBox.startup();
+                        mainView.PlaceOrderView.telTextBox.startup();
+                        mainView.PlaceOrderView.emailTextBox.startup();
+                    }
+                };
 
                 mainView.setOrder=function(){
-                    var notesText = mainView.PlaceAnOrderView.nameTextBox.get("value")+", "+
-                            +mainView.PlaceAnOrderView.telTextBox.get("value")+", "+
-                            +mainView.PlaceAnOrderView.emailTextBox.get("value");                    console.log("notesText=",notesText);
-//                    Request.postJSONData({
-//                                url: "/mobile/orders_set_order",
-//                                data: {prodId: prodId, posId: posId}, consoleLog: true
-//                            },
-//                            function (success, data) {
-//                                console.log("data 544", data);
-//                                if (!success) {
-//                                    mainView.msgBox.innerHTML = "Нет связи с сервером";
-//                                    mainView.dialogWin.show();
-//                                    return;
-//                                }
-//                                if (data.empty) {
-//                                    mainView.msgBox.innerHTML = "Срок хранения истек! Корзина пуста!";
-//                                    mainView.dialogWin.show();
-//                                    mainView.setEmptyBasketContent();
-//                                    return;
-//                                }
-//                                mainView.msgBox.innerHTML = "Удалено <br>" + mainView.productView.Name.innerText;
-//                                mainView.dialogWin.show();
-//                                mainView.loadBasketViewContent();
-//                            });
+                    var name=mainView.PlaceOrderView.nameTextBox.get("value");
+                    var tel =mainView.PlaceOrderView.telTextBox.get("value");
+                    var email=mainView.PlaceOrderView.emailTextBox.get("value");
+
+                    if(name.trim().length<1){
+                        mainView.msgBox.innerHTML = "Некорректное имя";
+                        mainView.dialogWin.show();
+                        return;
+                    }
+                    if(tel.trim().length<10){
+                        mainView.msgBox.innerHTML = "Некорректный телефон";
+                        mainView.dialogWin.show();
+                        return;
+                    }
+                    if(email.trim().length<5 || email.indexOf("@")==-1 || email.indexOf(".")==-1){
+                        mainView.msgBox.innerHTML = "Некорректная почта";
+                        mainView.dialogWin.show();
+                        return;
+                    }
+
+                    Request.postJSONData({
+                                url: "/mobile/orders_set_order",
+                                data: {name: name, tel: tel, email:email}, consoleLog: true
+                            },
+                            function (success, data) {
+                                if (!success) {
+                                    mainView.msgBox.innerHTML = "Нет связи с сервером";
+                                    mainView.dialogWin.show();
+                                    return;
+                                }
+                                if (data.empty) {
+                                    mainView.msgBox.innerHTML = "Срок хранения истек! Корзина пуста!";
+                                    mainView.dialogWin.show();
+                                    mainView.show();
+                                    return;
+                                }
+                                mainView.msgBox.innerHTML = "Заказ оформлен!";
+                                mainView.dialogWin.show();
+                                mainView.show();
+                            });
                 };
+
                 mainView.loadBasketViewContent = function () {
                     Request.getJSONData({url: "/mobile/get_basket_content", consoleLog: true},
                             function (success, result) {
@@ -282,45 +310,9 @@
                     if (mainView.viewBasket.list) mainView.viewBasket.list.destroy();
                     if (data.length < 1) {
                         mainView.setEmptyBasketContent();
-//                        mainView.viewBasket.orderBtn.set("onClick", function () {
-//                            //do nothing
-//                        });
                         return;
                     }
-
-//                    mainView.viewBasket.orderBtn.set("onClick", function () {
-//                       if(!mainView.PlaceAnOrderView){
-//                           mainView.PlaceAnOrderView= new ScrollableView({id:"place_order_view"});
-//                           document.getElementById("body").appendChild(mainView.PlaceAnOrderView.domNode);
-//
-//                           mainView.PlaceAnOrderView.headingTop = new Heading({
-//                               label:"Оформление заказа",
-//                               fixed: "top",
-//                               back: "Назад",
-//                               moveTo: mainView.viewBasket.id,
-//                               transition: "none"
-//                           });
-//
-//                           mainView.PlaceAnOrderView.headingBottom = new Heading({fixed: "bottom"});
-//                           mainView.PlaceAnOrderView.domNode.appendChild(mainView.PlaceAnOrderView.headingTop.domNode);
-//                           mainView.PlaceAnOrderView.domNode.appendChild(mainView.PlaceAnOrderView.headingBottom.domNode);
-//                           mainView.setBtnEmblemIn(mainView.PlaceAnOrderView);
-//                           mainView.setTestModeBtnIn(mainView.PlaceAnOrderView);
-//                           mainView.PlaceAnOrderView.startup();
-//
-//                           var nameTextBox=new TextBox({});
-//                           mainView.PlaceAnOrderView.domNode.appendChild(nameTextBox.domNode);
-////                           var telTextBox=new TextBox();
-////                           mainView.PlaceAnOrderView.addChild(telTextBox);
-////                           var emailTextBox=new TextBox();
-////                           mainView.PlaceAnOrderView.addChild(emailTextBox);
-//
-//                           var label = document.createElement("label");
-//                           label.htmlFor = nameTextBox.domNode;
-//                           label.innerText = "Имя";
-//                           mainView.PlaceAnOrderView.domNode.insertBefore(label, nameTextBox.domNode);
-//                       }
-//                    });
+                    mainView.viewBasket.orderBtn.set("style","display: inline");
                     mainView.viewBasket.list = new roundRectList({id: "basket_view"});
                     mainView.viewBasket.addChild(mainView.viewBasket.list);
                     mainView.viewBasket.orderBtn.set("clickable", true);
@@ -357,13 +349,10 @@
 
                 mainView.setEmptyBasketContent = function () {
                     if (mainView.viewBasket.list) mainView.viewBasket.list.destroy();
-//                    mainView.viewBasket.orderBtn.set("onClick", function () {
-//                        //do nothing
-//                    });
+                    mainView.viewBasket.orderBtn.set("style","display: none");
+
                     if (!mainView.viewBasket.divEmptyBasketContent) {
-
                         mainView.viewBasket.divEmptyBasketContent = document.createElement('div');
-
                         var divEmptyBasketText = document.createElement("div");
                         var divEmptyBasketImg = document.createElement("div");
                         var emptyBasketImg = document.createElement('img');

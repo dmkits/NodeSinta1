@@ -236,3 +236,23 @@ module.exports.deleteItemFromOrder = function (ChID,ProdID,posID, callback) {
             }
         });
 };
+
+
+module.exports.setConfirmedOrderInfo = function (ChID, name, tel, email, callback) {
+    var textInfo = "name:"+ name+",tel:"+tel+",email:"+email;
+    var reqSql = new sql.Request(conn);
+    var query_str = fs.readFileSync('./scripts/mobile_confirmed_order_info.sql', 'utf8');
+
+    reqSql.input('ChID',sql.Int, ChID);
+    reqSql.input('OrderInfo',sql.NVarChar, textInfo);
+
+    reqSql.query(query_str,
+        function (err,recordset) {
+            if (err) {
+                callback(err, null);
+            }
+            else {
+                callback(null, recordset);
+            }
+        });
+};
