@@ -60,7 +60,7 @@ define("dojox/mobile/Icon", [
 		constructor: function(/*Object?*/args, /*DomNode?*/node){
 			// summary:
 			//		Creates a new instance of the class.
-			// config_name:
+			// args:
 			//		Contains properties to be set.
 			// node:
 			//		The DOM node. If none is specified, it is automatically created. 

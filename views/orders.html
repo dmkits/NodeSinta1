@@ -57,6 +57,20 @@
                     document.getElementById('body').appendChild(mainView.prog.domNode);
                     mainView.prog.startup();
                 };
+                mainView.setTestModeBtnIn = function (view) {
+                    if (!mainView.testMode) return;
+                    if (view.test_btn) return;
+                    view.test_btn = new ToolBarButton({
+                        icon: "/icons/exclamation-mark29x29.ico",
+                        iconPos: "0,0,29,29",
+                        style: "float:right",
+                        onClick: function () {
+                            mainView.msgBox.innerHTML = mainView.testMode;
+                            mainView.dialogWin.show();
+                        }
+                    });
+                    view.headingTop.addChild(view.test_btn);
+                };
                 mainView.setBtnEmblemIn = function (view) {
                     if (!view.btnEmblem) {
                         view.btnEmblem = new ToolBarButton({
@@ -89,7 +103,6 @@
                     view.headingBottom.startup();
                     view.btnBasket.startup();
                 };
-
                 mainView.createDialogWindow = function () {
                     if (!mainView.dialogWin) {
                         mainView.dialogWin = new SimpleDialog({
@@ -113,20 +126,6 @@
                             });
                     mainView.cancelBtn.placeAt(mainView.dialogWin.domNode);
                 };
-                mainView.setTestModeBtnIn = function (view) {
-                    if (!mainView.testMode) return;
-                    if (view.test_btn) return;
-                    view.test_btn = new ToolBarButton({
-                        icon: "/icons/exclamation-mark29x29.ico",
-                        iconPos: "0,0,29,29",
-                        style: "float:right",
-                        onClick: function () {
-                            mainView.msgBox.innerHTML = mainView.testMode;
-                            mainView.dialogWin.show();
-                        }
-                    });
-                    view.headingTop.addChild(view.test_btn);
-                };
 
                 mainView.setBtnEmblemIn(mainView);
                 mainView.setBtnBasketIn(mainView);
@@ -137,17 +136,10 @@
                     if (!mainView.viewBasket) {
                         mainView.viewBasket = new ScrollableView({id: "view_basket"});
                         mainView.viewBasket.headingTop = new Heading({
-                            label: "Корзина",
-                            fixed: "top",
-                            back: "Назад",
-                            transition: "none"
-                        });
+                            label: "Корзина", fixed: "top", back: "Назад", transition: "none"});
                         var headingBottomBasket = new Heading({fixed: "bottom"});
                         mainView.viewBasket.orderBtn = new ToolBarButton({
-                            moveTo: "place_order_view",
-                            transition: "none",
-                            label: "Оформить заказ",
-                            style: "float:right",
+                            moveTo: "place_order_view",transition: "none", label: "Оформить заказ", style: "float:right",
                             onClick: function () {
                                 var order_id=mainView.getCookie("order_id");
                                 if(!order_id){
@@ -159,7 +151,6 @@
                                 mainView.buildUpPlaceOrderView();
                             }
                         });
-
                         document.getElementById('body').appendChild(mainView.viewBasket.domNode);
                         mainView.viewBasket.domNode.appendChild(mainView.viewBasket.headingTop.domNode);
                         mainView.viewBasket.domNode.appendChild(headingBottomBasket.domNode);
@@ -171,6 +162,7 @@
                     mainView.viewBasket.headingTop.set("moveTo", btnBasket.previousView.id);
                     mainView.loadBasketViewContent();
                 };
+
                 mainView.getCookie=function(name) {
                     var value = "; " + document.cookie;
                     var parts = value.split("; " + name + "=");
@@ -181,30 +173,20 @@
                     if (!mainView.PlaceOrderView) {
                         mainView.PlaceOrderView = new ScrollableView({id: "place_order_view"});
                         document.getElementById("body").appendChild(mainView.PlaceOrderView.domNode);
-
-                        mainView.PlaceOrderView.headingTop = new Heading({
-                            label: "Оформление заказа",
-                            fixed: "top",
-                            back: "Назад",
-                            moveTo: mainView.viewBasket.id,
-                            transition: "none"
+                        mainView.PlaceOrderView.headingTop = new Heading({label: "Оформление заказа", fixed: "top",
+                            back: "Назад", moveTo: mainView.viewBasket.id, transition: "none"
                         });
-
                         mainView.PlaceOrderView.headingBottom = new Heading({fixed: "bottom"});
-                        var sendOrderBtn=new ToolBarButton({
-                            label:"Отправить",
-                            style: "float:right",
+                        var sendOrderBtn=new ToolBarButton({label:"Отправить", style: "float:right",
                             onClick: function(){mainView.setOrder()}
-
                         });
                         mainView.PlaceOrderView.headingBottom.addChild(sendOrderBtn);
-
                         mainView.PlaceOrderView.domNode.appendChild(mainView.PlaceOrderView.headingTop.domNode);
                         mainView.PlaceOrderView.domNode.appendChild(mainView.PlaceOrderView.headingBottom.domNode);
                         mainView.setBtnEmblemIn(mainView.PlaceOrderView);
                         mainView.setTestModeBtnIn(mainView.PlaceOrderView);
+                        mainView.PlaceOrderView.headingBottom.startup();
                         mainView.PlaceOrderView.startup();
-
                         var table = document.createElement('table');
                         var tr1 = document.createElement('tr');
                         var td11 = document.createElement('td');
@@ -212,14 +194,12 @@
                         tr1.appendChild(td11);
                         tr1.appendChild(td12);
                         table.appendChild(tr1);
-
                         var tr2 = document.createElement('tr');
                         var td21 = document.createElement('td');
                         var td22 = document.createElement('td');
                         tr2.appendChild(td21);
                         tr2.appendChild(td22);
                         table.appendChild(tr2);
-
                         var tr3 = document.createElement('tr');
                         var td31 = document.createElement('td');
                         var td32 = document.createElement('td');
@@ -227,19 +207,15 @@
                         tr3.appendChild(td32);
                         table.appendChild(tr3);
                         mainView.PlaceOrderView.domNode.appendChild(table);
-
                         td11.innerText = "Имя:";
                         td21.innerText = "Телефон:";
                         td31.innerText = "Email:";
-
                         mainView.PlaceOrderView.nameTextBox = new TextBox({type:"text"});
                         mainView.PlaceOrderView.telTextBox = new TextBox({type:"tel"});
                         mainView.PlaceOrderView.emailTextBox = new TextBox({type:"email"});
-
                         td12.appendChild(mainView.PlaceOrderView.nameTextBox.domNode);
                         td22.appendChild(mainView.PlaceOrderView.telTextBox.domNode);
                         td32.appendChild(mainView.PlaceOrderView.emailTextBox.domNode);
-
                         mainView.PlaceOrderView.nameTextBox.startup();
                         mainView.PlaceOrderView.telTextBox.startup();
                         mainView.PlaceOrderView.emailTextBox.startup();
@@ -266,7 +242,6 @@
                         mainView.dialogWin.show();
                         return;
                     }
-
                     Request.postJSONData({
                                 url: "/mobile/orders_set_order",
                                 data: {name: name, tel: tel, email:email}, consoleLog: true
@@ -358,7 +333,6 @@
                         var emptyBasketImg = document.createElement('img');
                         divEmptyBasketImg.appendChild(emptyBasketImg);
                         mainView.viewBasket.domNode.appendChild(mainView.viewBasket.divEmptyBasketContent);
-                        //mainView.viewBasket.domNode.appendChild(divEmptyBasketImg);
                         divEmptyBasketText.innerText = "Ваша корзина пуста";
                         divEmptyBasketText.setAttribute("id", "div_empty_basket_text");
                         divEmptyBasketImg.setAttribute("id", "div_empty_basket_img");
@@ -405,8 +379,7 @@
 
                 mainView.loadMainViewHeaderInfo = function () {
                     Request.getJSONData({url: "/mobile/get_orders_main_info", consoleLog: true},
-                            function (success, result) {
-                                console.log("loadMainViewHeaderInfo result=", result);
+                            function (success, result) {                                                                console.log("loadMainViewHeaderInfo result=", result);
                                 if (success) {
                                     if (result.error) {
                                         mainView.msgBox.innerHTML = "Нет данных";
@@ -421,7 +394,6 @@
                 };
 
                 mainView.setMainViewHeaderInfo = function (maindata) {
-                    //  mainView.startup();
                     mainView.startup();
 
                     if (maindata.mode && maindata.mode.toString().toLowerCase().indexOf("test") !== -1) {
@@ -444,13 +416,11 @@
                                 consoleLog: true
                             }
                             , function (success, result) {
-                                if (success) {
-                                    console.log("mainView.loadMainViewContent getJSONData result=", result);
+                                if (success) {                                                                          console.log("mainView.loadMainViewContent getJSONData result=", result);
                                     var data = [];
                                     if (result.items) data = result.items;
                                     if (result.error) {
-                                        mainView.msgBox.innerHTML = "Нет данных";
-                                        console.log("mainView.loadMainViewContent getJSONData DATA ERROR! error=", result.error);
+                                        mainView.msgBox.innerHTML = "Нет данных";                                       console.log("mainView.loadMainViewContent getJSONData DATA ERROR! error=", result.error);
                                         mainView.dialogWin.show();
                                     }
                                     mainView.setMainViewContent(data);
@@ -495,14 +465,11 @@
                                     });
 
                                     mainView.oneBrandView.headingBottom = new Heading({fixed: "bottom"});
-                                    // mainView.oneBrandView.domNode.appendChild(mainView.oneBrandView.firstHeading.domNode);
                                     mainView.oneBrandView.domNode.appendChild(mainView.oneBrandView.headingTop.domNode);
                                     mainView.oneBrandView.domNode.appendChild(mainView.oneBrandView.headingBottom.domNode);
                                     mainView.setBtnEmblemIn(mainView.oneBrandView);
                                     mainView.setTestModeBtnIn(mainView.oneBrandView);
                                     mainView.setBtnBasketIn(mainView.oneBrandView);
-                                    //  mainView.oneBrandView.firstHeading.startup();
-                                    //mainView.oneBrandView.headingTop.startup();
                                     mainView.oneBrandView.startup();
                                 }
                                 if (mainView.oneBrandView.product_list) mainView.oneBrandView.product_list.destroy();
@@ -514,9 +481,6 @@
                         }
                     }
                 };
-//                    mainView.onBeforeTransitionIn = function () {
-//                        mainView.loadMainViewContent();
-//                    };
 
                 mainView.loadOneBrandViewContent = function (catid, heading) {
                     Request.getJSONData({
@@ -525,13 +489,11 @@
                                 consoleLog: true
                             }
                             , function (success, result) {
-                                if (success) {
-                                    console.log("mainView.loadOneBrandViewContent getJSONData result=", result);
+                                if (success) {                                                                          console.log("mainView.loadOneBrandViewContent getJSONData result=", result);
                                     var data = [];
                                     if (result.items) data = result.items;
                                     if (result.error) {
-                                        mainView.msgBox.innerHTML = "Нет данных";
-                                        console.log("mainView.loadOneBrandViewContent getJSONData DATA ERROR! error=", result.error);
+                                        mainView.msgBox.innerHTML = "Нет данных";                                       console.log("mainView.loadOneBrandViewContent getJSONData DATA ERROR! error=", result.error);
                                         mainView.dialogWin.show();
                                     }
                                     mainView.setOneBrandViewContent(data, heading);
@@ -558,9 +520,11 @@
                     mainView.oneBrandView.headingTop.addChild(mainView.oneBrandView.pane);
                     mainView.oneBrandView.pane.domNode.appendChild(mainView.oneBrandView.marquee);
                 };
+
                 window.onresize = function () {
                     mainView.setMarqueeLabel();
                 };
+
                 mainView.setOneBrandViewContent = function (data, heading) {
                     mainView.oneBrandView.heading = heading;
                     mainView.setMarqueeLabel();
@@ -570,7 +534,6 @@
                         mainView.oneBrandView.scrollTo({x: 0, y: 0});
                     };
                     mainView.oneBrandView.onBeforeTransitionIn = function () {
-                        //  mainView.oneBrandView.heading = heading;
                         mainView.setMarqueeLabel();
                     };
                     mainView.oneBrandView.product_list = new roundRectList({id: "product_list_d1"});
@@ -655,7 +618,6 @@
                     if (mainView.productInBasketView.tdUm.innerText)mainView.productInBasketView.tdUm.innerText = "Ед.изм: ";
                     mainView.productInBasketViewBtn.onClick = function () {
                         mainView.deleteFromBasket(prodId, posId);
-                        //  mainView.startProgressIndicator();
                         mainView.loadBasketViewContent();
                     };
 
@@ -668,7 +630,6 @@
                                 data: {prodId: prodId, posId: posId}, consoleLog: true
                             },
                             function (success, data) {
-                                console.log("data 544", data);
                                 if (!success) {
                                     mainView.msgBox.innerHTML = "Нет связи с сервером";
                                     mainView.dialogWin.show();
@@ -712,8 +673,7 @@
                         if (success) {
                             var data = [];
                             if (result.error) {
-                                mainView.msgBox.innerHTML = "Нет данных";
-                                console.log("mainView.loadProductViewContent getJSONData DATA ERROR! error=", result.error);
+                                mainView.msgBox.innerHTML = "Нет данных";                                               console.log("mainView.loadProductViewContent getJSONData DATA ERROR! error=", result.error);
                                 mainView.dialogWin.show();
                             }
                         } else {//error!!!
@@ -724,11 +684,13 @@
                         if (mainView.prog) mainView.prog.stop();
                     });
                 };
+
                 mainView.fillUpProductDescription = function (view, data) {
                     view.Name.innerText = '' + data.prodName;
                     view.tdPrice.innerText = "Цена: " + data.price;
                     view.tdUm.innerText = "Ед.изм: " + data.um;
                 };
+
                 mainView.loadMainViewHeaderInfo();
             });
 </script>

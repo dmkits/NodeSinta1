@@ -279,37 +279,35 @@ app.get("/mobile/get_orders_main_info", function(req, res){
 
 app.post("/mobile/orders_add_to_basket", function (req, res) {
     var prodID=req.body.prodId;
-    if (req.cookies.order_id) {                                                                                         console.log("req.cookies.order_id=",req.cookies.order_id);
+    if (req.cookies.order_id) {
         database.checkOrderByID(req.cookies.order_id, function (err, res) {
-            if (err){
-                console.log(err);
+            if (err){  console.log(err);
                 return;
             }
             if (res.ChID) {
                 database.addItemToOrder(res.ChID, prodID, function (err, res) {
                     if(err) console.log("291 app.js err", err);
                 });
-            }else     console.log("Заказа нет в БД");
+            } console.log("Заказа нет в БД");
         });
     } else {
         var uID = uuidV1();
         database.createNewOrder(uID, function (err, res) {
-            if (err)      console.log(err);
-            else {                                                                                                        console.log("Заказ добавлен в БД");
+            if (err) console.log(err);
+            else {
                 database.checkOrderByID(uID, function (err, res) {
-                    if (err){
-                        console.log(err);
+                    if (err){console.log(err);
                         return;
                     }
                     if (res.ChID) {
                         database.addItemToOrder(res.ChID, prodID, function (err, res) {
-                            if(err) console.log("291 app.js err", err);
+                            if(err)  console.log("291 app.js err", err);
                         });
-                    }else     console.log("Заказа нет в БД");
+                    }else   console.log("Заказа нет в БД");
                 });
             }
         });
-        res.cookie('order_id', uID, {maxAge: 20* 60000/*, httpOnly: true*/});                                 //20* 60000
+        res.cookie('order_id', uID, {maxAge: 24*60* 60000});
     }
     res.send({ok: ""});
 });
@@ -322,14 +320,14 @@ app.get("/mobile/get_basket_content", function (req, res) {
         return;
     }
     database.getBasketItems(req.cookies.order_id, function (err, recordset) {
-        if (err)   console.log(err);
+        if (err)  console.log(err);
         outData=recordset;
         res.send(outData);
     });
 });
 
 app.post("/mobile/orders_delete_from_basket", function (req, res) {
-    var outData = {};                                                            console.log("req.cookies.order_id 333", req.cookies.order_id);
+    var outData = {};
     if (!req.cookies.order_id) {
         outData.empty="empty";
         res.send(outData);

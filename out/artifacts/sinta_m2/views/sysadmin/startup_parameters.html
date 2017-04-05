@@ -24,20 +24,40 @@
             <td height="1px">
                 <table width="500px">
                     <tr>
-                        <td><label for="host">db.Host </label></td>
-                        <td><input id="host" type="text" aria-disabled="false"/></td>
+                        <td><label for="db.server">db.server </label></td>
+                        <td><input id="db.server" type="text" aria-disabled="false"/></td>
                     </tr>
                     <tr>
-                        <td><label for="database">db.Name </label></td>
-                        <td><input id="database" type="text" aria-disabled="false"/></td>
+                        <td><label for="db.port">db.port </label></td>
+                        <td><input id="db.port" type="text" aria-disabled="false"/></td>
                     </tr>
                     <tr>
-                        <td><label for="user">db.user </label></td>
-                        <td><input id="user" type="text" aria-disabled="false"/></td>
+                        <td><label for="db.name">db.name </label></td>
+                        <td><input id="db.name" type="text" aria-disabled="false"/></td>
                     </tr>
                     <tr>
-                        <td><label for="password">db.password </label></td>
+                        <td><label for="db.user">db.user </label></td>
+                        <td><input id="db.user" type="text" aria-disabled="false"/></td>
+                    </tr>
+                    <tr>
+                        <td><label for="db.password">db.password </label></td>
+                        <td><input id="db.password" type="text" aria-disabled="false"/></td>
+                    </tr>
+                    <tr>
+                        <td><label for="control.url">control.url </label></td>
+                        <td><input id="control.url" type="text" aria-disabled="false"/></td>
+                    </tr>
+                    <tr>
+                        <td><label for="order.url">order.url</label></td>
+                        <td><input id="order.url" type="text" aria-disabled="false"/></td>
+                    </tr>
+                    <tr>
+                        <td><label for="password">app.password</label></td>
                         <td><input id="password" type="text" aria-disabled="false"/></td>
+                    </tr>
+                    <tr>
+                        <td><label for="main_heading">main heading</label></td>
+                        <td><input id="main_heading" type="text" aria-disabled="false"/></td>
                     </tr>
                 </table>
             </td>
@@ -63,10 +83,16 @@
             function (APP, BorderContainer, LayoutContainer, ContentPane, ItemFileReadStore, TextBox, DateTextBox, Button, Request) {
                 var sa_startup_params_PageContent = APP.initElem("sa_startup_params_PageContent", ContentPane, {});
 
-                var hostInput=new TextBox({id:"host"},"host");
-                var databaseInput=new TextBox({id:"database"},"database");
-                var userInput=new TextBox({id:"user"},"user");
-                var passwordInput=new TextBox({id:"password"},"password");
+                var serverInput=new TextBox({id:"db.server"},"db.server");
+                var portInput=new TextBox({id:"db.port"},"db.port");
+                var databaseInput=new TextBox({id:"db.name"},"db.name");
+                var userInput=new TextBox({id:"db.user"},"db.user");
+                var dbPasswordInput=new TextBox({id:"db.password"},"db.password");
+                var controlUrlInput=new TextBox({id:"control.url"},"control.url");
+                var orderUrlInput=new TextBox({id:"order.url"},"order.url");
+                var passwordInput = new TextBox({id:"password"},"password");
+                var mainHeadingInput = new TextBox({id:"main_heading"},"main_heading");
+
                 var sa_startup_params_appLocalConfig = document.getElementById("sa_startup_params_appLocalConfig");
                 var reloadBtn = new Button({id: "SA_startup_params_BtnAppLocalConfigLoad"}, "SA_startup_params_BtnAppLocalConfigLoad");
                 var saveAndReconnectBtn = new Button({id: "SA_startup_params_BtnAppLocalConfigSaveAndReconnect"}, "SA_startup_params_BtnAppLocalConfigSaveAndReconnect");
@@ -89,7 +115,7 @@
                 reloadBtn.onClick= function() {
                     sa_startup_params_appLocalConfig.innerHTML = "<div><b>Loading configuration parameters...</b></div>";
                     Request.getJSONData({url: "/sysadmin/startup_parameters/load_app_config", consoleLog: true},
-                            function (success, result) {
+                            function (success, result) {                                console.log("result", result);
                                 if (!success) {
                                     sa_startup_params_appLocalConfig.innerHTML = "<div><b style='color:red'>No connection to the server!</b></div>";
                                     return;
@@ -105,20 +131,34 @@
                     );
                 };
                 function setDBConfigContent(DBConfigData) {
-                    hostInput.set("value",DBConfigData.host );
-                    databaseInput.set("value",DBConfigData.database );
-                    userInput.set("value",DBConfigData.user );
-                    passwordInput.set("value",DBConfigData.password );
+                    serverInput.set("value",DBConfigData["server"]);
+                    if(DBConfigData["port"]) portInput.set("value",DBConfigData["port"]);
+                    else portInput.set("value","1433");
+                    databaseInput.set("value",DBConfigData["database"] );
+                    userInput.set("value",DBConfigData["user"]);
+                    dbPasswordInput.set("value",DBConfigData["password"]);
+                    if(DBConfigData['control.url']) controlUrlInput.set("value", DBConfigData['control.url']);
+                    else controlUrlInput.set("value","/control");
+                    if(DBConfigData["order.url"]) orderUrlInput.set("value", DBConfigData["order.url"]);
+                    else orderUrlInput.set("value","/");
+                    if(DBConfigData["app.password"]) passwordInput.set("value", DBConfigData["app.password"]);
+                    mainHeadingInput.set("value",DBConfigData["main.heading"]);
                 }
 
                 saveAndReconnectBtn.onClick = function () {                                                             console.log("saveAndReconnectBtn.onClick");
                     var sa_startup_params_appLocalConfig = document.getElementById("sa_startup_params_appLocalConfig");
                     sa_startup_params_appLocalConfig.innerHTML = "<div><b>Configuration saving and reconnected to database...</b></div>";
                     var newDBConfig={
-                        host: hostInput.get('value'),
-                        database: databaseInput.get('value'),
-                        user: userInput.get('value'),
-                        password: passwordInput.get('value')
+                        "server": serverInput.get('value'),
+                        "port": portInput.get('value'),
+                        "database": databaseInput.get('value'),
+                        "user": userInput.get('value'),
+                        "password": dbPasswordInput.get('value'),
+                        "control.url": controlUrlInput.get('value'),
+                        "order.url": orderUrlInput.get('value'),
+                        "app.password": passwordInput.get('value'),
+                        "main.heading":mainHeadingInput.get("value")
+
                     };
                     Request.postJSONData({url:  "/sysadmin/startup_parameters/store_app_config_and_reconnect", data: newDBConfig, consoleLog: true},
                             function (success, data) {
