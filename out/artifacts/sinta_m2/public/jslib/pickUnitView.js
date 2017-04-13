@@ -5,7 +5,7 @@ define(["dojo/_base/declare","dojox/mobile/View","dojox/mobile/Heading", "dojox/
         "dojox/mobile/ToolBarButton"],
     function(declare, View, Heading, RoundRectList, ToggleButton,ListItem, ToolBarButton){
         return declare("PickUnitView", [View], {
-
+            heading:null,
             constructor: function (args, parentName) {
                 declare.safeMixin(this, args);
             },

@@ -9,7 +9,7 @@ module.exports.startupMode = startupMode;
 var fs = require('fs');
 var express = require('express');
 var app = express();
-var port=8181;
+var port=8081;
 var path=require ('path');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
@@ -91,7 +91,7 @@ app.get("/mobile/get_units", function(req, res){
             var app_params = process.argv.slice(2);
             if(app_params.length===0) outData.mode='production';
             else outData.mode=app_params[0];
-            outData.head="Магазины";
+            outData.head="Показатели";
             outData.units = recordset;
             res.send(outData);
         });
@@ -288,7 +288,7 @@ app.post("/mobile/orders_add_to_basket", function (req, res) {
                 database.addItemToOrder(res.ChID, prodID, function (err, res) {
                     if(err) console.log("291 app.js err", err);
                 });
-            } console.log("Заказа нет в БД");
+            }else console.log("Заказа нет в БД");
         });
     } else {
         var uID = uuidV1();

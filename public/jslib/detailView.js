@@ -14,6 +14,7 @@ define(["dojo/_base/declare", "dojox/mobile/View", "dojox/mobile/Heading", "dojo
             unit_id: null,
             pickUnitView: null,
             detail_id:null,
+            top_heading:null,
             constructor: function (args, parentName) {
                 declare.safeMixin(this, args);
             },
@@ -36,18 +37,11 @@ define(["dojo/_base/declare", "dojox/mobile/View", "dojox/mobile/Heading", "dojo
                 var instance = this;
                 if (!this.pickUnitBtnHeading) {
                     this.pickUnitBtnHeading = new Heading();
-                    var icon_btn = new ToolBarButton({
-                        preventTouch: true,
-                        clickable: false,
-                        icon: "/icons/hearts29x29.ico",
-                        iconPos: "0,0,29,29"
-                    });
-                    this.pickUnitBtnHeading.addChild(icon_btn);
                     this.addChild(this.pickUnitBtnHeading, 1);
                     this.pickUnitBtnHeading.startup();
                 }
                 if (!this.pickUnitBtn) {
-                    var v = window.innerWidth - 90;
+                    var v = window.innerWidth - 34;
                     this.pickUnitBtn = new ToolBarButton({
                         style: "width:" + v + "px; font-size:14px; align: center",
                         transition: "none",
@@ -74,10 +68,10 @@ define(["dojo/_base/declare", "dojox/mobile/View", "dojox/mobile/Heading", "dojo
                     }
                 }
                 this.pickUnitBtnHeading.addChild(this.pickUnitBtn);
-
-                window.onresize = function () {
+                window.addEventListener("resize", function() {
+                    v = window.innerWidth - 34;
                     instance.pickUnitBtn.set("style", "width:" + v + "px; font-size:14px; align: center");
-                };
+                }, false);
             },
             setDetailContent: function (data) {
                 this.list_items = new RoundRectList({"id": "list" + this.id, style: "position:relative"});

@@ -1,0 +1,46 @@
+.claro table.dijitCalendarContainer {
+    margin: 25px auto;
+}
+
+.mblTooltipBubble {
+    overflow: visible;
+    padding: 3px;
+. mblTooltipBubble-styles;
+}
+
+#date_picker {
+    text-align: center;
+    position: relative;
+    font-size: 1.5em;
+    font-weight: lighter;
+}
+
+#view_main_detail_btn {
+
+    /*display: inline-block;*/
+    /*position: relative;*/
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+    padding-bottom: 10px;
+    margin-bottom: 5px;
+    height: 29px;
+    line-height: 29px;
+    text-align: center;
+    font-family: Helvetica;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 1);
+    font-size: 13px;
+    font-weight: bold;
+    vertical-align: middle;
+    /*float:right;*/
+
+    border-width: 1px;
+    border-style: solid;
+    border-color: #2f3740 #405a7e #375073 #3a4755;
+    -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.305);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.305);
+
+    color: #ffffff;
+    background-color: #5877a2;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#222222), to(#4a6c9b), color-stop(0.02, #8ea4c1), color-stop(0.5, #5877a2), color-stop(0.5, #476999));
+    background-image: linear-gradient(to bottom, #222222 0%, #8ea4c1 2%, #5877a2 50%, #476999 50%, #4a6c9b 100%);
+}

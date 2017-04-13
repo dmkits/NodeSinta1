@@ -9,7 +9,7 @@ module.exports.startupMode = startupMode;
 var fs = require('fs');
 var express = require('express');
 var app = express();
-var port=8181;
+var port=8081;
 var path=require ('path');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
@@ -91,7 +91,7 @@ app.get("/mobile/get_units", function(req, res){
             var app_params = process.argv.slice(2);
             if(app_params.length===0) outData.mode='production';
             else outData.mode=app_params[0];
-            outData.head="Магазины";
+            outData.head="Показатели";
             outData.units = recordset;
             res.send(outData);
         });
@@ -279,37 +279,35 @@ app.get("/mobile/get_orders_main_info", function(req, res){
 
 app.post("/mobile/orders_add_to_basket", function (req, res) {
     var prodID=req.body.prodId;
-    if (req.cookies.order_id) {                                                                                         console.log("req.cookies.order_id=",req.cookies.order_id);
+    if (req.cookies.order_id) {
         database.checkOrderByID(req.cookies.order_id, function (err, res) {
-            if (err){
-                console.log(err);
+            if (err){  console.log(err);
                 return;
             }
             if (res.ChID) {
                 database.addItemToOrder(res.ChID, prodID, function (err, res) {
                     if(err) console.log("291 app.js err", err);
                 });
-            }else     console.log("Заказа нет в БД");
+            }else console.log("Заказа нет в БД");
         });
     } else {
         var uID = uuidV1();
         database.createNewOrder(uID, function (err, res) {
-            if (err)      console.log(err);
-            else {                                                                                                        console.log("Заказ добавлен в БД");
+            if (err) console.log(err);
+            else {
                 database.checkOrderByID(uID, function (err, res) {
-                    if (err){
-                        console.log(err);
+                    if (err){console.log(err);
                         return;
                     }
                     if (res.ChID) {
                         database.addItemToOrder(res.ChID, prodID, function (err, res) {
-                            if(err) console.log("291 app.js err", err);
+                            if(err)  console.log("291 app.js err", err);
                         });
-                    }else     console.log("Заказа нет в БД");
+                    }else   console.log("Заказа нет в БД");
                 });
             }
         });
-        res.cookie('order_id', uID, {maxAge: 20* 60000});                                 //20* 60000
+        res.cookie('order_id', uID, {maxAge: 24*60* 60000});
     }
     res.send({ok: ""});
 });
@@ -322,7 +320,7 @@ app.get("/mobile/get_basket_content", function (req, res) {
         return;
     }
     database.getBasketItems(req.cookies.order_id, function (err, recordset) {
-        if (err)   console.log(err);
+        if (err)  console.log(err);
         outData=recordset;
         res.send(outData);
     });

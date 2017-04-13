@@ -2,7 +2,7 @@
 define(["dojo/_base/declare", "dojox/mobile/View","dojox/mobile/Heading", "dojox/mobile/ToolBarButton", "dijit/CalendarLite"],
     function(declare, View, Heading, ToolBarButton, CalendarLite) {
         return declare("CalendarView", [View], {
-
+            heading:null,
             constructor: function(args,parentName){
                 declare.safeMixin(this,args);
             },
@@ -10,12 +10,12 @@ define(["dojo/_base/declare", "dojox/mobile/View","dojox/mobile/Heading", "dojox
                 this.hide();
                 document.getElementById("body").appendChild(this.domNode);
 
-                this.calendar_heading = new Heading({
+                this.heading = new Heading({
                     transition: "none",
-                    id: "calendar_heading",
+                    id: "heading",
                     back: "Назад"
                 });
-                this.addChild(this.calendar_heading);
+                this.addChild(this.heading);
 
                 this.date_picker = new CalendarLite({lang: 'ru',id: "date_picker"});
                 this.addChild(this.date_picker);
@@ -31,7 +31,7 @@ define(["dojo/_base/declare", "dojox/mobile/View","dojox/mobile/Heading", "dojox
                 this.startup();
             },
             setContent: function(parentView, parentDateButton){
-                this.calendar_heading.set("moveTo", parentView.id);
+                this.heading.set("moveTo", parentView.id);
                 this.date_picker.set("value", parentDateButton.dateValue);
                 this.accept_btn.set("moveTo", parentView.id);
                 var instance= this;
